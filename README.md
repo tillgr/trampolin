@@ -1,5 +1,5 @@
 Trampolin - Sportdatenanalyse
 
-Ordern Aufbau 
+Ordner Aufbau 
 - Spungdaten Innotramp  	-> Orginal Daten
 - Spungdaten_integrated 	-> Aufbereitete Daten
