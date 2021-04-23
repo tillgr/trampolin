@@ -94,7 +94,7 @@ def main():
 
             all_data = all_data.append(temp_data, ignore_index=True)
 
-    all_data.to_csv('all_data.csv', index=False)
+    all_data.to_csv('Sprungdaten_processed/all_data.csv', index=False)
 
     return
 
