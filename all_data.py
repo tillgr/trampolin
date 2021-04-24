@@ -41,7 +41,7 @@ def convert_comma_to_dot(x):
 def main():
 
     all_data = pd.DataFrame(columns=['Time', 'TimeInJump', 'ACC_N', 'ACC_N_ROT_filtered', 'Acc_x_Fil', 'Acc_y_Fil', 'Acc_z_Fil',
-                                     'Gyro_x_Fil', 'Gyro_y_Fil', 'Gyro_z_Fil,', 'SprungID', 'Sprungtyp',
+                                     'Gyro_x_Fil', 'Gyro_y_Fil', 'Gyro_z_Fil', 'SprungID', 'Sprungtyp',
                                      'DJump_SIG_I_x LapEnd', 'DJump_SIG_I_y LapEnd', 'DJump_SIG_I_z LapEnd',
                                      'DJump_Abs_I_x LapEnd', 'DJump_Abs_I_y LapEnd', 'DJump_Abs_I_z LapEnd'])
 
