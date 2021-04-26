@@ -48,12 +48,9 @@ def main():
     folders = os.listdir('Sprungdaten Innotramp')
     for folder in folders:
         files = os.listdir("Sprungdaten Innotramp/" + folder)
-        for i in range(len(files[:int(len(files) / 2)])):
+        for i in range(len(files[:int(len(files) / 2)])):           # we can read the corresponding sprungzuordnung and rohdaten this way
             temp_data = pd.DataFrame(columns=['Time', 'TimeInJump', 'ACC_N', 'ACC_N_ROT_filtered', 'Acc_x_Fil', 'Acc_y_Fil', 'Acc_z_Fil',
                          'Gyro_x_Fil', 'Gyro_y_Fil', 'Gyro_z_Fil'])
-                        #, 'SprungID', 'Sprungtyp',
-                         #'DJump_SIG_I_x LapEnd', 'DJump_SIG_I_y LapEnd', 'DJump_SIG_I_z LapEnd',
-                         #'DJump_Abs_I_x LapEnd', 'DJump_Abs_I_y LapEnd', 'DJump_Abs_I_z LapEnd'])
 
             csv_data = read_csv_data("Sprungdaten Innotramp/" + folder + "/" + files[i])
             xlsx_data = read_xlsx_data("Sprungdaten Innotramp/" + folder + "/" + files[i + int(len(files) / 2)])
@@ -63,7 +60,7 @@ def main():
 
             temp_data = temp_data.append(csv_data.drop(['Dist'], axis=1))
 
-            cumultime = np.cumsum(xlsx_data['Zeit'].to_numpy(), dtype=float)
+            cumultime = np.cumsum(xlsx_data['Zeit'].to_numpy(), dtype=float)        # cumultative sum to make the time equal to the rohdaten
             xlsx_data['cumultime'] = cumultime
 
             start_time = csv_data['Time'][0]
@@ -75,12 +72,12 @@ def main():
             for row in xlsx_data.iterrows():
 
                 end_time = row[1]['cumultime']
-                join_times = np.arange(start_time, end_time, 0.002)
-                SprungID = row[1]['Messung'] + "-" + str(row[1]['Lap#'])
+                join_times = np.arange(start_time, end_time, 0.002)                 # creates all times with 0.002 steps from start to end
+                SprungID = row[1]['Messung'] + "-" + str(row[1]['Lap#'])            # create an unique ID for each jump
 
                 multiply_array = np.array([SprungID, row[1]['Sprungtyp'], row[1]['DJump_SIG_I_x LapEnd'], row[1]['DJump_SIG_I_y LapEnd'], row[1]['DJump_SIG_I_z LapEnd'],
                                            row[1]['DJump_Abs_I_x LapEnd'], row[1]['DJump_Abs_I_y LapEnd'], row[1]['DJump_Abs_I_z LapEnd']])
-                multiply_array = np.transpose(np.repeat(multiply_array.reshape(8, 1), len(join_times), axis=1))
+                multiply_array = np.transpose(np.repeat(multiply_array.reshape(8, 1), len(join_times), axis=1))         # this array will be multiplied when joined with the rohdaten
 
                 temp_sprungzuordnung = pd.DataFrame(multiply_array, columns=['SprungID', 'Sprungtyp', 'DJump_SIG_I_x LapEnd', 'DJump_SIG_I_y LapEnd', 'DJump_SIG_I_z LapEnd',
                                                       'DJump_Abs_I_x LapEnd', 'DJump_Abs_I_y LapEnd', 'DJump_Abs_I_z LapEnd'])

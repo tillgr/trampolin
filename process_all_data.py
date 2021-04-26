@@ -11,8 +11,10 @@ def read_all_data():
 
 def sort_out_errors(all_data):
 
+    # delete all the unwanted data
     all_data = all_data.query('Sprungtyp != "Datenfehler" & Sprungtyp != "Fehlerhafte Daten" & Sprungtyp != "Unbekannt" & Sprungtyp != "Einturnen"')
 
+    # delete the nan values
     nan_value = float('NaN')
     all_data['Sprungtyp'].replace("", nan_value, inplace=True)
     all_data.dropna(subset=['Sprungtyp'], inplace=True)
