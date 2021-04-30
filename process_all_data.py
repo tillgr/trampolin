@@ -62,13 +62,16 @@ def correct_space_errors(data):
     data['Sprungtyp'].replace("51°", "Baby- Fliffis C", inplace=True)
     data['Sprungtyp'].replace("3/4 Salto Rw A", "3/4 Salto rw A", inplace=True)
     data['Sprungtyp'].replace("3/4 Salto vW A", "3/4 Salto vw A", inplace=True)
-    data['Sprungtyp'].replace("3/4 Salto Vw A", "3/4 Salto vw A", inplace=True)
+    data['Sprungtyp'].replace("3/4 Salto Vw  A", "3/4 Salto vw A", inplace=True)
     data['Sprungtyp'].replace("30/R", "3/4 Salto vw A", inplace=True)
     data['Sprungtyp'].replace("1 3/4 Salto Vw B", "1 3/4 Salto vw B", inplace=True)
     data['Sprungtyp'].replace("1 3/4 Salto Vw C", "1 3/4 Salto vw C", inplace=True)
     data['Sprungtyp'].replace("Voll ein 1 3/4 Salto Vw C", "Voll- ein 1 3/4 Salto vw C", inplace=True)
     data['Sprungtyp'].replace("801°", "Fliffis aus C", inplace=True)
     data['Sprungtyp'].replace("801<", "Fliffis aus B", inplace=True)
+    data['Sprungtyp'].replace("Schraubensalto ", "Schraubensalto", inplace=True)
+    data['Sprungtyp'].replace("Rudi ", "Rudi", inplace=True)
+    data['Sprungtyp'].replace("Scharubensalto A", "Schraubensalto A", inplace=True)
 
     return data
 
@@ -106,12 +109,12 @@ def main():
     save_as_csv(data_point_jumps, "data_point_jumps.csv")
     """
 
-    """
+    #"""
     data_point_jumps = read_data("data_point_jumps.csv")
     data_point_jumps = correct_space_errors(data_point_jumps)
     print(data_point_jumps['Sprungtyp'].unique())
     save_as_csv(data_point_jumps, "data_point_jumps.csv")
-    """
+    #"""
 
     data_point_jumps = read_data("data_point_jumps.csv")
     marked_jumps = only_marked_jumps(data_point_jumps)
