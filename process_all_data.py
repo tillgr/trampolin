@@ -24,9 +24,10 @@ def sort_out_errors(all_data):
     return all_data
 
 
-def save_as_csv(data, name):
+def save_as_csv(data, name, with_time=True):
 
-    data['Time'] = np.round(data['Time'], 3)
+    if with_time:
+        data['Time'] = np.round(data['Time'], 3)
 
     data.to_csv('Sprungdaten_processed/' + name, index=False)
 
@@ -77,6 +78,7 @@ def correct_space_errors(data):
 
 
 def only_marked_jumps(data):
+    # TODO
 
     data = data.query('Sprungtyp == "Fliffis aus C" or Sprungtyp == "Fliffis aus B" or Sprungtyp == "Fliffis- Rudi C" or Sprungtyp == "Fliffis- Rudi B"'
                       'or Sprungtyp == "Voll- ein- halb- aus C" or Sprungtyp == "Voll- ein- halb- aus B" or Sprungtyp == "Voll- ein- Rudi- aus A"'
@@ -88,6 +90,45 @@ def only_marked_jumps(data):
 
     print(data['Sprungtyp'].unique())
     return data
+
+
+def convert_comma_to_dot(x):
+    return float(x.replace(',', '.'))
+
+
+def calc_avg(data):
+
+    averaged_data = pd.DataFrame(columns=['Sprungtyp', 'SprungID', 'ACC_N', 'ACC_N_ROT_filtered',
+                                          'Acc_x_Fil', 'Acc_y_Fil', 'Acc_z_Fil', 'Gyro_x_Fil', 'Gyro_y_Fil', 'Gyro_z_Fil',
+                                          'DJump_SIG_I_x LapEnd', 'DJump_SIG_I_y LapEnd', 'DJump_SIG_I_z LapEnd',
+                                          'DJump_Abs_I_x LapEnd', 'DJump_Abs_I_y LapEnd', 'DJump_Abs_I_z LapEnd'])
+
+    data['ACC_N'] = data['ACC_N'].apply(convert_comma_to_dot)
+    data['ACC_N_ROT_filtered'] = data['ACC_N_ROT_filtered'].apply(convert_comma_to_dot)
+    data['Acc_x_Fil'] = data['Acc_x_Fil'].apply(convert_comma_to_dot)
+    data['Acc_y_Fil'] = data['Acc_y_Fil'].apply(convert_comma_to_dot)
+    data['Acc_z_Fil'] = data['Acc_z_Fil'].apply(convert_comma_to_dot)
+    data['Gyro_x_Fil'] = data['Gyro_x_Fil'].apply(convert_comma_to_dot)
+    data['Gyro_y_Fil'] = data['Gyro_y_Fil'].apply(convert_comma_to_dot)
+    data['Gyro_z_Fil'] = data['Gyro_z_Fil'].apply(convert_comma_to_dot)
+
+    for id in data['SprungID'].unique():
+
+        subframe = data[data['SprungID'] == id]
+
+        mean = subframe.mean()
+
+        averaged_data = averaged_data.append(mean, ignore_index=True)
+
+        averaged_data['Sprungtyp'].iloc[len(averaged_data) - 1] = subframe['Sprungtyp'].unique()[0]
+        averaged_data['SprungID'].iloc[len(averaged_data) - 1] = subframe['SprungID'].unique()[0]
+
+        print(len(averaged_data) - 1)
+
+    averaged_data = averaged_data.drop(columns=['Time'])
+
+    print(averaged_data)
+    return averaged_data
 
 
 def main():
@@ -109,15 +150,21 @@ def main():
     save_as_csv(data_point_jumps, "data_point_jumps.csv")
     """
 
-    #"""
+    """
     data_point_jumps = read_data("data_point_jumps.csv")
     data_point_jumps = correct_space_errors(data_point_jumps)
     print(data_point_jumps['Sprungtyp'].unique())
     save_as_csv(data_point_jumps, "data_point_jumps.csv")
-    #"""
+    """
 
+    """
     data_point_jumps = read_data("data_point_jumps.csv")
     marked_jumps = only_marked_jumps(data_point_jumps)
+    """
+
+    data_point_jumps = read_data("data_point_jumps.csv")
+    averaged_data = calc_avg(data_point_jumps)
+    save_as_csv(averaged_data, "averaged_data.csv", with_time=False)
 
     return
 
