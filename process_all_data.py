@@ -103,6 +103,9 @@ def calc_avg(data):
                                           'DJump_SIG_I_x LapEnd', 'DJump_SIG_I_y LapEnd', 'DJump_SIG_I_z LapEnd',
                                           'DJump_Abs_I_x LapEnd', 'DJump_Abs_I_y LapEnd', 'DJump_Abs_I_z LapEnd'])
 
+    std_data = pd.DataFrame(columns=['Sprungtyp', 'SprungID', 'ACC_N', 'ACC_N_ROT_filtered',
+                                     'Acc_x_Fil', 'Acc_y_Fil', 'Acc_z_Fil', 'Gyro_x_Fil', 'Gyro_y_Fil', 'Gyro_z_Fil'])
+
     data['ACC_N'] = data['ACC_N'].apply(convert_comma_to_dot)
     data['ACC_N_ROT_filtered'] = data['ACC_N_ROT_filtered'].apply(convert_comma_to_dot)
     data['Acc_x_Fil'] = data['Acc_x_Fil'].apply(convert_comma_to_dot)
@@ -117,18 +120,34 @@ def calc_avg(data):
         subframe = data[data['SprungID'] == id]
 
         mean = subframe.mean()
+        std = subframe.std()
 
         averaged_data = averaged_data.append(mean, ignore_index=True)
+        std_data = std_data.append(std, ignore_index=True)
 
         averaged_data['Sprungtyp'].iloc[len(averaged_data) - 1] = subframe['Sprungtyp'].unique()[0]
         averaged_data['SprungID'].iloc[len(averaged_data) - 1] = subframe['SprungID'].unique()[0]
 
+        std_data['Sprungtyp'].iloc[len(std_data) - 1] = subframe['Sprungtyp'].unique()[0]
+        std_data['SprungID'].iloc[len(std_data) - 1] = subframe['SprungID'].unique()[0]
+
         print(len(averaged_data) - 1)
 
     averaged_data = averaged_data.drop(columns=['Time'])
+    std_data = std_data.drop(columns=['Time', 'DJump_SIG_I_x LapEnd', 'DJump_SIG_I_y LapEnd', 'DJump_SIG_I_z LapEnd',
+                                      'DJump_Abs_I_x LapEnd', 'DJump_Abs_I_y LapEnd', 'DJump_Abs_I_z LapEnd'])
+
+    averaged_data = averaged_data.round({'ACC_N': 3, 'ACC_N_ROT_filtered': 3,
+                                          'Acc_x_Fil': 3, 'Acc_y_Fil': 3, 'Acc_z_Fil': 3, 'Gyro_x_Fil': 3, 'Gyro_y_Fil': 3, 'Gyro_z_Fil': 3,
+                                          'DJump_SIG_I_x LapEnd': 3, 'DJump_SIG_I_y LapEnd': 3, 'DJump_SIG_I_z LapEnd': 3,
+                                          'DJump_Abs_I_x LapEnd': 3, 'DJump_Abs_I_y LapEnd': 3, 'DJump_Abs_I_z LapEnd': 3})
+
+    std_data = std_data.round({'ACC_N': 3, 'ACC_N_ROT_filtered': 3, 'Acc_x_Fil': 3, 'Acc_y_Fil': 3, 'Acc_z_Fil': 3,
+                               'Gyro_x_Fil': 3, 'Gyro_y_Fil': 3, 'Gyro_z_Fil': 3})
 
     print(averaged_data)
-    return averaged_data
+    print(std_data)
+    return averaged_data, std_data
 
 
 def main():
@@ -163,8 +182,9 @@ def main():
     """
 
     data_point_jumps = read_data("data_point_jumps.csv")
-    averaged_data = calc_avg(data_point_jumps)
+    averaged_data, std_data = calc_avg(data_point_jumps)
     save_as_csv(averaged_data, "averaged_data.csv", with_time=False)
+    save_as_csv(std_data, "std_data.csv", with_time=False)
 
     return
 
