@@ -1,5 +1,6 @@
 import numpy as np
 import pandas as pd
+import os
 
 
 def read_data(name):
@@ -150,6 +151,42 @@ def calc_avg(data):
     return averaged_data, std_data
 
 
+def class_std_mean(avg, std):
+
+    avg_std_data = pd.DataFrame(columns=['Sprungtyp', 'avg_ACC_N', 'avg_ACC_N_ROT_filtered',
+                                          'avg_Acc_x_Fil', 'avg_Acc_y_Fil', 'avg_Acc_z_Fil', 'avg_Gyro_x_Fil', 'avg_Gyro_y_Fil', 'avg_Gyro_z_Fil',
+                                          'avg_DJump_SIG_I_x LapEnd', 'avg_DJump_SIG_I_y LapEnd', 'avg_DJump_SIG_I_z LapEnd',
+                                          'avg_DJump_Abs_I_x LapEnd', 'avg_DJump_Abs_I_y LapEnd', 'avg_DJump_Abs_I_z LapEnd',
+                                          'std_ACC_N', 'std_ACC_N_ROT_filtered',
+                                          'std_Acc_x_Fil', 'std_Acc_y_Fil', 'std_Acc_z_Fil', 'std_Gyro_x_Fil', 'std_Gyro_y_Fil', 'std_Gyro_z_Fil'])
+
+    for typ in avg['Sprungtyp'].unique():
+
+        avg_subframe = avg[avg['Sprungtyp'] == typ]
+        std_subframe = std[std['Sprungtyp'] == typ]
+
+        avg_mean = avg_subframe.mean()
+        std_mean = std_subframe.mean()
+
+        avg_mean = avg_mean.to_frame().transpose()
+        std_mean = std_mean.to_frame().transpose()
+        avg_mean.columns = ['avg_ACC_N', 'avg_ACC_N_ROT_filtered',
+                          'avg_Acc_x_Fil', 'avg_Acc_y_Fil', 'avg_Acc_z_Fil', 'avg_Gyro_x_Fil', 'avg_Gyro_y_Fil', 'avg_Gyro_z_Fil',
+                          'avg_DJump_SIG_I_x LapEnd', 'avg_DJump_SIG_I_y LapEnd', 'avg_DJump_SIG_I_z LapEnd',
+                          'avg_DJump_Abs_I_x LapEnd', 'avg_DJump_Abs_I_y LapEnd', 'avg_DJump_Abs_I_z LapEnd']
+        std_mean.columns = ['std_ACC_N', 'std_ACC_N_ROT_filtered', 'std_Acc_x_Fil', 'std_Acc_y_Fil', 'std_Acc_z_Fil',
+                            'std_Gyro_x_Fil', 'std_Gyro_y_Fil', 'std_Gyro_z_Fil']
+
+        result = pd.concat([avg_mean, std_mean], axis=1)
+        result.insert(0, "Sprungtyp", typ)
+
+        avg_std_data = avg_std_data.append(result)
+
+    avg_std_data.to_excel(os.getcwd() + "/Sprungdaten_processed/" + "class_std_mean.xlsx")
+
+    return
+
+
 def main():
 
     """
@@ -181,10 +218,16 @@ def main():
     marked_jumps = only_marked_jumps(data_point_jumps)
     """
 
+    """
     data_point_jumps = read_data("data_point_jumps.csv")
     averaged_data, std_data = calc_avg(data_point_jumps)
     save_as_csv(averaged_data, "averaged_data.csv", with_time=False)
     save_as_csv(std_data, "std_data.csv", with_time=False)
+    """
+
+    averaged_data = read_data("averaged_data.csv")
+    std_data = read_data("std_data.csv")
+    class_std_mean(averaged_data, std_data)
 
     return
 
