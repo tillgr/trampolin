@@ -28,7 +28,11 @@ def sort_out_errors(all_data):
 def save_as_csv(data, name, with_time=True):
 
     if with_time:
-        data['Time'] = np.round(data['Time'], 3)
+        data = data.round({'ACC_N': 3, 'ACC_N_ROT_filtered': 3,'Acc_x_Fil': 3, 'Acc_y_Fil': 3, 'Acc_z_Fil': 3,
+                           'Gyro_x_Fil': 3, 'Gyro_y_Fil': 3, 'Gyro_z_Fil': 3,
+                           'DJump_SIG_I_x LapEnd': 3, 'DJump_SIG_I_y LapEnd': 3, 'DJump_SIG_I_z LapEnd': 3,
+                           'DJump_Abs_I_x LapEnd': 3, 'DJump_Abs_I_y LapEnd': 3, 'DJump_Abs_I_z LapEnd': 3,
+                           'TimeInJump': 3, 'Time': 3})
 
     data.to_csv('Sprungdaten_processed/' + name, index=False)
 
@@ -107,15 +111,6 @@ def calc_avg(data):
     std_data = pd.DataFrame(columns=['Sprungtyp', 'SprungID', 'ACC_N', 'ACC_N_ROT_filtered',
                                      'Acc_x_Fil', 'Acc_y_Fil', 'Acc_z_Fil', 'Gyro_x_Fil', 'Gyro_y_Fil', 'Gyro_z_Fil'])
 
-    data['ACC_N'] = data['ACC_N'].apply(convert_comma_to_dot)
-    data['ACC_N_ROT_filtered'] = data['ACC_N_ROT_filtered'].apply(convert_comma_to_dot)
-    data['Acc_x_Fil'] = data['Acc_x_Fil'].apply(convert_comma_to_dot)
-    data['Acc_y_Fil'] = data['Acc_y_Fil'].apply(convert_comma_to_dot)
-    data['Acc_z_Fil'] = data['Acc_z_Fil'].apply(convert_comma_to_dot)
-    data['Gyro_x_Fil'] = data['Gyro_x_Fil'].apply(convert_comma_to_dot)
-    data['Gyro_y_Fil'] = data['Gyro_y_Fil'].apply(convert_comma_to_dot)
-    data['Gyro_z_Fil'] = data['Gyro_z_Fil'].apply(convert_comma_to_dot)
-
     for id in data['SprungID'].unique():
 
         subframe = data[data['SprungID'] == id]
@@ -134,9 +129,9 @@ def calc_avg(data):
 
         print(len(averaged_data) - 1)
 
-    averaged_data = averaged_data.drop(columns=['Time'])
+    averaged_data = averaged_data.drop(columns=['Time', 'TimeInJump'])
     std_data = std_data.drop(columns=['Time', 'DJump_SIG_I_x LapEnd', 'DJump_SIG_I_y LapEnd', 'DJump_SIG_I_z LapEnd',
-                                      'DJump_Abs_I_x LapEnd', 'DJump_Abs_I_y LapEnd', 'DJump_Abs_I_z LapEnd'])
+                                      'DJump_Abs_I_x LapEnd', 'DJump_Abs_I_y LapEnd', 'DJump_Abs_I_z LapEnd', 'TimeInJump'])
 
     averaged_data = averaged_data.round({'ACC_N': 3, 'ACC_N_ROT_filtered': 3,
                                           'Acc_x_Fil': 3, 'Acc_y_Fil': 3, 'Acc_z_Fil': 3, 'Gyro_x_Fil': 3, 'Gyro_y_Fil': 3, 'Gyro_z_Fil': 3,
@@ -187,17 +182,35 @@ def class_std_mean(avg, std):
     return
 
 
+def normalize(data):
+
+    for (column_name, column_data) in data.iteritems():
+
+        if column_name in ['ACC_N', 'ACC_N_ROT_filtered', 'Acc_x_Fil', 'Acc_y_Fil', 'Acc_z_Fil',
+                           'Gyro_x_Fil', 'Gyro_y_Fil', 'Gyro_z_Fil',
+                           'DJump_SIG_I_x LapEnd', 'DJump_SIG_I_y LapEnd', 'DJump_SIG_I_z LapEnd',
+                           'DJump_Abs_I_x LapEnd', 'DJump_Abs_I_y LapEnd', 'DJump_Abs_I_z LapEnd']:
+
+
+            max_value = data[column_name].max()
+            min_value = data[column_name].min()
+
+            data[column_name] = (data[column_name] - min_value) / (max_value - min_value)
+
+    return data
+
+
 def main():
 
     """
-    all_data = read_all_data("all_data.csv")
+    all_data = read_data("all_data.csv")
     data_only_jumps = sort_out_errors(all_data)
 
     count_jumptypes = data_only_jumps['Sprungtyp'].value_counts()
     with pd.option_context('display.max_rows', None, 'display.max_columns', None):
         print(count_jumptypes)
 
-    # save_as_csv(data_only_jumps, 'data_only_jumps.csv')
+    save_as_csv(data_only_jumps, 'data_only_jumps.csv')
     """
 
     """
@@ -225,9 +238,14 @@ def main():
     save_as_csv(std_data, "std_data.csv", with_time=False)
     """
 
+    """
     averaged_data = read_data("averaged_data.csv")
     std_data = read_data("std_data.csv")
     class_std_mean(averaged_data, std_data)
+    """
+
+    data_point_jumps = read_data("data_point_jumps.csv")
+    normalized_data = normalize(data_point_jumps)
 
     return
 

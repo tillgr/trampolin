@@ -91,6 +91,16 @@ def main():
 
             all_data = all_data.append(temp_data, ignore_index=True)
 
+    all_data['TimeInJump'] = all_data['TimeInJump'].apply(convert_comma_to_dot)
+    all_data['ACC_N'] = all_data['ACC_N'].apply(convert_comma_to_dot)
+    all_data['ACC_N_ROT_filtered'] = all_data['ACC_N_ROT_filtered'].apply(convert_comma_to_dot)
+    all_data['Acc_x_Fil'] = all_data['Acc_x_Fil'].apply(convert_comma_to_dot)
+    all_data['Acc_y_Fil'] = all_data['Acc_y_Fil'].apply(convert_comma_to_dot)
+    all_data['Acc_z_Fil'] = all_data['Acc_z_Fil'].apply(convert_comma_to_dot)
+    all_data['Gyro_x_Fil'] = all_data['Gyro_x_Fil'].apply(convert_comma_to_dot)
+    all_data['Gyro_y_Fil'] = all_data['Gyro_y_Fil'].apply(convert_comma_to_dot)
+    all_data['Gyro_z_Fil'] = all_data['Gyro_z_Fil'].apply(convert_comma_to_dot)
+
     all_data.to_csv('Sprungdaten_processed/all_data.csv', index=False)
 
     return
