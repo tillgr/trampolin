@@ -5,6 +5,7 @@ import logging
 from sklearn.metrics import accuracy_score
 from sklearn.model_selection import train_test_split
 from sklearn.svm import SVC
+import inflect
 
 logging.basicConfig(filename='svc.log', format='%(asctime)s[%(name)s] - %(levelname)s - %(message)s',
                     level=logging.DEBUG)
@@ -61,7 +62,8 @@ def run():
     data = read_processed_data("Sprungdaten_processed/averaged_data.csv")
     train, test = train_test_split(data, test_size=0.2)
 
-    feature_set = {('DJump_Abs_I_x LapEnd', 'DJump_Abs_I_z LapEnd'), ('DJump_SIG_I_x LapEnd', 'DJump_Abs_I_z LapEnd'), ('DJump_SIG_I_x LapEnd', 'DJump_SIG_I_z LapEnd')}
+    feature_set = {('DJump_Abs_I_x LapEnd', 'DJump_Abs_I_z LapEnd'), ('DJump_SIG_I_x LapEnd', 'DJump_Abs_I_z LapEnd'),
+                   ('DJump_SIG_I_x LapEnd', 'DJump_SIG_I_z LapEnd')}
     scores = dict()
     for feature in feature_set:
         X = get_samples_features(train, feature[0], feature[1])
@@ -76,8 +78,11 @@ def run():
     ranked = {k: v for k, v in sorted(scores.items(), key=lambda item: item[1], reverse=True)}
     i = 0
     logger.info('Accuracy ranking from high to low:')
+    p = inflect.engine()
     for key, value in ranked.items():
-        logger.info("Feature set: " + str(key) + " has the accuracy rate of " + str(value) + ".")
+        i += 1
+        logger.info("Feature set: " + str(key) + " has the accuracy rate of " + str(value) + ", it is the " + p.ordinal(
+            i) + " best.")
 
 
 if __name__ == '__main__':
