@@ -10,4 +10,5 @@
 | data_point_jumps.csv | beinhaltet alle Sprünge, welche Punkte geben. Außerdem sind hier die Namen der Sprünge angepasst, sodass eigentlich gleiche Sprünge nicht mehr mehrere Klassen einnehmen durch andere Schreibweise |
 | averaged_data.csv | beinhaltet für jeden Sprung genau eine Zeile mit nur den gemittelten Werten |
 | std_data.csv | beinhaltet für jeden Sprung genau eine Zeile mit nur den Werten der Standardabweichung |
+| normalized_data.csv | beinhaltet Daten, welche für jede Spalte min-max normalisiert sind |
 | ... | ... |
