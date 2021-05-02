@@ -3,9 +3,11 @@
 
 Sprungdaten_processed/all_data.zip
 Sprungdaten_processed/all_data.csv
-
 Sprungdaten_processed/data_only_jumps.zip
-
 Sprungdaten_processed/data_only_jumps.csv
-
 Sprungdaten_processed/data_point_jumps.csv
+/Sprungdaten_processed/data_only_jumps_float_converted.csv
+/Sprungdaten_processed/data_only_jumps_float_converted_no_strecksprung.csv
+
+__pycache__/
+svc.log
