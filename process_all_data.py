@@ -246,6 +246,7 @@ def main():
 
     data_point_jumps = read_data("data_point_jumps.csv")
     normalized_data = normalize(data_point_jumps)
+    save_as_csv(normalized_data, "normalized_data.csv")
 
     return
 
