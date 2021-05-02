@@ -21,7 +21,7 @@ def easy_prediction(classifier: SVC, testing_sample: DataFrame, test_actual: Dat
     predicted = classifier.predict(testing_sample)
     score = accuracy_score(test_actual.to_numpy(), predicted)
     logger.info("prediction accuracy: " + str(score))
-    print(score)
+    return score
 
 
 def get_samples_features(data: DataFrame, start_column: str, end_column: str):
@@ -38,7 +38,7 @@ def read_processed_data(filename: str):
         try:
             processed_data[column] = processed_data[column].str.replace(',', '.')
         except AttributeError:
-            print('str not appliable')
+            logger.info('str not appliable for column with key: ' + column)
     return processed_data
 
 
@@ -57,11 +57,28 @@ def get_jumps_by_type(data: DataFrame, type: str):
     return data[type]
 
 
-if __name__ == '__main__':
+def run():
     data = read_processed_data("Sprungdaten_processed/averaged_data.csv")
     train, test = train_test_split(data, test_size=0.2)
-    X = get_samples_features(train, 'DJump_Abs_I_x LapEnd', 'DJump_Abs_I_z LapEnd')
-    y = get_targets(train)
-    test_actual = get_targets(test)
-    clf = easy_classify(X, y, 'linear')
-    easy_prediction(clf, get_samples_features(test, 'DJump_Abs_I_x LapEnd', 'DJump_Abs_I_z LapEnd'), test_actual)
+
+    feature_set = {('DJump_Abs_I_x LapEnd', 'DJump_Abs_I_z LapEnd'), ('DJump_SIG_I_x LapEnd', 'DJump_Abs_I_z LapEnd'), ('DJump_SIG_I_x LapEnd', 'DJump_SIG_I_z LapEnd')}
+    scores = dict()
+    for feature in feature_set:
+        X = get_samples_features(train, feature[0], feature[1])
+        y = get_targets(train)
+        test_actual = get_targets(test)
+        clf_linear = SVC(kernel='linear')
+        clf_linear.fit(X, y)
+        logger.info("Train with features '" + feature[0] + ":" + feature[1] + "'")
+        score = easy_prediction(clf_linear, get_samples_features(test, feature[0], feature[1]), test_actual)
+        scores[feature] = score
+
+    ranked = {k: v for k, v in sorted(scores.items(), key=lambda item: item[1], reverse=True)}
+    i = 0
+    logger.info('Accuracy ranking from high to low:')
+    for key, value in ranked.items():
+        logger.info("Feature set: " + str(key) + " has the accuracy rate of " + str(value) + ".")
+
+
+if __name__ == '__main__':
+    run()
