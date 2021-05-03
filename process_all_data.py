@@ -69,6 +69,7 @@ def correct_space_errors(data):
     data['Sprungtyp'].replace("3/4 Salto Rw A", "3/4 Salto rw A", inplace=True)
     data['Sprungtyp'].replace("3/4 Salto vW A", "3/4 Salto vw A", inplace=True)
     data['Sprungtyp'].replace("3/4 Salto Vw  A", "3/4 Salto vw A", inplace=True)
+    data['Sprungtyp'].replace("3/4 Salto Vw A", "3/4 Salto vw A", inplace=True)
     data['Sprungtyp'].replace("30/R", "3/4 Salto vw A", inplace=True)
     data['Sprungtyp'].replace("1 3/4 Salto Vw B", "1 3/4 Salto vw B", inplace=True)
     data['Sprungtyp'].replace("1 3/4 Salto Vw C", "1 3/4 Salto vw C", inplace=True)
