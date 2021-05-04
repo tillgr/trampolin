@@ -69,6 +69,7 @@ def correct_space_errors(data):
     data['Sprungtyp'].replace("3/4 Salto Rw A", "3/4 Salto rw A", inplace=True)
     data['Sprungtyp'].replace("3/4 Salto vW A", "3/4 Salto vw A", inplace=True)
     data['Sprungtyp'].replace("3/4 Salto Vw  A", "3/4 Salto vw A", inplace=True)
+    data['Sprungtyp'].replace("3/4 Salto Vw A", "3/4 Salto vw A", inplace=True)
     data['Sprungtyp'].replace("30/R", "3/4 Salto vw A", inplace=True)
     data['Sprungtyp'].replace("1 3/4 Salto Vw B", "1 3/4 Salto vw B", inplace=True)
     data['Sprungtyp'].replace("1 3/4 Salto Vw C", "1 3/4 Salto vw C", inplace=True)
@@ -246,6 +247,7 @@ def main():
 
     data_point_jumps = read_data("data_point_jumps.csv")
     normalized_data = normalize(data_point_jumps)
+    save_as_csv(normalized_data, "normalized_data.csv")
 
     return
 
