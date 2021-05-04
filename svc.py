@@ -58,7 +58,7 @@ def get_jumps_by_type(data: DataFrame, type: str):
     return data[type]
 
 
-def run():
+def classify_by_abs():
     data = read_processed_data("Sprungdaten_processed/averaged_data.csv")
     train, test = train_test_split(data, test_size=0.2)
 
@@ -85,5 +85,17 @@ def run():
             i) + " best.")
 
 
+def classify_by_time_splits():
+    data = read_processed_data("Sprungdaten_processed/jumps_time_splits.csv.csv")
+    train, test = train_test_split(data, test_size=0.2)
+    X = get_samples_features(train, 'Acc_x_Fil_1', 'Gyro_z_Fil_4')
+    y = get_targets(train)
+    test_actual = get_targets(test)
+    clf_linear = SVC(kernel='linear')
+    clf_linear.fit(X, y)
+    score = easy_prediction(clf_linear, get_samples_features(test, 'Acc_x_Fil_1', 'Gyro_z_Fil_4'), test_actual)
+    print(score)
+
+
 if __name__ == '__main__':
-    run()
+    classify_by_time_splits()

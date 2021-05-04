@@ -10,4 +10,4 @@
 | data_point_jumps.csv | beinhaltet alle Sprünge, welche Punkte geben. Außerdem sind hier die Namen der Sprünge angepasst, sodass eigentlich gleiche Sprünge nicht mehr mehrere Klassen einnehmen durch andere Schreibweise |
 | averaged_data.csv | beinhaltet für jeden Sprung genau eine Zeile mit nur den gemittelten Werten |
 | std_data.csv | beinhaltet für jeden Sprung genau eine Zeile mit nur den Werten der Standardabweichung |
-| ... | ... |
+| jumps_time_splits.csv | Jumps with Acceleation and Gyro measurements at the time of % of the whole jump duration. For example, by 1/4, 2/4, 3/4 of the jump duration.|
