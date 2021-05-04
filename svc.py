@@ -86,7 +86,7 @@ def classify_by_abs():
 
 
 def classify_by_time_splits():
-    data = read_processed_data("Sprungdaten_processed/jumps_time_splits.csv.csv")
+    data = read_processed_data("Sprungdaten_processed/jumps_time_splits.csv")
     train, test = train_test_split(data, test_size=0.2)
     X = get_samples_features(train, 'Acc_x_Fil_1', 'Gyro_z_Fil_4')
     y = get_targets(train)
