@@ -94,7 +94,7 @@ def classify_by_time_splits():
     clf_linear = SVC(kernel='linear')
     clf_linear.fit(X, y)
     score = easy_prediction(clf_linear, get_samples_features(test, 'Acc_x_Fil_1', 'Gyro_z_Fil_4'), test_actual)
-    print(score)
+    logger.info('Accuracy of using splitting a jump in 5 portions: ' + str(score))
 
 
 if __name__ == '__main__':
