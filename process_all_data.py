@@ -1,11 +1,12 @@
 import numpy as np
 import pandas as pd
 import os
+from sklearn.model_selection import train_test_split
 
 
 def read_data(name):
 
-    all_data = pd.read_csv("Sprungdaten_processed/" + name)
+    all_data = pd.read_csv("Sprungdaten_processed/" + name + "/" + name + ".csv")
 
     return all_data
 
@@ -25,16 +26,15 @@ def sort_out_errors(all_data):
     return all_data
 
 
-def save_as_csv(data, name, with_time=True):
+def save_as_csv(data, name, folder=""):
 
-    if with_time:
-        data = data.round({'ACC_N': 3, 'ACC_N_ROT_filtered': 3,'Acc_x_Fil': 3, 'Acc_y_Fil': 3, 'Acc_z_Fil': 3,
-                           'Gyro_x_Fil': 3, 'Gyro_y_Fil': 3, 'Gyro_z_Fil': 3,
-                           'DJump_SIG_I_x LapEnd': 3, 'DJump_SIG_I_y LapEnd': 3, 'DJump_SIG_I_z LapEnd': 3,
-                           'DJump_Abs_I_x LapEnd': 3, 'DJump_Abs_I_y LapEnd': 3, 'DJump_Abs_I_z LapEnd': 3,
-                           'TimeInJump': 3, 'Time': 3})
+    for column in list(data.columns.values):
+        try:
+            data = data.round({column: 3})
+        except:
+            print("couldnt round column " + column)
 
-    data.to_csv('Sprungdaten_processed/' + name, index=False)
+    data.to_csv('Sprungdaten_processed/' + folder + "/" + name + ".csv", index=False)
 
 
 def delete_0_point_jumps(data):
@@ -201,10 +201,80 @@ def normalize(data):
     return data
 
 
+def split_train_test(data):
+
+    # if the data consists of only one row per jump we can use the easy way
+    if len(data['SprungID'].unique()) == len(data):
+        # drop the jumps which occur <= 2 times
+        indexes = np.where(data['Sprungtyp'].value_counts() == 2)
+        one_time_jumps = data['Sprungtyp'].value_counts()[indexes[0][0]:].index
+
+        for jump in one_time_jumps:
+            index = data[data['Sprungtyp'] == jump].index
+            data.drop(index, inplace=True)
+
+        # split train - test -> 80 : 20 -> stratify to keep distribution of classes
+        df_train, df_test, y_train, y_test = train_test_split(data, data['Sprungtyp'], stratify=data['Sprungtyp'], test_size=0.2, random_state=1)
+        print("Split of Train/Test Data complete")
+        df_train.reset_index(drop=True, inplace=True)
+        df_test.reset_index(drop=True, inplace=True)
+
+        return df_train, df_test
+
+    # to keep the data of the jumps consistens and not let them split up, we need to do some more complicated operations
+    df_split = pd.DataFrame(columns=['Sprungtyp', 'Data'])
+
+    # put each jump in its own dataframe and concatenate those to df_split
+    id_length = len(data['SprungID'].unique())
+    for id in data['SprungID'].unique():
+        print("Packing Dataframe: " + str(len(df_split) + 1) + "/" + str(id_length))
+        jump = data[data['SprungID'] == id]
+        df_split.loc[len(df_split)] = [jump['Sprungtyp'].unique()[0], jump]
+
+    # drop the jumps which occur <= 2 times
+    indexes = np.where(df_split['Sprungtyp'].value_counts() == 2)
+    one_time_jumps = df_split['Sprungtyp'].value_counts()[indexes[0][0]:].index
+
+    for jump in one_time_jumps:
+        index = df_split[df_split['Sprungtyp'] == jump].index
+        df_split.drop(index, inplace=True)
+
+    # split train - test -> 80 : 20 -> stratify to keep distribution of classes
+    df_train, df_test, y_train, y_test = train_test_split(df_split, df_split['Sprungtyp'], stratify=df_split['Sprungtyp'], test_size=0.2, random_state=1)
+    print("Split of Train/Test Data complete")
+
+    # rewrite dataframes
+    df_train.reset_index(drop=True, inplace=True)
+    df_test.reset_index(drop=True, inplace=True)
+
+    train_data = pd.DataFrame(columns=['Time', 'TimeInJump', 'ACC_N', 'ACC_N_ROT_filtered', 'Acc_x_Fil', 'Acc_y_Fil', 'Acc_z_Fil',
+                                     'Gyro_x_Fil', 'Gyro_y_Fil', 'Gyro_z_Fil', 'SprungID', 'Sprungtyp',
+                                     'DJump_SIG_I_x LapEnd', 'DJump_SIG_I_y LapEnd', 'DJump_SIG_I_z LapEnd',
+                                     'DJump_Abs_I_x LapEnd', 'DJump_Abs_I_y LapEnd', 'DJump_Abs_I_z LapEnd'])
+
+    test_data = pd.DataFrame(columns=['Time', 'TimeInJump', 'ACC_N', 'ACC_N_ROT_filtered', 'Acc_x_Fil', 'Acc_y_Fil', 'Acc_z_Fil',
+                                     'Gyro_x_Fil', 'Gyro_y_Fil', 'Gyro_z_Fil', 'SprungID', 'Sprungtyp',
+                                     'DJump_SIG_I_x LapEnd', 'DJump_SIG_I_y LapEnd', 'DJump_SIG_I_z LapEnd',
+                                     'DJump_Abs_I_x LapEnd', 'DJump_Abs_I_y LapEnd', 'DJump_Abs_I_z LapEnd'])
+
+    # unpack the dataframes to get the original structure back
+    for i in range(len(df_train)):
+        train_data = train_data.append(df_train.loc[i][1])
+        print("Unpacking training Dataframe: " + str(i + 1) + "/" + str(len(df_train)))
+    for j in range(len(df_test)):
+        test_data = test_data.append(df_test.loc[j][1])
+        print("Unpacking testing Dataframe: " + str(j + 1) + "/" + str(len(df_test)))
+
+    train_data.reset_index(drop=True, inplace=True)
+    test_data.reset_index(drop=True, inplace=True)
+
+    return train_data, test_data
+
+
 def main():
 
     """
-    all_data = read_data("all_data.csv")
+    all_data = read_data("all_data")
     data_only_jumps = sort_out_errors(all_data)
 
     count_jumptypes = data_only_jumps['Sprungtyp'].value_counts()
@@ -215,39 +285,47 @@ def main():
     """
 
     """
-    data_only_jumps = read_data("data_only_jumps.csv")
+    data_only_jumps = read_data("data_only_jumps")
     data_point_jumps = delete_0_point_jumps(data_only_jumps)
     save_as_csv(data_point_jumps, "data_point_jumps.csv")
     """
 
     """
-    data_point_jumps = read_data("data_point_jumps.csv")
+    data_point_jumps = read_data("data_point_jumps")
     data_point_jumps = correct_space_errors(data_point_jumps)
     print(data_point_jumps['Sprungtyp'].unique())
     save_as_csv(data_point_jumps, "data_point_jumps.csv")
     """
 
     """
-    data_point_jumps = read_data("data_point_jumps.csv")
+    data_point_jumps = read_data("data_point_jumps")
     marked_jumps = only_marked_jumps(data_point_jumps)
     """
 
     """
-    data_point_jumps = read_data("data_point_jumps.csv")
+    data_point_jumps = read_data("data_point_jumps")
     averaged_data, std_data = calc_avg(data_point_jumps)
     save_as_csv(averaged_data, "averaged_data.csv", with_time=False)
     save_as_csv(std_data, "std_data.csv", with_time=False)
     """
 
     """
-    averaged_data = read_data("averaged_data.csv")
+    averaged_data = read_data("averaged_data")
     std_data = read_data("std_data.csv")
     class_std_mean(averaged_data, std_data)
     """
 
-    data_point_jumps = read_data("data_point_jumps.csv")
+    """
+    data_point_jumps = read_data("data_point_jumps")
     normalized_data = normalize(data_point_jumps)
     save_as_csv(normalized_data, "normalized_data.csv")
+    """
+
+    for file in ["jumps_time_splits"]:
+        data_point_jumps = read_data(file)
+        train_data, test_data = split_train_test(data_point_jumps)
+        save_as_csv(train_data, file + "_train", folder=file)
+        save_as_csv(test_data, file + "_test", folder=file)
 
     return
 

@@ -16,3 +16,15 @@ __pycache__/
 svc.log
 
 Sprungdaten_processed/normalized_data.csv
+
+Sprungdaten_processed/data_point_jumps/data_point_jumps.csv
+
+Sprungdaten_processed/data_point_jumps/data_point_jumps_test.csv
+
+Sprungdaten_processed/data_point_jumps/data_point_jumps_train.csv
+
+Sprungdaten_processed/normalized_data/normalized_data.csv
+
+Sprungdaten_processed/normalized_data/normalized_data_test.csv
+
+Sprungdaten_processed/normalized_data/normalized_data_train.csv
