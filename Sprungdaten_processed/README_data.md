@@ -1,6 +1,7 @@
 # Datenintegration
 *befinden sich auf dem [TU Cloudstore](https://cloudstore.zih.tu-dresden.de) (unter den Orginaldaten im Ordner Sprungdaten_processed*
 
+Die nützlichen Daten sind nun in einem jeweils eigenen Unterordner mit jeweils einem Trainings- und Test-Datensatz.
 
 Übersicht der csv Dateien:
 | Name | Inhalt |
