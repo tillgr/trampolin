@@ -3,21 +3,20 @@ import pandas as pd
 import os
 import openpyxl
 import random
+from sklearn.metrics import accuracy_score
 
 
 def main():
-    trainings_data = pd.read_csv("Sprungdaten_processed/data_point_jumps.csv")
-
-    dis = distribution(trainings_data)
-    save_as_xlsx(dis, 'Verteilung_data_point_jumps')
-    classify(os.getcwd() + "/Sprungdaten_processed/Verteilung_data_point_jumps.xlsx", 20)
+    name = "data_point_jumps"
+    trainings_data = pd.read_csv("Sprungdaten_processed/" + name + "/" + name + "_train.csv")
+    test_data = pd.read_csv('Sprungdaten_processed/' + name + '/' + name + '_test.csv')
+    classify(trainings_data, test_data, 10000)
     return
 
 
-def classify(path_distribution, len_to_class):
-    # need the distribution file from the data and how many items must be classify
-    # returns a list with classification
-    dis = pd.read_excel(path_distribution, engine="openpyxl")
+def classify(trainings_data, test_data, loops=None):
+    dis = distribution(trainings_data).to_frame()
+    dis = dis.reset_index()
     dis.columns = ['Sprungtyp', 'Anzahl']
     r = []
     for i in range(len(dis)):
@@ -25,8 +24,30 @@ def classify(path_distribution, len_to_class):
         temp = temp * dis['Anzahl'][i]
         r.extend(temp)
     random.shuffle(r)
+    label = get_target(test_data)
+    if loops is None:
+        c = random.sample(r, len(test_data['SprungID'].unique()))
+        acc = accuracy_score(label, c)
+    else:
+        acc = []
+        best = 0
+        for i in range(loops):
+            c = random.sample(r, len(test_data['SprungID'].unique()))
+            a = accuracy_score(label, c)
+            acc.append(a)
+            if a > best:
+                best = a
+        acc = sum(acc) / len(acc)
+        print('best Acc:' + str(best))
+    print("Acc: " + str(acc))
+    return acc
 
-    return random.sample(r, len_to_class)
+
+def get_target(test_data):
+    labels = []
+    for jump in test_data['SprungID'].unique():
+        labels.append(test_data.loc[test_data['SprungID'] == jump]['Sprungtyp'].values[0])
+    return labels
 
 
 def distribution(trainings_data):
