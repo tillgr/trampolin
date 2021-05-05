@@ -271,6 +271,26 @@ def split_train_test(data):
     return train_data, test_data
 
 
+def combine_avg_std(avg_data, std_data):
+
+    avg_data.rename(columns={'ACC_N': 'avg_ACC_N', 'ACC_N_ROT_filtered': 'avg_ACC_N_ROT_filtered',
+                             'Acc_x_Fil': 'avg_Acc_x_Fil', 'Acc_y_Fil': 'avg_Acc_y_Fil', 'Acc_z_Fil': 'avg_Acc_z_Fil',
+                             'Gyro_x_Fil': 'avg_Gyro_x_Fil', 'Gyro_y_Fil': 'avg_Gyro_y_Fil', 'Gyro_z_Fil': 'avg_Gyro_z_Fil'}, inplace=True)
+
+    std_data.rename(columns={'ACC_N': 'std_ACC_N', 'ACC_N_ROT_filtered': 'std_ACC_N_ROT_filtered',
+                             'Acc_x_Fil': 'std_Acc_x_Fil', 'Acc_y_Fil': 'std_Acc_y_Fil', 'Acc_z_Fil': 'std_Acc_z_Fil',
+                             'Gyro_x_Fil': 'std_Gyro_x_Fil', 'Gyro_y_Fil': 'std_Gyro_y_Fil', 'Gyro_z_Fil': 'std_Gyro_z_Fil'}, inplace=True)
+
+    avg_std_data = pd.merge(avg_data, std_data, on=['SprungID', 'Sprungtyp'], how='left')
+    avg_std_data = avg_std_data[['Sprungtyp', 'SprungID', 'avg_ACC_N', 'std_ACC_N', 'avg_ACC_N_ROT_filtered', 'std_ACC_N_ROT_filtered',
+    'avg_Acc_x_Fil', 'std_Acc_x_Fil', 'avg_Acc_y_Fil', 'std_Acc_y_Fil', 'avg_Acc_z_Fil',  'std_Acc_z_Fil',
+    'avg_Gyro_x_Fil', 'std_Gyro_x_Fil', 'avg_Gyro_y_Fil', 'std_Gyro_y_Fil', 'avg_Gyro_z_Fil', 'std_Gyro_z_Fil',
+    'DJump_SIG_I_x LapEnd', 'DJump_SIG_I_y LapEnd', 'DJump_SIG_I_z LapEnd',
+    'DJump_Abs_I_x LapEnd', 'DJump_Abs_I_y LapEnd', 'DJump_Abs_I_z LapEnd']]
+
+    return avg_std_data
+
+
 def main():
 
     """
@@ -321,11 +341,20 @@ def main():
     save_as_csv(normalized_data, "normalized_data.csv")
     """
 
-    for file in ["jumps_time_splits"]:
+    #"""
+    for file in ["avg_std_data"]:
         data_point_jumps = read_data(file)
         train_data, test_data = split_train_test(data_point_jumps)
         save_as_csv(train_data, file + "_train", folder=file)
         save_as_csv(test_data, file + "_test", folder=file)
+    #"""
+
+    """
+    averaged_data = read_data("averaged_data")
+    std_data = read_data("std_data")
+    avg_std_data = combine_avg_std(averaged_data, std_data)
+    save_as_csv(avg_std_data, "avg_std_data", folder="avg_std_data")
+    """
 
     return
 
