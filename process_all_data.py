@@ -350,6 +350,46 @@ def make_jump_length_consistent(data, method="cut_last"):
     return df
 
 
+def percentage_cutting(data, percent_steps, mean=None):
+
+    if mean is None:
+        df = pd.DataFrame(columns=['SprungID', 'Sprungtyp', 'Time', 'TimeInJump', 'ACC_N', 'ACC_N_ROT_filtered',
+                                   'Acc_x_Fil', 'Acc_y_Fil', 'Acc_z_Fil', 'Gyro_x_Fil', 'Gyro_y_Fil', 'Gyro_z_Fil',
+                                   'DJump_SIG_I_x LapEnd', 'DJump_SIG_I_y LapEnd', 'DJump_SIG_I_z LapEnd',
+                                   'DJump_Abs_I_x LapEnd', 'DJump_Abs_I_y LapEnd', 'DJump_Abs_I_z LapEnd'])
+        for jump in data['SprungID'].unique():
+            print(jump)
+            subframe = data[data['SprungID'] == jump]
+            subframe.reset_index(drop=True, inplace=True)
+            index_list = np.rint(np.arange(0, len(subframe), len(subframe) * percent_steps))
+            df = df.append(subframe.iloc[index_list], ignore_index=True)
+    else:
+        df = pd.DataFrame(columns=['SprungID', 'Sprungtyp', 'ACC_N', 'ACC_N_ROT_filtered',
+                                       'Acc_x_Fil', 'Acc_y_Fil', 'Acc_z_Fil', 'Gyro_x_Fil', 'Gyro_y_Fil', 'Gyro_z_Fil',
+                                       'DJump_SIG_I_x LapEnd', 'DJump_SIG_I_y LapEnd', 'DJump_SIG_I_z LapEnd',
+                                       'DJump_Abs_I_x LapEnd', 'DJump_Abs_I_y LapEnd', 'DJump_Abs_I_z LapEnd'])
+        for jump in data['SprungID'].unique():
+            print(jump)
+            subframe = data[data['SprungID'] == jump]
+            subframe.reset_index(drop=True, inplace=True)
+            index_list = np.rint(np.arange(0, len(subframe), len(subframe) * percent_steps))
+            index_list = np.append(index_list, len(subframe))
+            id = subframe['SprungID'][0]
+            jump_type = subframe['Sprungtyp'][0]
+            for i in range(len(index_list)-1):
+                start = int(index_list[i])
+                end = int(index_list[i+1])
+
+                temp = subframe.iloc[start:end].mean()
+                temp = temp.to_frame().transpose()
+                temp = temp.drop(['Time', 'TimeInJump'], axis=1)
+                temp.insert(0, 'SprungID', id)
+                temp.insert(1, 'Sprungtyp', jump_type)
+                df = df.append(temp, ignore_index=True)
+
+    return df
+
+
 def main():
 
     """
@@ -424,7 +464,15 @@ def main():
         data = make_jump_length_consistent(data_point_jumps, method=method)
         save_as_csv(data, "same_length_" + method, folder="same_length")
     """
-
+    """
+    data_point_jumps = read_data("data_point_jumps")
+    # percentage_cutting with 'mean' or nothing
+    data = percentage_cutting(data_point_jumps, 0.25, 'mean')
+    save_as_csv(data, 'percentage_25', folder='percentage/25')
+    train_data, test_data = split_train_test(data)
+    save_as_csv(train_data, 'percentage_25_train', folder='percentage/25')
+    save_as_csv(test_data, 'percentage_25_test', folder='percentage/25')
+    """
     return
 
 
