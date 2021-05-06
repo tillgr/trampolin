@@ -28,3 +28,21 @@ Sprungdaten_processed/normalized_data/normalized_data.csv
 Sprungdaten_processed/normalized_data/normalized_data_test.csv
 
 Sprungdaten_processed/normalized_data/normalized_data_train.csv
+
+Sprungdaten_processed/same_length/same_length_cut_first.csv
+
+Sprungdaten_processed/same_length/same_length_cut_first_test.csv
+
+Sprungdaten_processed/same_length/same_length_cut_first_train.csv
+
+Sprungdaten_processed/same_length/same_length_cut_last.csv
+
+Sprungdaten_processed/same_length/same_length_cut_last_test.csv
+
+Sprungdaten_processed/same_length/same_length_cut_last_train.csv
+
+Sprungdaten_processed/same_length/same_length_padding_0.csv
+
+Sprungdaten_processed/same_length/same_length_padding_0_test.csv
+
+Sprungdaten_processed/same_length/same_length_padding_0_train.csv

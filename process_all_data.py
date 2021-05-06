@@ -291,6 +291,65 @@ def combine_avg_std(avg_data, std_data):
     return avg_std_data
 
 
+def make_jump_length_consistent(data, method="cut_last"):
+
+    ids = data['SprungID'].value_counts()
+    min_length = ids[-1]
+
+    df = pd.DataFrame(columns=['SprungID', 'Sprungtyp', 'Time', 'TimeInJump', 'ACC_N', 'ACC_N_ROT_filtered',
+                               'Acc_x_Fil', 'Acc_y_Fil', 'Acc_z_Fil', 'Gyro_x_Fil', 'Gyro_y_Fil', 'Gyro_z_Fil',
+                               'DJump_SIG_I_x LapEnd', 'DJump_SIG_I_y LapEnd', 'DJump_SIG_I_z LapEnd',
+                               'DJump_Abs_I_x LapEnd', 'DJump_Abs_I_y LapEnd', 'DJump_Abs_I_z LapEnd'])
+    if method == "cut_last":
+
+        for id in data['SprungID'].unique():
+            subframe = data[data['SprungID'] == id]
+            subframe.reset_index(drop=True, inplace=True)
+            df = df.append(subframe[:min_length], ignore_index=True)
+
+    if method == "cut_first":
+
+        for id in data['SprungID'].unique():
+            subframe = data[data['SprungID'] == id]
+            subframe.reset_index(drop=True, inplace=True)
+            df = df.append(subframe[len(subframe) - min_length:], ignore_index=True)
+
+    if method == "padding_0":
+
+        max_length = ids[0]
+
+        for id in data['SprungID'].unique():
+            subframe = data[data['SprungID'] == id]
+            subframe.reset_index(drop=True, inplace=True)
+            if len(subframe) < max_length:
+                length_to_fill = max_length - len(subframe)
+                zero_list = [0] * length_to_fill
+                time_list = np.arange(round(subframe['Time'].iloc[-1] + 0.002, 3), round(subframe['Time'].iloc[-1] + (0.002 * length_to_fill + 0.001), 3), 0.002)
+                timeinjump_list = np.arange(round(subframe['TimeInJump'].iloc[-1] + 0.002, 3), round(subframe['TimeInJump'].iloc[-1] + (0.002 * length_to_fill + 0.001), 3), 0.002)
+                jump_ids = [subframe['SprungID'].iloc[-1]] * length_to_fill
+                jump_typ = [subframe['Sprungtyp'].iloc[-1]] * length_to_fill
+
+                """
+                temp_df = pd.DataFrame([jump_ids, jump_typ, time_list, timeinjump_list, zero_list, zero_list, zero_list,
+                                        zero_list, zero_list, zero_list, zero_list, zero_list, zero_list, zero_list, zero_list, zero_list, zero_list, zero_list],
+                                        columns=['SprungID', 'Sprungtyp', 'Time', 'TimeInJump', 'ACC_N', 'ACC_N_ROT_filtered',
+                                                 'Acc_x_Fil', 'Acc_y_Fil', 'Acc_z_Fil', 'Gyro_x_Fil', 'Gyro_y_Fil', 'Gyro_z_Fil',
+                                                 'DJump_SIG_I_x LapEnd', 'DJump_SIG_I_y LapEnd', 'DJump_SIG_I_z LapEnd',
+                                                 'DJump_Abs_I_x LapEnd', 'DJump_Abs_I_y LapEnd', 'DJump_Abs_I_z LapEnd'])
+                                                 """
+                temp_df = pd.DataFrame(data={'SprungID': jump_ids, 'Sprungtyp': jump_typ, 'Time': time_list, 'TimeInJump': timeinjump_list,
+                                             'ACC_N': zero_list, 'ACC_N_ROT_filtered': zero_list,
+                                             'Acc_x_Fil': zero_list, 'Acc_y_Fil': zero_list, 'Acc_z_Fil': zero_list,
+                                             'Gyro_x_Fil': zero_list, 'Gyro_y_Fil': zero_list, 'Gyro_z_Fil': zero_list,
+                                             'DJump_SIG_I_x LapEnd': zero_list, 'DJump_SIG_I_y LapEnd': zero_list, 'DJump_SIG_I_z LapEnd': zero_list,
+                                             'DJump_Abs_I_x LapEnd': zero_list, 'DJump_Abs_I_y LapEnd': zero_list, 'DJump_Abs_I_z LapEnd': zero_list})
+
+                df = df.append(subframe, ignore_index=True)
+                df = df.append(temp_df, ignore_index=True)
+
+    return df
+
+
 def main():
 
     """
@@ -341,19 +400,29 @@ def main():
     save_as_csv(normalized_data, "normalized_data.csv")
     """
 
-    #"""
-    for file in ["avg_std_data"]:
-        data_point_jumps = read_data(file)
-        train_data, test_data = split_train_test(data_point_jumps)
+    """
+    for file in ['averaged_data']:
+        data = read_data(file)
+        #data = pd.read_csv("Sprungdaten_processed/" + "same_length" + "/" + "same_length_" + file + ".csv")
+        train_data, test_data = split_train_test(data)
         save_as_csv(train_data, file + "_train", folder=file)
         save_as_csv(test_data, file + "_test", folder=file)
-    #"""
+        #save_as_csv(train_data, "same_length_" + file + "_train", folder="same_length")
+        #save_as_csv(test_data, "same_length_" + file + "_test", folder="same_length")
+    """
 
     """
     averaged_data = read_data("averaged_data")
     std_data = read_data("std_data")
     avg_std_data = combine_avg_std(averaged_data, std_data)
     save_as_csv(avg_std_data, "avg_std_data", folder="avg_std_data")
+    """
+
+    """
+    for method in ['cut_first', 'cut_last', 'padding_0']:
+        data_point_jumps = read_data("data_point_jumps")
+        data = make_jump_length_consistent(data_point_jumps, method=method)
+        save_as_csv(data, "same_length_" + method, folder="same_length")
     """
 
     return
