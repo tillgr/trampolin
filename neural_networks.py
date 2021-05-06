@@ -11,8 +11,8 @@ def prepare_data():
 
     # data_train = pd.read_csv("Sprungdaten_processed/same_length/same_length_cut_last_train.csv")
     # data_test = pd.read_csv("Sprungdaten_processed/same_length/same_length_cut_last_test.csv")
-    data_train = pd.read_csv("Sprungdaten_processed/percentage/5/percentage_5_train.csv")
-    data_test = pd.read_csv("Sprungdaten_processed/percentage/5/percentage_5_test.csv")
+    data_train = pd.read_csv("Sprungdaten_processed/percentage/5/percentage_mean_5_train.csv")
+    data_test = pd.read_csv("Sprungdaten_processed/percentage/5/percentage_mean_5_test.csv")
 
     x_train = []
     y_train = []
@@ -49,21 +49,21 @@ def prepare_data():
 def build_model(p, q, jump_data_length):
 
     first_input = Input(shape=(jump_data_length, 14, 1), name="first_input")
-    x = Conv2D(32, kernel_size=(3, 3), padding="same", activation="relu")(first_input)
+    x = Conv2D(32, kernel_size=(1 + q, 1 + q), padding="same", activation="tanh")(first_input)
     for i in range(p):
-        x = Conv2D(32 * (i + 1), kernel_size=(1 + q, 1 + q), padding="same", activation="relu")(x)
+        x = Conv2D(32 * (i + 1), kernel_size=(1 + q, 1 + q), padding="same", activation="tanh")(x)
     x = MaxPooling2D(pool_size=(q, q), padding="same")(x)
     x = Flatten()(x)
-    x = Dense(128, activation='relu')(x)
+    x = Dense(128, activation='tanh')(x)
     x = Dense(41, activation='softmax', name="output")(x)
 
     model = Model(inputs=first_input, outputs=x)
-    model.compile(loss=keras.losses.categorical_crossentropy, optimizer='adam', metrics=['accuracy'])
+    model.compile(loss="kl_divergence", optimizer='adam', metrics=['accuracy'])
 
     return model
 
 
-def grid_seach_build(x_train, y_train, x_test, y_test, jump_data_length):
+def grid_search_build(x_train, y_train, x_test, y_test, jump_data_length):
 
     best_score = 0
     best_model = 0
@@ -87,7 +87,7 @@ def grid_seach_build(x_train, y_train, x_test, y_test, jump_data_length):
 def main():
 
     x_train, y_train, x_test, y_test, jump_data_length = prepare_data()
-    model = grid_seach_build(x_train, y_train, x_test, y_test, jump_data_length)
+    model = grid_search_build(x_train, y_train, x_test, y_test, jump_data_length)
     model.evaluate(x_test, y_test, verbose=1)
 
     return
