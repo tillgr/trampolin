@@ -13,4 +13,5 @@ Die nützlichen Daten sind nun in einem jeweils eigenen Unterordner mit jeweils 
 | std_data.csv | beinhaltet für jeden Sprung genau eine Zeile mit nur den Werten der Standardabweichung |
 | normalized_data.csv | beinhaltet Daten, welche für jede Spalte min-max normalisiert sind |
 | jumps_time_splits.csv | Jumps with Acceleation and Gyro measurements at the time of % of the whole jump duration. For example, by 1/4, 2/4, 3/4 of the jump duration.|
+| same_length | Alle Sprünge haben die gleiche Länge: <br> cut_first: Immer die ersten Daten eines Sprung sind entfernt <br> cut_last: Immer die letzten Daten eines Sprungs sind entfernt <br> padding_0: Am Ende der Sprünge wird auf die gleiche Länge alles mit 0 aufgefüllt|
 | ... | ... |
