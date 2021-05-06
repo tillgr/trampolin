@@ -380,11 +380,16 @@ def percentage_cutting(data, percent_steps, mean=None):
                 start = int(index_list[i])
                 end = int(index_list[i+1])
 
-                temp = subframe.iloc[start:end].mean()
-                temp = temp.to_frame().transpose()
-                temp = temp.drop(['Time', 'TimeInJump'], axis=1)
-                temp.insert(0, 'SprungID', id)
-                temp.insert(1, 'Sprungtyp', jump_type)
+                if start == end:
+                    temp = subframe.iloc[end-1]
+                    temp = temp.to_frame().transpose()
+                    temp = temp.drop(['Time', 'TimeInJump'], axis=1)
+                else:
+                    temp = subframe.iloc[start:end].mean()
+                    temp = temp.to_frame().transpose()
+                    temp = temp.drop(['Time', 'TimeInJump'], axis=1)
+                    temp.insert(0, 'SprungID', id)
+                    temp.insert(1, 'Sprungtyp', jump_type)
                 df = df.append(temp, ignore_index=True)
 
     return df
@@ -464,15 +469,15 @@ def main():
         data = make_jump_length_consistent(data_point_jumps, method=method)
         save_as_csv(data, "same_length_" + method, folder="same_length")
     """
-    """
+    #"""
     data_point_jumps = read_data("data_point_jumps")
     # percentage_cutting with 'mean' or nothing
-    data = percentage_cutting(data_point_jumps, 0.25, 'mean')
-    save_as_csv(data, 'percentage_25', folder='percentage/25')
+    data = percentage_cutting(data_point_jumps, 0.02, 'mean')
+    save_as_csv(data, 'percentage_mean_2', folder='percentage/2')
     train_data, test_data = split_train_test(data)
-    save_as_csv(train_data, 'percentage_25_train', folder='percentage/25')
-    save_as_csv(test_data, 'percentage_25_test', folder='percentage/25')
-    """
+    save_as_csv(train_data, 'percentage_mean_2_train', folder='percentage/2')
+    save_as_csv(test_data, 'percentage_mean_2_test', folder='percentage/2')
+    # """
     return
 
 
