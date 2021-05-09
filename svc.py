@@ -86,16 +86,39 @@ def classify_by_abs():
 
 
 def classify_by_time_splits():
-    data = read_processed_data("Sprungdaten_processed/jumps_time_splits.csv")
-    train, test = train_test_split(data, test_size=0.2)
-    X = get_samples_features(train, 'Acc_x_Fil_1', 'Gyro_z_Fil_4')
+    train = read_processed_data("Sprungdaten_processed/jumps_time_splits/jumps_time_splits_train_51.csv")
+    test = read_processed_data("Sprungdaten_processed/jumps_time_splits/jumps_time_splits_test_51.csv")
+    X = get_samples_features(train, 'Acc_x_Fil_1', 'DJump_Abs_I_z LapEnd')
     y = get_targets(train)
     test_actual = get_targets(test)
     clf_linear = SVC(kernel='linear')
     clf_linear.fit(X, y)
-    score = easy_prediction(clf_linear, get_samples_features(test, 'Acc_x_Fil_1', 'Gyro_z_Fil_4'), test_actual)
-    logger.info('Accuracy of using splitting a jump in 5 portions: ' + str(score))
+    score = easy_prediction(clf_linear, get_samples_features(test, 'Acc_x_Fil_1', 'DJump_Abs_I_z LapEnd'), test_actual)
+    print(str(score))
+    logger.info('Accuracy of using splitting a jump in 50 portions, c=10 : ' + str(score))
+
+
+def classify_by_avg():
+    train = read_processed_data("Sprungdaten_processed/jumps_time_splits/jumps_time_splits_train_51.csv")
+    test = read_processed_data("Sprungdaten_processed/jumps_time_splits/jumps_time_splits_test_51.csv")
+    train_avg: DataFrame = read_processed_data("Sprungdaten_processed/avg_std_data/avg_std_data_train.csv")
+    test_avg = read_processed_data("Sprungdaten_processed/avg_std_data/avg_std_data_test.csv")
+
+    train.set_index('SprungID')
+    test.set_index('SprungID')
+    train_merged = train.merge(train_avg)
+    test_merged = test.merge(test_avg)
+
+    X = get_samples_features(train_merged, 'Acc_x_Fil_1', 'std_Gyro_z_Fil')
+    y = get_targets(train_merged)
+    test_actual = get_targets(test_merged)
+    clf_linear = SVC(kernel='linear')
+    clf_linear.fit(X, y)
+    score = easy_prediction(clf_linear, get_samples_features(test_merged, 'Acc_x_Fil_1', 'std_Gyro_z_Fil'),
+                            test_actual)
+    print(str(score))
+    logger.info('Accuracy of using avg, std and splits jump in 50: ' + str(score))
 
 
 if __name__ == '__main__':
-    classify_by_time_splits()
+    classify_by_avg()
