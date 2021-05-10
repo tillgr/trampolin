@@ -22,6 +22,8 @@ if __name__ == '__main__':
         targets,
         test_size=0.3)
 
+    #gleiche anzahl an allen sprüngen
+
     #neighbours
     n_neighbors = 15
 
