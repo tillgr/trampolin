@@ -28,9 +28,12 @@ def sort_out_errors(all_data):
 
 def save_as_csv(data, name, folder=""):
 
-    for column in list(data.columns.values):
+    name_list = list(data.columns.values)
+    name_list.remove('SprungID')
+    name_list.remove('Sprungtyp')
+    for column in name_list:
         try:
-            data = data.round({column: 3})
+            data[column] = data[column].astype(float).round(3)
         except:
             print("couldnt round column " + column)
 
@@ -442,6 +445,32 @@ def percentage_cutting(data, percent_steps, method=None):
     return df
 
 
+def vectorize(data):
+    first = True
+    for jump in data['SprungID'].unique():
+        print(jump)
+        subframe = data[data['SprungID'] == jump]
+        subframe.reset_index(drop=True, inplace=True)
+        equal_data = subframe[['SprungID', 'Sprungtyp', 'DJump_SIG_I_x LapEnd', 'DJump_SIG_I_y LapEnd',
+                               'DJump_SIG_I_z LapEnd', 'DJump_Abs_I_x LapEnd', 'DJump_Abs_I_y LapEnd',
+                               'DJump_Abs_I_z LapEnd']].iloc[0]
+        equal_data = equal_data.to_frame().transpose()
+
+        for row in np.rint(np.arange(0, 100, 100/len(subframe))):
+            copy = subframe[['ACC_N', 'ACC_N_ROT_filtered', 'Acc_x_Fil', 'Acc_y_Fil', 'Acc_z_Fil',
+                             'Gyro_x_Fil', 'Gyro_y_Fil', 'Gyro_z_Fil']].iloc[0]
+            copy = copy.to_frame().transpose()
+            copy.columns = [str(int(row)) + '-ACC_N', str(int(row)) + '-ACC_N_ROT_filtered', str(int(row)) + '-Acc_x_Fil',
+                            str(int(row)) + '-Acc_y_Fil', str(int(row)) + '-Acc_z_Fil', str(int(row)) + '-Gyro_x_Fil',
+                            str(int(row)) + '-Gyro_y_Fil', str(int(row)) + '-Gyro_z_Fil']
+            equal_data = pd.concat([equal_data, copy], axis=1)
+        if first is True:
+            df = pd.DataFrame(columns=equal_data.columns)
+            first = False
+        df = df.append(equal_data, ignore_index=True)
+    return df
+
+
 def main():
 
     """
@@ -518,21 +547,22 @@ def main():
     """
     """
     data_point_jumps = read_data("data_point_jumps")
-    # percentage_cutting with 'mean' or nothing
-    data = percentage_cutting(data_point_jumps, 0.01, 'mean')
+    # percentage_cutting with 'mean' , 'mean_std' or nothing
+    data = percentage_cutting(data_point_jumps, 0.25, 'mean')
     save_as_csv(data, 'percentage_mean_1', folder='percentage/1')
     train_data, test_data = split_train_test(data)
     save_as_csv(train_data, 'percentage_mean_1_train', folder='percentage/1')
     save_as_csv(test_data, 'percentage_mean_1_test', folder='percentage/1')
     """
 
-    data_point_jumps = read_data("data_point_jumps")
-    # percentage_cutting with 'mean' or nothing
-    data = percentage_cutting(data_point_jumps, 0.05, 'mean_std')
-    save_as_csv(data, 'percentage_mean_std_5', folder='percentage/5')
+
+    name = 'percentage_mean_5'
+    data_point_jumps = pd.read_csv('Sprungdaten_processed/percentage/5/' + name + '.csv')
+    data = vectorize(data_point_jumps)
     train_data, test_data = split_train_test(data)
-    save_as_csv(train_data, 'percentage_mean_std_5_train', folder='percentage/5')
-    save_as_csv(test_data, 'percentage_mean_std_5_test', folder='percentage/5')
+    save_as_csv(train_data, 'vector_' + name + '_train', folder='percentage/5')
+    save_as_csv(test_data,  'vector_' + name + '_test', folder='percentage/5')
+    save_as_csv(data, 'vector_' + name, folder='percentage/5')
 
 
     return
