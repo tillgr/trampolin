@@ -14,6 +14,5 @@ Die nützlichen Daten sind nun in einem jeweils eigenen Unterordner mit jeweils 
 | normalized_data.csv | beinhaltet Daten, welche für jede Spalte min-max normalisiert sind |
 | jumps_time_splits.csv | Jumps with Acceleation and Gyro measurements at the time of % of the whole jump duration. For example, by 1/4, 2/4, 3/4 of the jump duration.|
 | same_length | Alle Sprünge haben die gleiche Länge: <br> cut_first: Immer die ersten Daten eines Sprung sind entfernt <br> cut_last: Immer die letzten Daten eines Sprungs sind entfernt <br> padding_0: Am Ende der Sprünge wird auf die gleiche Länge alles mit 0 aufgefüllt|
-| percentage | Sprünge haben die gleiche Länge. <br>-> ohne mean: Datenpunkte mit gleichmäßigen Abstand. percentage_X: X gibt Abstand der Datenpunkte in Prozent an. <br>-> mit mean: Datenpunkt gemittelt von dem gleichmäßigen Abstand. <br> Bsp: mean_25 : 4 Daten Zeilen pro Sprung, 0-25% Daten gemittelt = ersten Zeile, 25-50% = zweite Zeile... <br>
--vector: Daten wurden Vektorisiert|
+| percentage | Sprünge haben die gleiche Länge. <br>-> ohne mean: Datenpunkte mit gleichmäßigen Abstand. percentage_X: X gibt Abstand der Datenpunkte in Prozent an. <br>-> mit mean: Datenpunkt gemittelt von dem gleichmäßigen Abstand. <br> Bsp: mean_25 : 4 Daten Zeilen pro Sprung, 0-25% Daten gemittelt = ersten Zeile, 25-50% = zweite Zeile... <br> - vector: Daten wurden Vektorisiert|
 | ... | ... |
