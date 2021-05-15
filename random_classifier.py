@@ -3,7 +3,7 @@ import pandas as pd
 import os
 import openpyxl
 import random
-from sklearn.metrics import accuracy_score
+from sklearn.metrics import accuracy_score, confusion_matrix
 
 
 def main():
@@ -27,20 +27,73 @@ def classify(trainings_data, test_data, loops=None):
     label = get_target(test_data)
     if loops is None:
         c = random.sample(r, len(test_data['SprungID'].unique()))
+
         acc = accuracy_score(label, c)
+        tp, fp, tn, fn = metrics(label, c)
+        print(tp, fp, fn, tn)
+        # Precision
+        prec = tp/(tp+fp)
+        # Recall
+        rec = tp/(fn+tp)
+        # F1 Score
+        f = 2*(prec*rec) / (prec + rec)
+        # Youden
+        youden = rec + (tn/(tn + fp)) - 1
+
     else:
         acc = []
+        prec = []
+        rec = []
+        youden = []
+        f = []
         best = 0
         for i in range(loops):
+            print(str(i) + '/' + str(loops))
             c = random.sample(r, len(test_data['SprungID'].unique()))
             a = accuracy_score(label, c)
             acc.append(a)
-            if a > best:
-                best = a
+            tp, fp, tn, fn = metrics(label, c)
+            prec.append((tp/(tp+fp)))
+            rec.append((tp/(fn+tp)))
+            f.append((2*(prec[-1] * rec[-1]) / (prec[-1] + rec[-1])))
+            y = (rec[-1] + (tn/(tn + fp)) - 1)
+            youden.append(y)
+            if y > best:
+                best = y
         acc = sum(acc) / len(acc)
-        print('best Acc:' + str(best))
-    print("Acc: " + str(acc))
+        prec = sum(prec) / len(prec)
+        rec = sum(rec) / len(rec)
+        f = sum(f) / len(f)
+        youden = sum(youden) / len(youden)
+        print('best Youden:' + str(best))
+    print("Accuracy: " + str(acc))
+    print("Youden: " + str(youden))
+    print("F1-Score: " + str(f))
+    print("Precision: " + str(prec))
+    print("Recall: " + str(rec))
     return acc
+
+
+def metrics(label, c):
+    conf = confusion_matrix(label, c)
+    tp = sum(conf.diagonal())
+    fp = 0
+    fn = 0
+    tn = 0
+    for r in range(len(conf)):
+        # fp
+        row = conf[r]
+        row = np.delete(row, r)
+        fp += sum(row)
+        # fn
+        col = conf[:, r]
+        col = np.delete(col, r)
+        fn += sum(col)
+        # tn
+        sub_array = np.delete(conf, r, 0)
+        sub_array = np.delete(sub_array, r, 1)
+        tn += sum(sum(sub_array))
+    return tp, fp, tn, fn
 
 
 def get_target(test_data):
