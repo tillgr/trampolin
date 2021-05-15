@@ -28,25 +28,26 @@ def easy_prediction(classifier: SVC, testing_sample: DataFrame, test_actual: Dat
 def get_samples_features(data: DataFrame, start_column: str, end_column: str):
     X: DataFrame = data.loc[:, start_column:end_column]
     X.astype(dtype='float64')
-    logger.info(X.dtypes)
-    logger.info('shape of the samples feature matrix: ' + str(X.shape))
+    # logger.info(X.dtypes)
+    # logger.info('shape of the samples feature matrix: ' + str(X.shape))
     return X
 
 
 def read_processed_data(filename: str):
     processed_data = pd.read_csv(filename)
+    logger.info("read data set:" + filename)
     for column in processed_data.columns:
         try:
             processed_data[column] = processed_data[column].str.replace(',', '.')
         except AttributeError:
-            logger.info('str not appliable for column with key: ' + column)
+            pass
     return processed_data
 
 
 def get_targets(data: DataFrame):
     targets = set(data['Sprungtyp'])
-    logger.info('Sprungtyps are: ' + str(targets))
-    logger.info('Shape of targets: ' + str(data['Sprungtyp'].shape))
+    # logger.info('Sprungtyps are: ' + str(targets))
+    # logger.info('Shape of targets: ' + str(data['Sprungtyp'].shape))
     return data['Sprungtyp']
 
 
@@ -120,5 +121,75 @@ def classify_by_avg():
     logger.info('Accuracy of using avg, std and splits jump in 50: ' + str(score))
 
 
+def classify_by_quater():
+    train = read_processed_data("Sprungdaten_processed/jumps_time_splits/quatered_train.csv")
+    test = read_processed_data("Sprungdaten_processed/jumps_time_splits/quatered_test.csv")
+
+
+    X = get_samples_features(train, 'Acc_x_Fil_avg_1', 'Gyro_z_Fil_avg_4')
+    y = get_targets(train)
+    test_actual = get_targets(test)
+    clf_linear = SVC(kernel='linear')
+    clf_linear.fit(X, y)
+    score = easy_prediction(clf_linear, get_samples_features(test, 'Acc_x_Fil_avg_1', 'Gyro_z_Fil_avg_4'),
+                            test_actual)
+    print(str(score))
+    logger.info('Accuracy of using quatered avg: ' + str(score))
+
+
+def classify_by_quater_with_splits():
+    train = read_processed_data("Sprungdaten_processed/jumps_time_splits/quatered_train.csv")
+    test = read_processed_data("Sprungdaten_processed/jumps_time_splits/quatered_test.csv")
+    train_splits = read_processed_data("Sprungdaten_processed/jumps_time_splits/jumps_time_splits_train_51.csv")
+    test_splits = read_processed_data("Sprungdaten_processed/jumps_time_splits/jumps_time_splits_test_51.csv")
+    train_avg = read_processed_data("Sprungdaten_processed/averaged_data/averaged_data_train.csv")
+    test_avg = read_processed_data("Sprungdaten_processed/averaged_data/averaged_data_test.csv")
+
+    train.set_index('SprungID')
+    test.set_index('SprungID')
+    train_merged = train.merge(train_splits)
+    test_merged = test.merge(test_splits)
+    train_avg = train_avg.drop(columns=['ACC_N', 'ACC_N_ROT_filtered','Acc_x_Fil','Acc_y_Fil','Acc_z_Fil','Gyro_x_Fil','Gyro_y_Fil','Gyro_z_Fil'])
+    test_avg = test_avg.drop(columns=['ACC_N', 'ACC_N_ROT_filtered','Acc_x_Fil','Acc_y_Fil','Acc_z_Fil','Gyro_x_Fil','Gyro_y_Fil','Gyro_z_Fil'])
+    train_merged = train_merged.merge(train_avg)
+    test_merged = test_merged.merge(test_avg)
+
+    X = get_samples_features(train_merged, 'Acc_x_Fil_avg_1', 'DJump_Abs_I_z LapEnd')
+    y = get_targets(train_merged)
+    test_actual = get_targets(test_merged)
+    clf_linear = SVC(kernel='linear')
+    clf_linear.fit(X, y)
+    score = easy_prediction(clf_linear, get_samples_features(test_merged, 'Acc_x_Fil_avg_1', 'DJump_Abs_I_z LapEnd'),
+                            test_actual)
+    print(str(score))
+    logger.info('Accuracy of using quatered avg with splits 50: ' + str(score))
+
+
+def classify_by_quater_with_splits_std_avg():
+    train = read_processed_data("Sprungdaten_processed/jumps_time_splits/quatered_train.csv")
+    test = read_processed_data("Sprungdaten_processed/jumps_time_splits/quatered_test.csv")
+    train_splits = read_processed_data("Sprungdaten_processed/jumps_time_splits/jumps_time_splits_train_51.csv")
+    test_splits = read_processed_data("Sprungdaten_processed/jumps_time_splits/jumps_time_splits_test_51.csv")
+    train_avg = read_processed_data("Sprungdaten_processed/averaged_data/averaged_data_train.csv")
+    test_avg = read_processed_data("Sprungdaten_processed/averaged_data/averaged_data_test.csv")
+
+    train.set_index('SprungID')
+    test.set_index('SprungID')
+    train_merged = train.merge(train_splits)
+    test_merged = test.merge(test_splits)
+    train_merged = train.merge(train_avg)
+    test_merged = test.merge(test_avg)
+
+    X = get_samples_features(train_merged, 'Acc_x_Fil_avg_1', 'DJump_Abs_I_z LapEnd')
+    y = get_targets(train_merged)
+    test_actual = get_targets(test_merged)
+    clf_linear = SVC(kernel='linear')
+    clf_linear.fit(X, y)
+    score = easy_prediction(clf_linear, get_samples_features(test_merged, 'Acc_x_Fil_avg_1', 'DJump_Abs_I_z LapEnd'),
+                            test_actual)
+    print(str(score))
+    logger.info('Accuracy of using quatered avg with splits 50 and std: ' + str(score))
+
+
 if __name__ == '__main__':
-    classify_by_avg()
+    classify_by_quater_with_splits_std_avg()

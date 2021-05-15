@@ -50,15 +50,44 @@ def time_frames(data: DataFrame, portion: int):
             i += 1
             slice: Series = subframe.loc[int(len(subframe.index) * i / portion), 'Acc_x_Fil':'Gyro_z_Fil']
             values = values + slice.to_list()
-        # values = values + lap_ends.values.tolist()[0]
+        data_time_splits.loc[len(data_time_splits)] = values
+    return data_time_splits
+
+
+def quater_average(data: DataFrame, portion: int):
+    columns = ['SprungID', 'Sprungtyp']
+    p = 0
+    while p < portion:
+        p += 1
+        columns.append('Acc_x_Fil_avg_' + str(p))
+        columns.append('Acc_y_Fil_avg_' + str(p))
+        columns.append('Acc_z_Fil_avg_' + str(p))
+        columns.append('Gyro_x_Fil_avg_' + str(p))
+        columns.append('Gyro_y_Fil_avg_' + str(p))
+        columns.append('Gyro_z_Fil_avg_' + str(p))
+    data_time_splits = pd.DataFrame(columns=columns)
+
+    for id in data['SprungID'].unique():
+        subframe = data[data['SprungID'] == id]
+        subframe = subframe.reset_index(drop=True)
+        jump_type = subframe['Sprungtyp'].unique()[0]
+        i = 0
+        values = [id, jump_type]
+        while i < portion:
+            i += 1
+            slice = subframe.loc[int(len(subframe.index) * (i-1) / portion):int(len(subframe.index) * i / portion), 'Acc_x_Fil':'Gyro_z_Fil'].mean().round(3)
+            values = values + slice.to_list()
         data_time_splits.loc[len(data_time_splits)] = values
     return data_time_splits
 
 
 if __name__ == '__main__':
+    # data = read_data('Sprungdaten_processed/data_point_jumps/data_point_jumps_train.csv')
+    # portioned = time_frames(data, 101)
+    # portioned.to_csv('Sprungdaten_processed/jumps_time_splits/jumps_time_splits_train_101.csv', index=False)
+    # data = read_data('Sprungdaten_processed/data_point_jumps/data_point_jumps_test.csv')
+    # portioned = time_frames(data, 101)
+    # portioned.to_csv('Sprungdaten_processed/jumps_time_splits/jumps_time_splits_test_101.csv', index=False)
     data = read_data('Sprungdaten_processed/data_point_jumps/data_point_jumps_train.csv')
-    portioned = time_frames(data, 101)
-    portioned.to_csv('Sprungdaten_processed/jumps_time_splits/jumps_time_splits_train_101.csv', index=False)
-    data = read_data('Sprungdaten_processed/data_point_jumps/data_point_jumps_test.csv')
-    portioned = time_frames(data, 101)
-    portioned.to_csv('Sprungdaten_processed/jumps_time_splits/jumps_time_splits_test_101.csv', index=False)
+    quatered = quater_average(data, 2)
+    quatered.to_csv('Sprungdaten_processed/jumps_time_splits/half_avg_train.csv', index=False)
