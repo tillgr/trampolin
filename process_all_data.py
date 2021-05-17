@@ -555,7 +555,7 @@ def main():
     save_as_csv(test_data, 'percentage_mean_1_test', folder='percentage/1')
     """
 
-
+    '''
     name = 'percentage_mean_5'
     data_point_jumps = pd.read_csv('Sprungdaten_processed/percentage/5/' + name + '.csv')
     data = vectorize(data_point_jumps)
@@ -563,7 +563,18 @@ def main():
     save_as_csv(train_data, 'vector_' + name + '_train', folder='percentage/5')
     save_as_csv(test_data,  'vector_' + name + '_test', folder='percentage/5')
     save_as_csv(data, 'vector_' + name, folder='percentage/5')
+    '''
 
+    #TODO: vectorize data sets
+    for number in ['1', '2', '10']:
+        name = 'percentage_mean_' + number
+        data_point_jumps = pd.read_csv('Sprungdaten_processed/percentage/' + number + '/' + name + '.csv')
+        data = vectorize(data_point_jumps)
+        train_data, test_data = split_train_test(data)
+        folder = 'percentage/' + number
+        save_as_csv(train_data, 'vector_' + name + '_train', folder=folder)
+        save_as_csv(test_data, 'vector_' + name + '_test', folder=folder)
+        save_as_csv(data, 'vector_' + name, folder=folder)
 
     return
 
