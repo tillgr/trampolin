@@ -89,12 +89,12 @@ def classify_by_abs():
 def classify_by_time_splits():
     train = read_processed_data("Sprungdaten_processed/jumps_time_splits/jumps_time_splits_train_51.csv")
     test = read_processed_data("Sprungdaten_processed/jumps_time_splits/jumps_time_splits_test_51.csv")
-    X = get_samples_features(train, 'Acc_x_Fil_1', 'DJump_Abs_I_z LapEnd')
+    X = get_samples_features(train, 'Acc_x_Fil_1', 'Gyro_z_Fil_50')
     y = get_targets(train)
     test_actual = get_targets(test)
     clf_linear = SVC(kernel='linear')
     clf_linear.fit(X, y)
-    score = easy_prediction(clf_linear, get_samples_features(test, 'Acc_x_Fil_1', 'DJump_Abs_I_z LapEnd'), test_actual)
+    score = easy_prediction(clf_linear, get_samples_features(test, 'Acc_x_Fil_1', 'Gyro_z_Fil_50'), test_actual)
     print(str(score))
     logger.info('Accuracy of using splitting a jump in 50 portions, c=10 : ' + str(score))
 
@@ -191,5 +191,17 @@ def classify_by_quater_with_splits_std_avg():
     logger.info('Accuracy of using quatered avg with splits 50 and std: ' + str(score))
 
 
+def classify_by_2_percentage_sample():
+    train = read_processed_data("Sprungdaten_processed/percentage/2/vector_percentage_2_only_fil_train.csv")
+    test = read_processed_data("Sprungdaten_processed/percentage/2/vector_percentage_2_only_fil_test.csv")
+    X = get_samples_features(train, '0-Acc_x_Fil', '48-Gyro_z_Fil')
+    y = get_targets(train)
+    test_actual = get_targets(test)
+    clf_linear = SVC(kernel='linear')
+    clf_linear.fit(X, y)
+    score = easy_prediction(clf_linear, get_samples_features(test, '0-Acc_x_Fil', '48-Gyro_z_Fil'), test_actual)
+    logger.info('Accuracy of sample every 2% of total duration per jump: ' + str(score))
+
+
 if __name__ == '__main__':
-    classify_by_quater_with_splits_std_avg()
+    classify_by_time_splits()
