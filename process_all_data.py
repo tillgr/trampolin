@@ -354,6 +354,7 @@ def make_jump_length_consistent(data, method="cut_last"):
 
 
 def percentage_cutting(data, percent_steps, method=None):
+
     if method is None:
         df = pd.DataFrame(columns=['SprungID', 'Sprungtyp', 'Time', 'TimeInJump', 'ACC_N', 'ACC_N_ROT_filtered',
                                    'Acc_x_Fil', 'Acc_y_Fil', 'Acc_z_Fil', 'Gyro_x_Fil', 'Gyro_y_Fil', 'Gyro_z_Fil',
@@ -363,9 +364,9 @@ def percentage_cutting(data, percent_steps, method=None):
             print(jump)
             subframe = data[data['SprungID'] == jump]
             subframe.reset_index(drop=True, inplace=True)
-            # the last seems to be out of bound for 2 percentages, therefore the -1
-            # index_list = np.rint(np.arange(0, len(subframe)-1, len(subframe) * percent_steps))
             index_list = np.rint(np.arange(0, len(subframe), len(subframe) * percent_steps))
+            if len(index_list) != 100/(percent_steps * 100):
+                index_list = index_list[:-1]
             df = df.append(subframe.iloc[index_list], ignore_index=True)
     if method == 'mean':
         df = pd.DataFrame(columns=['SprungID', 'Sprungtyp', 'ACC_N', 'ACC_N_ROT_filtered',
@@ -457,11 +458,11 @@ def vectorize(data):
                                'DJump_Abs_I_z LapEnd']].iloc[0]
         equal_data = equal_data.to_frame().transpose()
 
-        for row in np.rint(np.arange(0, 49, 1)):
-            copy = subframe[['Acc_x_Fil', 'Acc_y_Fil', 'Acc_z_Fil',
+        for row in np.rint(np.arange(0, 100, 100/len(subframe))):
+            copy = subframe[['ACC_N', 'ACC_N_ROT_filtered', 'Acc_x_Fil', 'Acc_y_Fil', 'Acc_z_Fil',
                              'Gyro_x_Fil', 'Gyro_y_Fil', 'Gyro_z_Fil']].iloc[0]
             copy = copy.to_frame().transpose()
-            copy.columns = [str(int(row)) + '-Acc_x_Fil',
+            copy.columns = [str(int(row)) + '-ACC_N', str(int(row)) + '-ACC_N_ROT_filtered', str(int(row)) + '-Acc_x_Fil',
                             str(int(row)) + '-Acc_y_Fil', str(int(row)) + '-Acc_z_Fil', str(int(row)) + '-Gyro_x_Fil',
                             str(int(row)) + '-Gyro_y_Fil', str(int(row)) + '-Gyro_z_Fil']
             equal_data = pd.concat([equal_data, copy], axis=1)
@@ -546,18 +547,18 @@ def main():
         data = make_jump_length_consistent(data_point_jumps, method=method)
         save_as_csv(data, "same_length_" + method, folder="same_length")
     """
+    # template for creating datasets percentage
     # """
-    # data_point_jumps = read_data("data_point_jumps")
-    # # percentage_cutting with 'mean' , 'mean_std' or nothing
-    # data = percentage_cutting(data_point_jumps, 0.02)
-    # save_as_csv(data, 'percentage_2', folder='percentage/2')
-    p2 = pd.read_csv('Sprungdaten_processed/percentage/2/percentage_2.csv')
-    data = vectorize(p2)
+    data_point_jumps = read_data("data_point_jumps")
+    # percentage_cutting with 'mean' , 'mean_std' or nothing
+    data = percentage_cutting(data_point_jumps, 0.01)
+    save_as_csv(data, 'percentage_1', folder='percentage/1')
     train_data, test_data = split_train_test(data)
-    save_as_csv(train_data, 'vector_percentage_2_only_fil_train', folder='percentage/2')
-    save_as_csv(test_data, 'vector_percentage_2_only_fil_test', folder='percentage/2')
+    save_as_csv(train_data, 'percentage_1_train', folder='percentage/1')
+    save_as_csv(test_data, 'percentage_1_test', folder='percentage/1')
     # """
 
+    # template for vectorisation
     '''
     name = 'percentage_mean_5'
     data_point_jumps = pd.read_csv('Sprungdaten_processed/percentage/5/' + name + '.csv')
@@ -565,19 +566,10 @@ def main():
     train_data, test_data = split_train_test(data)
     save_as_csv(train_data, 'vector_' + name + '_train', folder='percentage/5')
     save_as_csv(test_data,  'vector_' + name + '_test', folder='percentage/5')
-    save_as_csv(data, 'vector_' + name, folder='percentage/2')
+    save_as_csv(data, 'vector_' + name, folder='percentage/5')
     '''
 
-    # #TODO: vectorize data sets
-    # for number in ['1', '2', '10']:
-    #     name = 'percentage_mean_' + number
-    #     data_point_jumps = pd.read_csv('Sprungdaten_processed/percentage/' + number + '/' + name + '.csv')
-    #     data = vectorize(data_point_jumps)
-    #     train_data, test_data = split_train_test(data)
-    #     folder = 'percentage/' + number
-    #     save_as_csv(train_data, 'vector_' + name + '_train', folder=folder)
-    #     save_as_csv(test_data, 'vector_' + name + '_test', folder=folder)
-    #     save_as_csv(data, 'vector_' + name, folder=folder)
+
 
     return
 
