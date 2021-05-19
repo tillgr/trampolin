@@ -457,14 +457,16 @@ def vectorize(data):
                                'DJump_SIG_I_z LapEnd', 'DJump_Abs_I_x LapEnd', 'DJump_Abs_I_y LapEnd',
                                'DJump_Abs_I_z LapEnd']].iloc[0]
         equal_data = equal_data.to_frame().transpose()
+        percentage_list = np.rint(np.arange(0, 100, 100 / len(subframe)))
+        for row in range(len(subframe)):
 
-        for row in np.rint(np.arange(0, 100, 100/len(subframe))):
+            name = percentage_list[row]
             copy = subframe[['ACC_N', 'ACC_N_ROT_filtered', 'Acc_x_Fil', 'Acc_y_Fil', 'Acc_z_Fil',
-                             'Gyro_x_Fil', 'Gyro_y_Fil', 'Gyro_z_Fil']].iloc[0]
+                             'Gyro_x_Fil', 'Gyro_y_Fil', 'Gyro_z_Fil']].iloc[int(row)]
             copy = copy.to_frame().transpose()
-            copy.columns = [str(int(row)) + '-ACC_N', str(int(row)) + '-ACC_N_ROT_filtered', str(int(row)) + '-Acc_x_Fil',
-                            str(int(row)) + '-Acc_y_Fil', str(int(row)) + '-Acc_z_Fil', str(int(row)) + '-Gyro_x_Fil',
-                            str(int(row)) + '-Gyro_y_Fil', str(int(row)) + '-Gyro_z_Fil']
+            copy.columns = [str(int(name)) + '-ACC_N', str(int(name)) + '-ACC_N_ROT_filtered', str(int(name)) + '-Acc_x_Fil',
+                            str(int(name)) + '-Acc_y_Fil', str(int(name)) + '-Acc_z_Fil', str(int(name)) + '-Gyro_x_Fil',
+                            str(int(name)) + '-Gyro_y_Fil', str(int(name)) + '-Gyro_z_Fil']
             equal_data = pd.concat([equal_data, copy], axis=1)
         if first is True:
             df = pd.DataFrame(columns=equal_data.columns)
@@ -548,26 +550,37 @@ def main():
         save_as_csv(data, "same_length_" + method, folder="same_length")
     """
     # template for creating datasets percentage
-    # """
+    """
     data_point_jumps = read_data("data_point_jumps")
     # percentage_cutting with 'mean' , 'mean_std' or nothing
-    data = percentage_cutting(data_point_jumps, 0.01)
-    save_as_csv(data, 'percentage_1', folder='percentage/1')
+    data = percentage_cutting(data_point_jumps, 0.02, 'mean_std')
+    save_as_csv(data, 'percentage_mean_std_2', folder='percentage/2')
     train_data, test_data = split_train_test(data)
-    save_as_csv(train_data, 'percentage_1_train', folder='percentage/1')
-    save_as_csv(test_data, 'percentage_1_test', folder='percentage/1')
-    # """
+    save_as_csv(train_data, 'percentage_mean_std_2_train', folder='percentage/2')
+    save_as_csv(test_data, 'percentage_mean_std_2_test', folder='percentage/2')
+    """
 
     # template for vectorisation
     '''
-    name = 'percentage_mean_5'
-    data_point_jumps = pd.read_csv('Sprungdaten_processed/percentage/5/' + name + '.csv')
+    name = 'percentage_1'
+    data_point_jumps = pd.read_csv('Sprungdaten_processed/percentage/1/' + name + '.csv')
     data = vectorize(data_point_jumps)
     train_data, test_data = split_train_test(data)
-    save_as_csv(train_data, 'vector_' + name + '_train', folder='percentage/5')
-    save_as_csv(test_data,  'vector_' + name + '_test', folder='percentage/5')
-    save_as_csv(data, 'vector_' + name, folder='percentage/5')
+    save_as_csv(train_data, 'vector_' + name + '_train', folder='percentage/1')
+    save_as_csv(test_data,  'vector_' + name + '_test', folder='percentage/1')
+    save_as_csv(data, 'vector_' + name, folder='percentage/1')
     '''
+
+    # """
+    name = 'percentage_'
+    for percent in ['1', '2', '5', '10', '20', '25']:
+        data = pd.read_csv('Sprungdaten_processed/percentage/' + percent + '/' + name + percent + '.csv')
+        vector_data = vectorize(data)
+        train_data, test_data = split_train_test(data)
+        save_as_csv(train_data, 'vector_' + name + percent + '_train', folder='percentage/' + percent)
+        save_as_csv(test_data,  'vector_' + name + percent + '_test', folder='percentage/' + percent)
+        save_as_csv(vector_data, 'vector_' + name + percent, folder='percentage/' + percent)
+    # """
 
 
 
