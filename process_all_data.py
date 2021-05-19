@@ -271,6 +271,7 @@ def split_train_test(data):
     train_data.reset_index(drop=True, inplace=True)
     test_data.reset_index(drop=True, inplace=True)
 
+
     return train_data, test_data
 
 
@@ -571,18 +572,38 @@ def main():
     save_as_csv(data, 'vector_' + name, folder='percentage/1')
     '''
 
-    # """
+    """
     name = 'percentage_'
     for percent in ['1', '2', '5', '10', '20', '25']:
         data = pd.read_csv('Sprungdaten_processed/percentage/' + percent + '/' + name + percent + '.csv')
+        train_data = pd.read_csv('Sprungdaten_processed/percentage/' + percent + '/' + name + percent + '_train' + '.csv')
+        test_data = pd.read_csv('Sprungdaten_processed/percentage/' + percent + '/' + name + percent +'_tes'+ '.csv')
+        if 'mean' not in name:
+            data = data.drop(columns=['Time', 'TimeInJump']
+            train_data = train_data.drop(columns=['Time', 'TimeInJump']
+            test_data = test_data.drop(columns=['Time', 'TimeInJump']
         vector_data = vectorize(data)
-        train_data, test_data = split_train_test(data)
+        
+        vector_train_data = vectorize(train_data)
+        vector_test_data = vectorize(test_data)
         save_as_csv(train_data, 'vector_' + name + percent + '_train', folder='percentage/' + percent)
         save_as_csv(test_data,  'vector_' + name + percent + '_test', folder='percentage/' + percent)
         save_as_csv(vector_data, 'vector_' + name + percent, folder='percentage/' + percent)
-    # """
+    """
 
+    data_point_jumps = read_data("data_point_jumps")
+    param = 'mean'
+    for percent in [0.25, 0.20, 0.10, 0.05, 0.02, 0.01]:
+        data = percentage_cutting(data_point_jumps, percent, param)
+        save_as_csv(data, 'percentage_' + param + '_' + str(int(percent * 100)), folder='percentage/' + str(int(percent * 100)))
+        train_data, test_data = split_train_test(data)
+        if param in ['mean', 'mean_std']:
+            train_data = train_data.drop(columns=['Time', 'TimeInJump'])
+            test_data = test_data.drop(columns=['Time', 'TimeInJump'])
+        save_as_csv(train_data, 'percentage_' + param + '_' + str(int(percent * 100)) + '_train', folder='percentage/' + str(int(percent * 100)))
+        save_as_csv(test_data, 'percentage_' + param + '_' + str(int(percent * 100)) + '_test', folder='percentage/' + str(int(percent * 100)))
 
+    # mean werte für alle aktualisiert
 
     return
 
