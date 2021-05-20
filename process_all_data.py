@@ -448,7 +448,7 @@ def percentage_cutting(data, percent_steps, method=None):
     return df
 
 
-def vectorize(data):
+def vectorize(data, std=None):
     first = True
     for jump in data['SprungID'].unique():
         print(jump)
@@ -459,17 +459,41 @@ def vectorize(data):
                                'DJump_Abs_I_z LapEnd']].iloc[0]
         equal_data = equal_data.to_frame().transpose()
         percentage_list = np.rint(np.arange(0, 100, 100 / len(subframe)))
-        for row in range(len(subframe)):
+        if std is None:
+            for row in range(len(subframe)):
 
-            name = str(int(percentage_list[row]))
-            copy = subframe[['ACC_N', 'ACC_N_ROT_filtered', 'Acc_x_Fil', 'Acc_y_Fil', 'Acc_z_Fil',
-                             'Gyro_x_Fil', 'Gyro_y_Fil', 'Gyro_z_Fil']].iloc[int(row)]
-            copy = copy.to_frame().transpose()
-            copy.columns = [name + '-ACC_N', name + '-ACC_N_ROT_filtered', name + '-Acc_x_Fil',
-                            name + '-Acc_y_Fil', name + '-Acc_z_Fil', name + '-Gyro_x_Fil',
-                            name + '-Gyro_y_Fil', name + '-Gyro_z_Fil']
-            copy.reset_index(drop=True, inplace=True)
-            equal_data = pd.concat([equal_data, copy], axis=1)
+                name = str(int(percentage_list[row]))
+
+                copy = subframe[['ACC_N', 'ACC_N_ROT_filtered', 'Acc_x_Fil', 'Acc_y_Fil', 'Acc_z_Fil',
+                                 'Gyro_x_Fil', 'Gyro_y_Fil', 'Gyro_z_Fil']].iloc[int(row)]
+                copy = copy.to_frame().transpose()
+                copy.columns = [name + '-ACC_N', name + '-ACC_N_ROT_filtered', name + '-Acc_x_Fil',
+                                name + '-Acc_y_Fil', name + '-Acc_z_Fil', name + '-Gyro_x_Fil',
+                                name + '-Gyro_y_Fil', name + '-Gyro_z_Fil']
+                copy.reset_index(drop=True, inplace=True)
+                equal_data = pd.concat([equal_data, copy], axis=1)
+        else:
+            for row in range(len(subframe)):
+                name = str(int(percentage_list[row]))
+                copy = subframe[['mean_ACC_N', 'std_ACC_N',
+                                 'mean_ACC_N_ROT_filtered', 'std_ACC_N_ROT_filtered',
+                                 'mean_Acc_x_Fil', 'std_Acc_x_Fil',
+                                 'mean_Acc_y_Fil', 'std_Acc_y_Fil',
+                                 'mean_Acc_z_Fil', 'std_Acc_z_Fil',
+                                 'mean_Gyro_x_Fil', 'std_Gyro_x_Fil',
+                                 'mean_Gyro_y_Fil', 'std_Gyro_y_Fil',
+                                 'mean_Gyro_z_Fil', 'std_Gyro_z_Fil']].iloc[int(row)]
+                copy = copy.to_frame().transpose()
+                copy.columns = [name + '-mean_ACC_N', name + '-std_ACC_N',
+                                name + '-mean_ACC_N_ROT_filtered', name + '-std_ACC_N_ROT_filtered',
+                                name + '-mean_Acc_x_Fil', name + '-std_Acc_x_Fil',
+                                name + '-mean_Acc_y_Fil', name + '-std_Acc_y_Fil',
+                                name + '-mean_Acc_z_Fil', name + '-std_Acc_z_Fil',
+                                name + '-mean_Gyro_x_Fil', name + '-std_Gyro_x_Fil',
+                                name + '-mean_Gyro_y_Fil', name + '-std_Gyro_y_Fil',
+                                name + '-mean_Gyro_z_Fil', name + '-std_Gyro_z_Fil']
+                copy.reset_index(drop=True, inplace=True)
+                equal_data = pd.concat([equal_data, copy], axis=1)
         if first is True:
             df = pd.DataFrame(columns=equal_data.columns)
             first = False
@@ -574,7 +598,7 @@ def main():
     '''
 
     #"""
-    name = 'percentage_'
+    name = 'percentage_mean_std_'
     for percent in ['25', '20', '10', '5', '2', '1']:
         data = pd.read_csv('Sprungdaten_processed/percentage/' + percent + '/' + name + percent + '.csv')
         train_data = pd.read_csv('Sprungdaten_processed/percentage/' + percent + '/' + name + percent + '_train' + '.csv')
@@ -583,10 +607,17 @@ def main():
             data = data.drop(columns=['Time', 'TimeInJump'])
             train_data = train_data.drop(columns=['Time', 'TimeInJump'])
             test_data = test_data.drop(columns=['Time', 'TimeInJump'])
-        vector_data = vectorize(data)
-        
-        vector_train_data = vectorize(train_data)
-        vector_test_data = vectorize(test_data)
+
+        if 'std' in name:
+            vector_data = vectorize(data, 'std')
+
+            vector_train_data = vectorize(train_data, 'std')
+            vector_test_data = vectorize(test_data, 'std')
+        else:
+            vector_data = vectorize(data)
+
+            vector_train_data = vectorize(train_data)
+            vector_test_data = vectorize(test_data)
         save_as_csv(vector_train_data, 'vector_' + name + percent + '_train', folder='percentage/' + percent)
         save_as_csv(vector_test_data,  'vector_' + name + percent + '_test', folder='percentage/' + percent)
         save_as_csv(vector_data, 'vector_' + name + percent, folder='percentage/' + percent)
