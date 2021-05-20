@@ -461,13 +461,14 @@ def vectorize(data):
         percentage_list = np.rint(np.arange(0, 100, 100 / len(subframe)))
         for row in range(len(subframe)):
 
-            name = percentage_list[row]
+            name = str(int(percentage_list[row]))
             copy = subframe[['ACC_N', 'ACC_N_ROT_filtered', 'Acc_x_Fil', 'Acc_y_Fil', 'Acc_z_Fil',
                              'Gyro_x_Fil', 'Gyro_y_Fil', 'Gyro_z_Fil']].iloc[int(row)]
             copy = copy.to_frame().transpose()
-            copy.columns = [str(int(name)) + '-ACC_N', str(int(name)) + '-ACC_N_ROT_filtered', str(int(name)) + '-Acc_x_Fil',
-                            str(int(name)) + '-Acc_y_Fil', str(int(name)) + '-Acc_z_Fil', str(int(name)) + '-Gyro_x_Fil',
-                            str(int(name)) + '-Gyro_y_Fil', str(int(name)) + '-Gyro_z_Fil']
+            copy.columns = [name + '-ACC_N', name + '-ACC_N_ROT_filtered', name + '-Acc_x_Fil',
+                            name + '-Acc_y_Fil', name + '-Acc_z_Fil', name + '-Gyro_x_Fil',
+                            name + '-Gyro_y_Fil', name + '-Gyro_z_Fil']
+            copy.reset_index(drop=True, inplace=True)
             equal_data = pd.concat([equal_data, copy], axis=1)
         if first is True:
             df = pd.DataFrame(columns=equal_data.columns)
@@ -572,27 +573,28 @@ def main():
     save_as_csv(data, 'vector_' + name, folder='percentage/1')
     '''
 
-    """
+    #"""
     name = 'percentage_'
-    for percent in ['1', '2', '5', '10', '20', '25']:
+    for percent in ['25', '20', '10', '5', '2', '1']:
         data = pd.read_csv('Sprungdaten_processed/percentage/' + percent + '/' + name + percent + '.csv')
         train_data = pd.read_csv('Sprungdaten_processed/percentage/' + percent + '/' + name + percent + '_train' + '.csv')
-        test_data = pd.read_csv('Sprungdaten_processed/percentage/' + percent + '/' + name + percent +'_tes'+ '.csv')
+        test_data = pd.read_csv('Sprungdaten_processed/percentage/' + percent + '/' + name + percent +'_test'+ '.csv')
         if 'mean' not in name:
-            data = data.drop(columns=['Time', 'TimeInJump']
-            train_data = train_data.drop(columns=['Time', 'TimeInJump']
-            test_data = test_data.drop(columns=['Time', 'TimeInJump']
+            data = data.drop(columns=['Time', 'TimeInJump'])
+            train_data = train_data.drop(columns=['Time', 'TimeInJump'])
+            test_data = test_data.drop(columns=['Time', 'TimeInJump'])
         vector_data = vectorize(data)
         
         vector_train_data = vectorize(train_data)
         vector_test_data = vectorize(test_data)
-        save_as_csv(train_data, 'vector_' + name + percent + '_train', folder='percentage/' + percent)
-        save_as_csv(test_data,  'vector_' + name + percent + '_test', folder='percentage/' + percent)
+        save_as_csv(vector_train_data, 'vector_' + name + percent + '_train', folder='percentage/' + percent)
+        save_as_csv(vector_test_data,  'vector_' + name + percent + '_test', folder='percentage/' + percent)
         save_as_csv(vector_data, 'vector_' + name + percent, folder='percentage/' + percent)
-    """
+    #"""
 
+    """
     data_point_jumps = read_data("data_point_jumps")
-    param = 'mean'
+    param = 'mean_std'
     for percent in [0.25, 0.20, 0.10, 0.05, 0.02, 0.01]:
         data = percentage_cutting(data_point_jumps, percent, param)
         save_as_csv(data, 'percentage_' + param + '_' + str(int(percent * 100)), folder='percentage/' + str(int(percent * 100)))
@@ -603,7 +605,7 @@ def main():
         save_as_csv(train_data, 'percentage_' + param + '_' + str(int(percent * 100)) + '_train', folder='percentage/' + str(int(percent * 100)))
         save_as_csv(test_data, 'percentage_' + param + '_' + str(int(percent * 100)) + '_test', folder='percentage/' + str(int(percent * 100)))
 
-    # mean werte für alle aktualisiert
+    """
 
     return
 
