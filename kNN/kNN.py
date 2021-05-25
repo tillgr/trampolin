@@ -32,17 +32,17 @@ if __name__ == '__main__':
     X_test = test.loc[:, start_column:end_column].to_numpy()
     '''
 
-    train_merged = train.merge(train_avg)
-    test_merged = test.merge(test_avg)
+    #train_merged = train.merge(train_avg)
+    #test_merged = test.merge(test_avg)
 
     # percentage 10
-    #train_merged = pd.read_csv("../Sprungdaten_processed/percentage/10/vector_percentage_10_train.csv")
-    #test_merged = pd.read_csv("../Sprungdaten_processed/percentage/10/vector_percentage_10_test.csv")
+    train_merged = pd.read_csv("../Sprungdaten_processed/percentage/10/vector_percentage_10_train.csv")
+    test_merged = pd.read_csv("../Sprungdaten_processed/percentage/10/vector_percentage_10_test.csv")
 
-    start_column: str = 'Acc_x_Fil_1'
-    end_column: str = 'DJump_Abs_I_z LapEnd'
-    #start_column: str = 'DJump_SIG_I_x LapEnd'
-    #end_column: str = '10-Gyro_z_Fil'
+    #start_column: str = 'Acc_x_Fil_1'
+    #end_column: str = 'DJump_Abs_I_z LapEnd'
+    start_column: str = 'DJump_SIG_I_x LapEnd'
+    end_column: str = '90-Gyro_z_Fil'
 
 
     # get X_train
