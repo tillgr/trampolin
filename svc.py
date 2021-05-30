@@ -3,6 +3,7 @@ from pandas import DataFrame
 import logging
 
 from sklearn.metrics import accuracy_score, f1_score
+from sklearn.naive_bayes import GaussianNB
 from sklearn.svm import SVC
 
 from random_classifier import metrics
@@ -10,6 +11,7 @@ from random_classifier import metrics
 logging.basicConfig(filename='svc.log', format='%(asctime)s[%(name)s] - %(levelname)s - %(message)s',
                     level=logging.DEBUG)
 logger = logging.getLogger('SVC')
+gnb_logger = logging.getLogger("GNB")
 
 
 def easy_classify(X: DataFrame, y: DataFrame, kernel: str):
@@ -94,6 +96,16 @@ def classify(datasets: list, feature_start: str, feature_end: str, drops: list):
     prediction_and_evaludate(clf_linear, get_samples_features(test, feature_start, feature_end), test_actual)
 
 
+def gnb_classify(datasets: list, feature_start: str, feature_end: str, drops: list):
+    train, test = get_train_test_data(datasets)
+    gnb = GaussianNB()
+    X = get_samples_features(train, feature_start, feature_end)
+    y = get_targets(train)
+    test_actual = get_targets(test)
+    gnb.fit(X, y)
+    prediction_and_evaludate(gnb,get_samples_features(test, feature_start, feature_end), test_actual)
+
+
 if __name__ == '__main__':
     # logger.info("------------start of new run------------")
     # classify(['percentage/2/vector_percentage_2'], '0-ACC_N', '98-Gyro_z_Fil', [])
@@ -146,9 +158,16 @@ if __name__ == '__main__':
     # logger.info("------------p25 std------------")
     # classify(['percentage/25/vector_percentage_mean_std_25'], 'DJump_SIG_I_x LapEnd', '75-std_Gyro_z_Fil', [])
 
+    '''
     logger.info("------------avg ------------")
     classify(['averaged_data/averaged_data'], 'ACC_N', 'DJump_Abs_I_z LapEnd', [])
     logger.info("------------avg std------------")
     classify(['avg_std_data/avg_std_data'], 'avg_ACC_N', 'DJump_Abs_I_z LapEnd', [])
     logger.info("------------std------------")
     classify(['std_data/std_data'], 'ACC_N', 'Gyro_z_Fil', [])
+    '''
+
+    gnb_logger.info("------------start of new run------------")
+    gnb_classify(['percentage/25/vector_percentage_mean_25'], '0-ACC_N', '75-Gyro_z_Fil', [])
+    gnb_logger.info("------------start of new run------------")
+    gnb_classify(['percentage/25/vector_percentage_mean_25'], 'DJump_SIG_I_x LapEnd', '75-Gyro_z_Fil', [])
