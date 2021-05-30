@@ -8,7 +8,7 @@ from sklearn.svm import SVC
 
 from random_classifier import metrics
 
-logging.basicConfig(filename='svc.log', format='%(asctime)s[%(name)s] - %(levelname)s - %(message)s',
+logging.basicConfig(filename='svc_gnb.log', format='%(asctime)s[%(name)s] - %(levelname)s - %(message)s',
                     level=logging.DEBUG)
 logger = logging.getLogger('SVC')
 gnb_logger = logging.getLogger("GNB")
@@ -28,8 +28,8 @@ def prediction_and_evaludate(classifier: SVC, testing_sample: DataFrame, test_ac
     f1 = f1_score(test_actual.to_numpy(), predicted, average=f1_average)
     logger.info("F1 score with param " + f1_average + " :" + str(f1.round(4)))
     mean_prec, mean_rec, mean_f, mean_youden = metrics(test_actual.to_numpy(), predicted)
-    logger.info("Random classifier: F1 score: " + str(mean_f.round(4)))
     logger.info("Random classifier: Youden score: " + str(mean_youden.round(4)))
+    logger.info("Random classifier: F1 score: " + str(mean_f.round(4)))
 
     return score
 
@@ -106,7 +106,7 @@ def gnb_classify(datasets: list, feature_start: str, feature_end: str, drops: li
     prediction_and_evaludate(gnb,get_samples_features(test, feature_start, feature_end), test_actual)
 
 
-if __name__ == '__main__':
+def run_svc():
     # logger.info("------------start of new run------------")
     # classify(['percentage/2/vector_percentage_2'], '0-ACC_N', '98-Gyro_z_Fil', [])
     # logger.info("------------p2------------")
@@ -148,8 +148,19 @@ if __name__ == '__main__':
     # classify(['percentage/20/vector_percentage_20'], 'DJump_SIG_I_x LapEnd', '80-Gyro_z_Fil', [])
     # logger.info("------------p20 mean------------")
     # classify(['percentage/20/vector_percentage_mean_20'], 'DJump_SIG_I_x LapEnd', '80-Gyro_z_Fil', [])
-    # logger.info("------------p10 std------------")
-    # classify(['percentage/20/vector_percentage_mean_std_20'], 'DJump_SIG_I_x LapEnd', '80-std_Gyro_z_Fil', [])
+    # logger.info("------------p20 std------------")
+    #     # classify(['percentage/20/vector_percentage_mean_std_20'], 'DJump_SIG_I_x LapEnd', '80-std_Gyro_z_Fil', [])
+    # logger.info("------------p20 std-----only processed-------")
+    # classify(['percentage/20/vector_percentage_mean_std_20'], 'DJump_SIG_I_x LapEnd', 'DJump_Abs_I_z LapEnd', [])
+
+    i = 0
+    drops = []
+    while i < 100:
+        drops.append(str(i) + "-mean_ACC_N_ROT_filtered")
+        drops.append(str(i) + "-std_ACC_N_ROT_filtered")
+        i += 20
+    logger.info("------------p20 std-----without processed, without n rot filtered-------")
+    classify(['percentage/20/vector_percentage_mean_std_20'], '0-mean_ACC_N', '80-std_Gyro_z_Fil', drops)
 
     # logger.info("------------p25 ------------")
     # classify(['percentage/25/vector_percentage_25'], 'DJump_SIG_I_x LapEnd', '75-Gyro_z_Fil', [])
@@ -167,7 +178,79 @@ if __name__ == '__main__':
     classify(['std_data/std_data'], 'ACC_N', 'Gyro_z_Fil', [])
     '''
 
-    gnb_logger.info("------------start of new run------------")
-    gnb_classify(['percentage/25/vector_percentage_mean_25'], '0-ACC_N', '75-Gyro_z_Fil', [])
-    gnb_logger.info("------------start of new run------------")
-    gnb_classify(['percentage/25/vector_percentage_mean_25'], 'DJump_SIG_I_x LapEnd', '75-Gyro_z_Fil', [])
+
+def run_gnb():
+    # logger.info("------------start of new run---GNB--with partial fit-------")
+    # logger.info("------------p1 ------------")
+    # gnb_classify(['percentage/1/vector_percentage_1'], 'DJump_SIG_I_x LapEnd', '99-Gyro_z_Fil', [])
+    # logger.info("------------p1 mean------------")
+    # gnb_classify(['percentage/1/vector_percentage_mean_1'], 'DJump_SIG_I_x LapEnd', '99-Gyro_z_Fil', [])
+    # logger.info("------------p1 std------------")
+    # gnb_classify(['percentage/1/vector_percentage_mean_std_1'], 'DJump_SIG_I_x LapEnd', '99-std_Gyro_z_Fil', [])
+    #
+    # logger.info("------------p2------------")
+    # gnb_classify(['percentage/2/vector_percentage_2'], 'DJump_SIG_I_x LapEnd', '98-Gyro_z_Fil', [])
+    # logger.info("------------p2 mean------------")
+    # gnb_classify(['percentage/2/vector_percentage_mean_2'], 'DJump_SIG_I_x LapEnd', '98-Gyro_z_Fil', [])
+    # logger.info("------------p2 std------------")
+    # gnb_classify(['percentage/2/vector_percentage_mean_std_2'], 'DJump_SIG_I_x LapEnd', '98-std_Gyro_z_Fil', [])
+    #
+    # logger.info("------------p5 ------------")
+    # gnb_classify(['percentage/5/vector_percentage_5'], 'DJump_SIG_I_x LapEnd', '95-Gyro_z_Fil', [])
+    # logger.info("------------p5 mean------------")
+    # gnb_classify(['percentage/5/vector_percentage_mean_5'], 'DJump_SIG_I_x LapEnd', '95-Gyro_z_Fil', [])
+    # logger.info("------------p5 std------------")
+    # gnb_classify(['percentage/5/vector_percentage_mean_std_5'], 'DJump_SIG_I_x LapEnd', '95-std_Gyro_z_Fil', [])
+    #
+    # logger.info("------------p10 ------------")
+    # gnb_classify(['percentage/10/vector_percentage_10'], 'DJump_SIG_I_x LapEnd', '90-Gyro_z_Fil', [])
+    # logger.info("------------p10 mean------------")
+    # gnb_classify(['percentage/10/vector_percentage_mean_10'], 'DJump_SIG_I_x LapEnd', '90-Gyro_z_Fil', [])
+    # logger.info("------------p10 std------------")
+    # gnb_classify(['percentage/10/vector_percentage_mean_std_10'], 'DJump_SIG_I_x LapEnd', '90-std_Gyro_z_Fil', [])
+
+    logger.info("------------p10 std----without processed--------")
+    gnb_classify(['percentage/10/vector_percentage_mean_std_10'], '0-mean_ACC_N', '90-std_Gyro_z_Fil', [])
+    logger.info("------------p10 std----only processed--------")
+    gnb_classify(['percentage/10/vector_percentage_mean_std_10'], 'DJump_SIG_I_x LapEnd', 'DJump_Abs_I_z LapEnd', [])
+
+    i = 0
+    drops = []
+    while i < 100:
+        drops.append(str(i) + "-mean_ACC_N_ROT_filtered")
+        drops.append(str(i) + "-std_ACC_N_ROT_filtered")
+        i += 10
+    logger.info("------------p10 std----without processed without n rot filtered--------")
+    gnb_classify(['percentage/10/vector_percentage_mean_std_10'], '0-mean_ACC_N', '90-std_Gyro_z_Fil', [])
+
+
+    # logger.info("------------p20 ------------")
+    # gnb_classify(['percentage/20/vector_percentage_20'], 'DJump_SIG_I_x LapEnd', '80-Gyro_z_Fil', [])
+    # logger.info("------------p20 mean------------")
+    # gnb_classify(['percentage/20/vector_percentage_mean_20'], 'DJump_SIG_I_x LapEnd', '80-Gyro_z_Fil', [])
+    # logger.info("------------p20 std------------")
+    # gnb_classify(['percentage/20/vector_percentage_mean_std_20'], 'DJump_SIG_I_x LapEnd', '80-std_Gyro_z_Fil', [])
+    # logger.info("------------p20 std-----only processed-------")
+    # gnb_classify(['percentage/20/vector_percentage_mean_std_20'], 'DJump_SIG_I_x LapEnd', 'DJump_Abs_I_z LapEnd', [])
+    #
+
+    # logger.info("------------p20 std-----without processed, without n rot filtered-------")
+    # gnb_classify(['percentage/20/vector_percentage_mean_std_20'], '0-mean_ACC_N', '80-std_Gyro_z_Fil', drops)
+
+    # logger.info("------------p25 ------------")
+    # gnb_classify(['percentage/25/vector_percentage_25'], 'DJump_SIG_I_x LapEnd', '75-Gyro_z_Fil', [])
+    # logger.info("------------p25 mean------------")
+    # gnb_classify(['percentage/25/vector_percentage_mean_25'], 'DJump_SIG_I_x LapEnd', '75-Gyro_z_Fil', [])
+    # logger.info("------------p25 std------------")
+    # gnb_classify(['percentage/25/vector_percentage_mean_std_25'], 'DJump_SIG_I_x LapEnd', '75-std_Gyro_z_Fil', [])
+
+    # logger.info("------------avg ------------")
+    # gnb_classify(['averaged_data/averaged_data'], 'ACC_N', 'DJump_Abs_I_z LapEnd', [])
+    # logger.info("------------avg std------------")
+    # gnb_classify(['avg_std_data/avg_std_data'], 'avg_ACC_N', 'DJump_Abs_I_z LapEnd', [])
+    # logger.info("------------std------------")
+    # gnb_classify(['std_data/std_data'], 'ACC_N', 'Gyro_z_Fil', [])
+
+
+if __name__ == '__main__':
+    run_gnb()
