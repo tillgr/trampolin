@@ -3,6 +3,9 @@ import numpy as np
 import pandas as pd
 from sklearn.linear_model import SGDClassifier
 from sklearn import metrics
+from sklearn.metrics import accuracy_score, f1_score
+from random_classifier import metrics
+
 
 def test_1():
     train_data = pd.read_csv('../Sprungdaten_processed/jumps_time_splits/jumps_time_splits_train_51.csv')
@@ -40,7 +43,7 @@ def test2():
 
 if __name__ == '__main__':
 
-    train = pd.read_csv("../Sprungdaten_processed/jumps_time_splits/jumps_time_splits_train_101.csv")
+    '''train = pd.read_csv("../Sprungdaten_processed/jumps_time_splits/jumps_time_splits_train_101.csv")
     test = pd.read_csv("../Sprungdaten_processed/jumps_time_splits/jumps_time_splits_test_101.csv")
     train_avg = pd.read_csv("../Sprungdaten_processed/averaged_data/averaged_data_train.csv")
     test_avg = pd.read_csv("../Sprungdaten_processed/averaged_data/averaged_data_test.csv")
@@ -55,7 +58,20 @@ if __name__ == '__main__':
     y_train = np.array((train_merged['Sprungtyp']))
 
     X_test = test_merged.loc[:, start_column:end_column].to_numpy()
-    y_test = np.array((test_merged['Sprungtyp']))
+    y_test = np.array((test_merged['Sprungtyp']))'''
+
+    train_data = pd.read_csv('../Sprungdaten_processed/percentage/10/vector_percentage_mean_std_10_train.csv')
+    test_data = pd.read_csv('../Sprungdaten_processed/percentage/10/vector_percentage_mean_std_10_test.csv')
+
+    # get_features (X)
+    start_column: str = 'DJump_SIG_I_x LapEnd'
+    end_column: str = '90-std_Gyro_z_Fil'
+
+    X_train = train_data.loc[:, start_column:end_column].to_numpy()
+    y_train = np.array((train_data['Sprungtyp']))
+
+    X_test = test_data.loc[:, start_column:end_column].to_numpy()
+    y_test = np.array((test_data['Sprungtyp']))
 
     for losses in ['log', 'modified_huber', 'squared_hinge', 'perceptron']:
         for penalty in ['l2', 'l1', 'elasticnet']:
@@ -68,5 +84,9 @@ if __name__ == '__main__':
                                     n_iter_no_change=5, class_weight=None,
                                     warm_start=False, average=False).fit(X_train, y_train)
                 y_pred = clf.predict(X_test)
-                if metrics.accuracy_score(y_test, y_pred) > 0.87:
-                    print(f"Accuracy: {losses} , {penalty} , {maxi}: ", metrics.accuracy_score(y_test, y_pred))
+                if accuracy_score(y_test, y_pred) > 0.89:
+                    print(f"Accuracy score: {losses} , {penalty} , {maxi}: ", accuracy_score(y_test, y_pred))
+                    print(f"Accuracy f1 score weighted: {f1_score(y_test, y_pred, average='weighted')} ")
+                    mean_prec, mean_rec, mean_f, mean_youden = metrics(y_test, y_pred)
+                    print(f"Accuracy f1 score: {str(mean_f.round(5))}")
+                    print(f"Accuracy youden score: {str(mean_youden.round(5))}")
