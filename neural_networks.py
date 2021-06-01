@@ -6,6 +6,7 @@ from keras.layers import Dense, Conv2D, MaxPooling2D, Input, Flatten, Dropout, S
 from keras import backend as k
 import matplotlib.pyplot as plt
 import tensorflow as tf
+import shap
 
 
 def prepare_data():
@@ -260,17 +261,34 @@ def run_multiple_times_oneliner(num_columns, runs, act_func, loss, optim, epochs
 def main():
 
     x_train, y_train, x_test, y_test, jump_data_length, num_columns = prepare_data()
-    # x_train, y_train, x_test, y_test, num_columns = prepare_data_oneliner()
+    #x_train, y_train, x_test, y_test, num_columns = prepare_data_oneliner()
 
     # model = grid_search_build(x_train, y_train, x_test, y_test, jump_data_length)
     # model = build_model_testing(jump_data_length, x_train, y_train)
     # model = run_multiple_times(10, jump_data_length, 3, 3, 2, 2, 'tanh', 'kl_divergence', 'Nadam', x_train, y_train, x_test, y_test, 20)
-    model = run_multiple_times(jump_data_length, num_columns, runs=10, conv=1, kernel=3, pool=2, dense=2, act_func='tanh', loss='categorical_crossentropy', optim='Nadam', epochs=40, x_train=x_train, y_train=y_train, x_test=x_test, y_test=y_test)
+    model = run_multiple_times(jump_data_length, num_columns, runs=1, conv=1, kernel=3, pool=2, dense=2, act_func='tanh', loss='categorical_crossentropy', optim='Nadam', epochs=40, x_train=x_train, y_train=y_train, x_test=x_test, y_test=y_test)
     #model = run_multiple_times(jump_data_length, num_columns, runs=10, conv=3, kernel=3, pool=2, dense=2, act_func='tanh', loss='kl_divergence', optim='Nadam', epochs=30, x_train=x_train, y_train=y_train, x_test=x_test, y_test=y_test)
 
-    # model = run_multiple_times_oneliner(num_columns, runs=10, act_func='tanh', loss='kl_divergence', optim='adam', epochs=60, x_train=x_train, y_train=y_train, x_test=x_test, y_test=y_test)
+    # model = run_multiple_times_oneliner(num_columns, runs=1, act_func='tanh', loss='kl_divergence', optim='adam', epochs=60, x_train=x_train, y_train=y_train, x_test=x_test, y_test=y_test)
 
     model.evaluate(x_test, y_test, verbose=1)
+
+    """
+    shap.initjs()
+    explainer = shap.KernelExplainer(model, x_train)
+    output = x_test.copy()
+    output['predict'] = pd.DataFrame(np.round(model.predict(output), 2)).idxmax(axis=1)
+    shap_values = explainer.shap_values(x_test, nsamples=1)
+    shap.force_plot(explainer.expected_value[0], shap_values[0], x_test, link="logit")
+    """
+
+    shap.initjs()
+
+    background = x_train[np.random.choice(x_train.shape[0], 100, replace=False)]
+    e = shap.DeepExplainer(model, background)
+    shap_values = e.shap_values(x_test[1: 5])
+    shap.image_plot(shap_values, -x_test[1: 5])
+
 
     return
 
