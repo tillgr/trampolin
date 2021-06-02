@@ -576,7 +576,7 @@ def main():
     """
     # template for creating datasets percentage
 
-    #"""
+    """
     data_point_jumps = read_data("data_point_jumps")
     param = 'mean_std'
     for percent in [0.25, 0.20, 0.10, 0.05, 0.02, 0.01]:
@@ -588,7 +588,7 @@ def main():
         save_as_csv(train_data, 'percentage_' + param + '_' + str(int(percent * 100)) + '_train', folder='percentage/' + str(int(percent * 100)))
         save_as_csv(test_data, 'percentage_' + param + '_' + str(int(percent * 100)) + '_test', folder='percentage/' + str(int(percent * 100)))
 
-    # """
+    """
 
     # template for vectorisation
     """
@@ -616,6 +616,47 @@ def main():
         save_as_csv(vector_test_data,  'vector_' + name + percent + '_test', folder='percentage/' + percent)
         save_as_csv(vector_data, 'vector_' + name + percent, folder='percentage/' + percent)
     """
+
+    data_only_jumps = pd.read_csv("Sprungdaten_processed/data_only_jumps.csv")
+    data_only_jumps = correct_space_errors(data_only_jumps)
+
+    data_only_jumps = data_only_jumps.drop(['ACC_N_ROT_filtered', 'DJump_SIG_I_x LapEnd', 'DJump_SIG_I_y LapEnd', 'DJump_SIG_I_z LapEnd',
+                                            'DJump_Abs_I_x LapEnd', 'DJump_Abs_I_y LapEnd', 'DJump_Abs_I_z LapEnd'], axis=1)
+
+    files = os.listdir('Sprungdaten Innotramp/preprocessed data')
+
+    preprocessed_data = pd.DataFrame(columns=['SprungID', 'Messung', 'Lap#',
+                                              'DJump_SIG_I_x LapEnd', 'DJump_SIG_I_y LapEnd', 'DJump_SIG_I_z LapEnd',
+                                              'DJump_I_ABS_x LapEnd', 'DJump_I_ABS_y LapEnd', 'DJump_I_ABS_z LapEnd',
+                                              'DJump_ABS_I_x LapEnd', 'DJump_ABS_I_y LapEnd', 'DJump_ABS_I_z LapEnd',
+                                              'DJump_SIG_I_S1_x LapEnd', 'DJump_SIG_I_S1_y LapEnd', 'DJump_SIG_I_S1_z LapEnd',
+                                              'DJump_SIG_I_S2_x LapEnd', 'DJump_SIG_I_S2_y LapEnd', 'DJump_SIG_I_S2_z LapEnd',
+                                              'DJump_SIG_I_S3_x LapEnd', 'DJump_SIG_I_S3_y LapEnd', 'DJump_SIG_I_S3_z LapEnd',
+                                              'DJump_SIG_I_S4_x LapEnd', 'DJump_SIG_I_S4_y LapEnd', 'DJump_SIG_I_S4_z LapEnd',
+                                              'DJump_I_ABS_S1_x LapEnd', 'DJump_I_ABS_S1_y LapEnd', 'DJump_I_ABS_S1_z LapEnd',
+                                              'DJump_I_ABS_S2_x LapEnd', 'DJump_I_ABS_S2_y LapEnd', 'DJump_I_ABS_S2_z LapEnd',
+                                              'DJump_I_ABS_S3_x LapEnd', 'DJump_I_ABS_S3_y LapEnd', 'DJump_I_ABS_S3_z LapEnd',
+                                              'DJump_I_ABS_S4_x LapEnd', 'DJump_I_ABS_S4_y LapEnd', 'DJump_I_ABS_S4_z LapEnd',
+                                              'DJump_ABS_I_S1_x LapEnd', 'DJump_ABS_I_S1_y LapEnd', 'DJump_ABS_I_S1_z LapEnd',
+                                              'DJump_ABS_I_S2_x LapEnd', 'DJump_ABS_I_S2_y LapEnd', 'DJump_ABS_I_S2_z LapEnd',
+                                              'DJump_ABS_I_S3_x LapEnd', 'DJump_ABS_I_S3_y LapEnd', 'DJump_ABS_I_S3_z LapEnd',
+                                              'DJump_ABS_I_S4_x LapEnd', 'DJump_ABS_I_S4_y LapEnd', 'DJump_ABS_I_S4_z LapEnd'])
+
+    for file in files:
+        data = pd.read_excel("Sprungdaten Innotramp/preprocessed data/" + file, engine="openpyxl")
+        data = data.drop(['Event', 'Lap ID', 'Total laps', 'Zeit', 'Meter'], axis=1)
+        id_list = []
+        for row in data.iterrows():
+            jump_id = row[1]['Messung'] + "-" + str(row[1]['Lap#'])
+            id_list.append(jump_id)
+        data.insert(0, "SprungID", id_list)
+
+        preprocessed_data = preprocessed_data.append(data, ignore_index=True)
+
+    preprocessed_data = preprocessed_data.drop(['Messung', 'Lap#'], axis=1)
+
+    # huge
+    data = pd.merge(data_only_jumps, preprocessed_data, on='SprungID', how='left')
 
     return
 
