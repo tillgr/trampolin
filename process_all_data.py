@@ -35,7 +35,10 @@ def save_as_csv(data, name, folder=""):
         except:
             print("couldnt round column " + column)
 
-    data.to_csv('Sprungdaten_processed/' + folder + "/" + name + ".csv", index=False)
+    if folder == "":
+        data.to_csv('Sprungdaten_processed/' + name + ".csv", index=False)
+    else:
+        data.to_csv('Sprungdaten_processed/' + folder + "/" + name + ".csv", index=False)
 
 
 def delete_0_point_jumps(data):
@@ -103,15 +106,19 @@ def convert_comma_to_dot(x):
     return float(x.replace(',', '.'))
 
 
-def calc_avg(data):
-    averaged_data = pd.DataFrame(columns=['Sprungtyp', 'SprungID', 'ACC_N', 'ACC_N_ROT_filtered',
-                                          'Acc_x_Fil', 'Acc_y_Fil', 'Acc_z_Fil', 'Gyro_x_Fil', 'Gyro_y_Fil',
-                                          'Gyro_z_Fil',
-                                          'DJump_SIG_I_x LapEnd', 'DJump_SIG_I_y LapEnd', 'DJump_SIG_I_z LapEnd',
-                                          'DJump_Abs_I_x LapEnd', 'DJump_Abs_I_y LapEnd', 'DJump_Abs_I_z LapEnd'])
+def calc_avg(data, with_preprocessed=False):
+    if with_preprocessed:
+        averaged_data = pd.DataFrame(columns=['Sprungtyp', 'SprungID', 'ACC_N',
+                                              'Acc_x_Fil', 'Acc_y_Fil', 'Acc_z_Fil', 'Gyro_x_Fil', 'Gyro_y_Fil',
+                                              'Gyro_z_Fil',
+                                              'DJump_SIG_I_x LapEnd', 'DJump_SIG_I_y LapEnd', 'DJump_SIG_I_z LapEnd',
+                                              'DJump_Abs_I_x LapEnd', 'DJump_Abs_I_y LapEnd', 'DJump_Abs_I_z LapEnd']) # TODO
 
-    std_data = pd.DataFrame(columns=['Sprungtyp', 'SprungID', 'ACC_N', 'ACC_N_ROT_filtered',
-                                     'Acc_x_Fil', 'Acc_y_Fil', 'Acc_z_Fil', 'Gyro_x_Fil', 'Gyro_y_Fil', 'Gyro_z_Fil'])
+    else:
+        averaged_data = pd.DataFrame(columns=['Sprungtyp', 'SprungID', 'ACC_N',
+                                              'Acc_x_Fil', 'Acc_y_Fil', 'Acc_z_Fil', 'Gyro_x_Fil', 'Gyro_y_Fil', 'Gyro_z_Fil'])
+
+    std_data = pd.DataFrame(columns=['Sprungtyp', 'SprungID', 'ACC_N', 'Acc_x_Fil', 'Acc_y_Fil', 'Acc_z_Fil', 'Gyro_x_Fil', 'Gyro_y_Fil', 'Gyro_z_Fil'])
 
     for id in data['SprungID'].unique():
         subframe = data[data['SprungID'] == id]
@@ -131,20 +138,24 @@ def calc_avg(data):
         print(len(averaged_data) - 1)
 
     averaged_data = averaged_data.drop(columns=['Time', 'TimeInJump'])
-    std_data = std_data.drop(columns=['Time', 'DJump_SIG_I_x LapEnd', 'DJump_SIG_I_y LapEnd', 'DJump_SIG_I_z LapEnd',
-                                      'DJump_Abs_I_x LapEnd', 'DJump_Abs_I_y LapEnd', 'DJump_Abs_I_z LapEnd',
-                                      'TimeInJump'])
+    if with_preprocessed:
+        std_data = std_data.drop(columns=['Time', 'DJump_SIG_I_x LapEnd', 'DJump_SIG_I_y LapEnd', 'DJump_SIG_I_z LapEnd', # TODO
+                                          'DJump_Abs_I_x LapEnd', 'DJump_Abs_I_y LapEnd', 'DJump_Abs_I_z LapEnd',
+                                          'TimeInJump'])
 
-    averaged_data = averaged_data.round({'ACC_N': 3, 'ACC_N_ROT_filtered': 3,
-                                         'Acc_x_Fil': 3, 'Acc_y_Fil': 3, 'Acc_z_Fil': 3, 'Gyro_x_Fil': 3,
-                                         'Gyro_y_Fil': 3, 'Gyro_z_Fil': 3,
-                                         'DJump_SIG_I_x LapEnd': 3, 'DJump_SIG_I_y LapEnd': 3,
-                                         'DJump_SIG_I_z LapEnd': 3,
-                                         'DJump_Abs_I_x LapEnd': 3, 'DJump_Abs_I_y LapEnd': 3,
-                                         'DJump_Abs_I_z LapEnd': 3})
+        averaged_data = averaged_data.round({'ACC_N': 3,
+                                             'Acc_x_Fil': 3, 'Acc_y_Fil': 3, 'Acc_z_Fil': 3, 'Gyro_x_Fil': 3,
+                                             'Gyro_y_Fil': 3, 'Gyro_z_Fil': 3,
+                                             'DJump_SIG_I_x LapEnd': 3, 'DJump_SIG_I_y LapEnd': 3,
+                                             'DJump_SIG_I_z LapEnd': 3,
+                                             'DJump_Abs_I_x LapEnd': 3, 'DJump_Abs_I_y LapEnd': 3,
+                                             'DJump_Abs_I_z LapEnd': 3}) # TODO
+    else:
+        std_data = std_data.drop(columns=['Time', 'TimeInJump'])
 
-    std_data = std_data.round({'ACC_N': 3, 'ACC_N_ROT_filtered': 3, 'Acc_x_Fil': 3, 'Acc_y_Fil': 3, 'Acc_z_Fil': 3,
-                               'Gyro_x_Fil': 3, 'Gyro_y_Fil': 3, 'Gyro_z_Fil': 3})
+        averaged_data = averaged_data.round({'ACC_N': 3, 'Acc_x_Fil': 3, 'Acc_y_Fil': 3, 'Acc_z_Fil': 3, 'Gyro_x_Fil': 3, 'Gyro_y_Fil': 3, 'Gyro_z_Fil': 3})
+
+    std_data = std_data.round({'ACC_N': 3, 'Acc_x_Fil': 3, 'Acc_y_Fil': 3, 'Acc_z_Fil': 3, 'Gyro_x_Fil': 3, 'Gyro_y_Fil': 3, 'Gyro_z_Fil': 3})
 
     print(averaged_data)
     print(std_data)
@@ -270,24 +281,32 @@ def split_train_test(data):
     return train_data, test_data
 
 
-def combine_avg_std(avg_data, std_data):
-    avg_data.rename(columns={'ACC_N': 'avg_ACC_N', 'ACC_N_ROT_filtered': 'avg_ACC_N_ROT_filtered',
+def combine_avg_std(avg_data, std_data, with_preprocessed=False):
+    avg_data.rename(columns={'ACC_N': 'avg_ACC_N',
                              'Acc_x_Fil': 'avg_Acc_x_Fil', 'Acc_y_Fil': 'avg_Acc_y_Fil', 'Acc_z_Fil': 'avg_Acc_z_Fil',
                              'Gyro_x_Fil': 'avg_Gyro_x_Fil', 'Gyro_y_Fil': 'avg_Gyro_y_Fil',
                              'Gyro_z_Fil': 'avg_Gyro_z_Fil'}, inplace=True)
 
-    std_data.rename(columns={'ACC_N': 'std_ACC_N', 'ACC_N_ROT_filtered': 'std_ACC_N_ROT_filtered',
+    std_data.rename(columns={'ACC_N': 'std_ACC_N',
                              'Acc_x_Fil': 'std_Acc_x_Fil', 'Acc_y_Fil': 'std_Acc_y_Fil', 'Acc_z_Fil': 'std_Acc_z_Fil',
                              'Gyro_x_Fil': 'std_Gyro_x_Fil', 'Gyro_y_Fil': 'std_Gyro_y_Fil',
                              'Gyro_z_Fil': 'std_Gyro_z_Fil'}, inplace=True)
 
     avg_std_data = pd.merge(avg_data, std_data, on=['SprungID', 'Sprungtyp'], how='left')
-    avg_std_data = avg_std_data[
-        ['Sprungtyp', 'SprungID', 'avg_ACC_N', 'std_ACC_N', 'avg_ACC_N_ROT_filtered', 'std_ACC_N_ROT_filtered',
-         'avg_Acc_x_Fil', 'std_Acc_x_Fil', 'avg_Acc_y_Fil', 'std_Acc_y_Fil', 'avg_Acc_z_Fil', 'std_Acc_z_Fil',
-         'avg_Gyro_x_Fil', 'std_Gyro_x_Fil', 'avg_Gyro_y_Fil', 'std_Gyro_y_Fil', 'avg_Gyro_z_Fil', 'std_Gyro_z_Fil',
-         'DJump_SIG_I_x LapEnd', 'DJump_SIG_I_y LapEnd', 'DJump_SIG_I_z LapEnd',
-         'DJump_Abs_I_x LapEnd', 'DJump_Abs_I_y LapEnd', 'DJump_Abs_I_z LapEnd']]
+
+    if with_preprocessed:  # TODO
+        avg_std_data = avg_std_data[
+            ['Sprungtyp', 'SprungID', 'avg_ACC_N', 'std_ACC_N',
+             'avg_Acc_x_Fil', 'std_Acc_x_Fil', 'avg_Acc_y_Fil', 'std_Acc_y_Fil', 'avg_Acc_z_Fil', 'std_Acc_z_Fil',
+             'avg_Gyro_x_Fil', 'std_Gyro_x_Fil', 'avg_Gyro_y_Fil', 'std_Gyro_y_Fil', 'avg_Gyro_z_Fil', 'std_Gyro_z_Fil',
+             'DJump_SIG_I_x LapEnd', 'DJump_SIG_I_y LapEnd', 'DJump_SIG_I_z LapEnd',
+             'DJump_Abs_I_x LapEnd', 'DJump_Abs_I_y LapEnd', 'DJump_Abs_I_z LapEnd']]
+
+    else:
+        avg_std_data = avg_std_data[
+            ['Sprungtyp', 'SprungID', 'avg_ACC_N', 'std_ACC_N',
+             'avg_Acc_x_Fil', 'std_Acc_x_Fil', 'avg_Acc_y_Fil', 'std_Acc_y_Fil', 'avg_Acc_z_Fil', 'std_Acc_z_Fil',
+             'avg_Gyro_x_Fil', 'std_Gyro_x_Fil', 'avg_Gyro_y_Fil', 'std_Gyro_y_Fil', 'avg_Gyro_z_Fil', 'std_Gyro_z_Fil']]
 
     return avg_std_data
 
@@ -356,12 +375,17 @@ def make_jump_length_consistent(data, method="cut_last"):
     return df
 
 
-def percentage_cutting(data, percent_steps, method=None):
+def percentage_cutting(data, percent_steps, method=None, with_preprocessed=False):
     if method is None:
-        df = pd.DataFrame(columns=['SprungID', 'Sprungtyp', 'Time', 'TimeInJump', 'ACC_N', 'ACC_N_ROT_filtered',
-                                   'Acc_x_Fil', 'Acc_y_Fil', 'Acc_z_Fil', 'Gyro_x_Fil', 'Gyro_y_Fil', 'Gyro_z_Fil',
-                                   'DJump_SIG_I_x LapEnd', 'DJump_SIG_I_y LapEnd', 'DJump_SIG_I_z LapEnd',
-                                   'DJump_Abs_I_x LapEnd', 'DJump_Abs_I_y LapEnd', 'DJump_Abs_I_z LapEnd'])
+        if with_preprocessed:
+            df = pd.DataFrame(columns=['SprungID', 'Sprungtyp', 'Time', 'TimeInJump', 'ACC_N',
+                                       'Acc_x_Fil', 'Acc_y_Fil', 'Acc_z_Fil', 'Gyro_x_Fil', 'Gyro_y_Fil', 'Gyro_z_Fil',
+                                       'DJump_SIG_I_x LapEnd', 'DJump_SIG_I_y LapEnd', 'DJump_SIG_I_z LapEnd',
+                                       'DJump_Abs_I_x LapEnd', 'DJump_Abs_I_y LapEnd', 'DJump_Abs_I_z LapEnd']) # TODO
+        else:
+            df = pd.DataFrame(columns=['SprungID', 'Sprungtyp', 'Time', 'TimeInJump', 'ACC_N',
+                                       'Acc_x_Fil', 'Acc_y_Fil', 'Acc_z_Fil', 'Gyro_x_Fil', 'Gyro_y_Fil', 'Gyro_z_Fil'])
+
         for jump in data['SprungID'].unique():
             print(jump)
             subframe = data[data['SprungID'] == jump]
@@ -371,10 +395,15 @@ def percentage_cutting(data, percent_steps, method=None):
                 index_list = index_list[:-1]
             df = df.append(subframe.iloc[index_list], ignore_index=True)
     if method == 'mean':
-        df = pd.DataFrame(columns=['SprungID', 'Sprungtyp', 'ACC_N', 'ACC_N_ROT_filtered',
-                                   'Acc_x_Fil', 'Acc_y_Fil', 'Acc_z_Fil', 'Gyro_x_Fil', 'Gyro_y_Fil', 'Gyro_z_Fil',
-                                   'DJump_SIG_I_x LapEnd', 'DJump_SIG_I_y LapEnd', 'DJump_SIG_I_z LapEnd',
-                                   'DJump_Abs_I_x LapEnd', 'DJump_Abs_I_y LapEnd', 'DJump_Abs_I_z LapEnd'])
+        if with_preprocessed:
+            df = pd.DataFrame(columns=['SprungID', 'Sprungtyp', 'ACC_N',
+                                       'Acc_x_Fil', 'Acc_y_Fil', 'Acc_z_Fil', 'Gyro_x_Fil', 'Gyro_y_Fil', 'Gyro_z_Fil',
+                                       'DJump_SIG_I_x LapEnd', 'DJump_SIG_I_y LapEnd', 'DJump_SIG_I_z LapEnd',
+                                       'DJump_Abs_I_x LapEnd', 'DJump_Abs_I_y LapEnd', 'DJump_Abs_I_z LapEnd']) # TODO
+        else:
+            df = pd.DataFrame(columns=['SprungID', 'Sprungtyp', 'ACC_N',
+                                       'Acc_x_Fil', 'Acc_y_Fil', 'Acc_z_Fil', 'Gyro_x_Fil', 'Gyro_y_Fil', 'Gyro_z_Fil'])
+
         for jump in data['SprungID'].unique():
             print(jump)
             subframe = data[data['SprungID'] == jump]
@@ -401,17 +430,27 @@ def percentage_cutting(data, percent_steps, method=None):
 
                 df = df.append(temp, ignore_index=True)
     if method == 'mean_std':
-        df = pd.DataFrame(columns=['SprungID', 'Sprungtyp',
-                                   'mean_ACC_N', 'std_ACC_N',
-                                   'mean_ACC_N_ROT_filtered', 'std_ACC_N_ROT_filtered',
-                                   'mean_Acc_x_Fil', 'std_Acc_x_Fil',
-                                   'mean_Acc_y_Fil', 'std_Acc_y_Fil',
-                                   'mean_Acc_z_Fil', 'std_Acc_z_Fil',
-                                   'mean_Gyro_x_Fil', 'std_Gyro_x_Fil',
-                                   'mean_Gyro_y_Fil', 'std_Gyro_y_Fil',
-                                   'mean_Gyro_z_Fil', 'std_Gyro_z_Fil',
-                                   'DJump_SIG_I_x LapEnd', 'DJump_SIG_I_y LapEnd', 'DJump_SIG_I_z LapEnd',
-                                   'DJump_Abs_I_x LapEnd', 'DJump_Abs_I_y LapEnd', 'DJump_Abs_I_z LapEnd'])
+        if with_preprocessed:
+            df = pd.DataFrame(columns=['SprungID', 'Sprungtyp',
+                                       'mean_ACC_N', 'std_ACC_N',
+                                       'mean_Acc_x_Fil', 'std_Acc_x_Fil',
+                                       'mean_Acc_y_Fil', 'std_Acc_y_Fil',
+                                       'mean_Acc_z_Fil', 'std_Acc_z_Fil',
+                                       'mean_Gyro_x_Fil', 'std_Gyro_x_Fil',
+                                       'mean_Gyro_y_Fil', 'std_Gyro_y_Fil',
+                                       'mean_Gyro_z_Fil', 'std_Gyro_z_Fil',
+                                       'DJump_SIG_I_x LapEnd', 'DJump_SIG_I_y LapEnd', 'DJump_SIG_I_z LapEnd',
+                                       'DJump_Abs_I_x LapEnd', 'DJump_Abs_I_y LapEnd', 'DJump_Abs_I_z LapEnd']) # TODO
+        else:
+            df = pd.DataFrame(columns=['SprungID', 'Sprungtyp',
+                                       'mean_ACC_N', 'std_ACC_N',
+                                       'mean_Acc_x_Fil', 'std_Acc_x_Fil',
+                                       'mean_Acc_y_Fil', 'std_Acc_y_Fil',
+                                       'mean_Acc_z_Fil', 'std_Acc_z_Fil',
+                                       'mean_Gyro_x_Fil', 'std_Gyro_x_Fil',
+                                       'mean_Gyro_y_Fil', 'std_Gyro_y_Fil',
+                                       'mean_Gyro_z_Fil', 'std_Gyro_z_Fil'])
+
         for jump in data['SprungID'].unique():
             print(jump)
             subframe = data[data['SprungID'] == jump]
@@ -430,15 +469,20 @@ def percentage_cutting(data, percent_steps, method=None):
                 mean = mean.to_frame().transpose()
                 std = std.to_frame().transpose()
                 mean = mean.drop(['Time', 'TimeInJump'], axis=1)
-                std = std.drop(['Time', 'TimeInJump', 'DJump_SIG_I_x LapEnd', 'DJump_SIG_I_y LapEnd',
-                                'DJump_SIG_I_z LapEnd', 'DJump_Abs_I_x LapEnd', 'DJump_Abs_I_y LapEnd',
-                                'DJump_Abs_I_z LapEnd'], axis=1)
-                mean.columns = ['mean_ACC_N', 'mean_ACC_N_ROT_filtered',
-                                'mean_Acc_x_Fil', 'mean_Acc_y_Fil', 'mean_Acc_z_Fil', 'mean_Gyro_x_Fil',
-                                'mean_Gyro_y_Fil', 'mean_Gyro_z_Fil',
-                                'DJump_SIG_I_x LapEnd', 'DJump_SIG_I_y LapEnd', 'DJump_SIG_I_z LapEnd',
-                                'DJump_Abs_I_x LapEnd', 'DJump_Abs_I_y LapEnd', 'DJump_Abs_I_z LapEnd']
-                std.columns = ['std_ACC_N', 'std_ACC_N_ROT_filtered', 'std_Acc_x_Fil', 'std_Acc_y_Fil',
+                if with_preprocessed:
+                    std = std.drop(['Time', 'TimeInJump', 'DJump_SIG_I_x LapEnd', 'DJump_SIG_I_y LapEnd',
+                                    'DJump_SIG_I_z LapEnd', 'DJump_Abs_I_x LapEnd', 'DJump_Abs_I_y LapEnd',
+                                    'DJump_Abs_I_z LapEnd'], axis=1)
+                    mean.columns = ['mean_ACC_N', 'mean_Acc_x_Fil', 'mean_Acc_y_Fil', 'mean_Acc_z_Fil', 'mean_Gyro_x_Fil',
+                                    'mean_Gyro_y_Fil', 'mean_Gyro_z_Fil',
+                                    'DJump_SIG_I_x LapEnd', 'DJump_SIG_I_y LapEnd', 'DJump_SIG_I_z LapEnd', # TODO
+                                    'DJump_Abs_I_x LapEnd', 'DJump_Abs_I_y LapEnd', 'DJump_Abs_I_z LapEnd']
+                else:
+                    std = std.drop(['Time', 'TimeInJump'], axis=1)
+                    mean.columns = ['mean_ACC_N', 'mean_Acc_x_Fil', 'mean_Acc_y_Fil', 'mean_Acc_z_Fil', 'mean_Gyro_x_Fil',
+                                    'mean_Gyro_y_Fil', 'mean_Gyro_z_Fil']
+
+                std.columns = ['std_ACC_N', 'std_Acc_x_Fil', 'std_Acc_y_Fil',
                                'std_Acc_z_Fil', 'std_Gyro_x_Fil', 'std_Gyro_y_Fil', 'std_Gyro_z_Fil']
 
                 temp = pd.concat([mean, std], axis=1)
@@ -617,12 +661,26 @@ def main():
         save_as_csv(vector_data, 'vector_' + name + percent, folder='percentage/' + percent)
     """
 
-    data_only_jumps = pd.read_csv("Sprungdaten_processed/data_only_jumps.csv")
+    """
+    data_only_jumps = pd.read_csv("Sprungdaten_processed/old/data_only_jumps.csv")
     data_only_jumps = correct_space_errors(data_only_jumps)
 
     data_only_jumps = data_only_jumps.drop(['ACC_N_ROT_filtered', 'DJump_SIG_I_x LapEnd', 'DJump_SIG_I_y LapEnd', 'DJump_SIG_I_z LapEnd',
                                             'DJump_Abs_I_x LapEnd', 'DJump_Abs_I_y LapEnd', 'DJump_Abs_I_z LapEnd'], axis=1)
 
+    # undersample strecksprung
+    subframe = data_only_jumps[data_only_jumps['Sprungtyp'] == 'Strecksprung']
+    ids = subframe['SprungID'].unique()
+    chosen_ids = np.random.choice(ids, 300, replace=False)
+
+    ids_to_delete = list(set(ids) - set(chosen_ids))
+    data_only_jumps = data_only_jumps[~data_only_jumps['SprungID'].isin(ids_to_delete)]
+
+    # save_as_csv(data_only_jumps, "data_only_jumps", folder="without_preprocessed")
+    """
+
+    """
+    # merge with preprocessed data
     files = os.listdir('Sprungdaten Innotramp/preprocessed data')
 
     preprocessed_data = pd.DataFrame(columns=['SprungID', 'Messung', 'Lap#',
@@ -657,6 +715,33 @@ def main():
 
     # huge
     data = pd.merge(data_only_jumps, preprocessed_data, on='SprungID', how='left')
+
+    # save_as_csv(data, "data_only_jumps")
+    """
+
+    # without preprocessed data
+    data_only_jumps = pd.read_csv("Sprungdaten_processed/without_preprocessed/data_only_jumps.csv")
+
+    """
+    averaged_data, std_data = calc_avg(data_only_jumps)
+    save_as_csv(averaged_data, "averaged_data", folder="without_preprocessed/averaged_data")
+    save_as_csv(std_data, "std_data", folder="without_preprocessed/std_data")
+    avg_std_data = combine_avg_std(averaged_data, std_data)
+    save_as_csv(avg_std_data, "avg_std_data", folder="without_preprocessed/avg_std_data")
+    """
+
+    param = 'mean_std'
+    for percent in [0.25, 0.20, 0.10, 0.05, 0.02, 0.01]:
+        data = percentage_cutting(data_only_jumps, percent, param)
+        save_as_csv(data, 'percentage_' + param + '_' + str(int(percent * 100)),
+                    folder='without_preprocessed/percentage/' + str(int(percent * 100)))
+
+        train_data, test_data = split_train_test(data)
+
+        save_as_csv(train_data, 'percentage_' + param + '_' + str(int(percent * 100)) + '_train',
+                    folder='without_preprocessed/percentage/' + str(int(percent * 100)))
+        save_as_csv(test_data, 'percentage_' + param + '_' + str(int(percent * 100)) + '_test',
+                    folder='without_preprocessed/percentage/' + str(int(percent * 100)))
 
     return
 
