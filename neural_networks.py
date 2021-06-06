@@ -292,15 +292,25 @@ def main():
     shap.force_plot(explainer.expected_value[0], shap_values[0], x_test)
     """
 
-    """
+
     # CNN
     shap.initjs()
+    """
+    
     background = x_train[np.random.choice(x_train.shape[0], 100, replace=False)]
     e = shap.DeepExplainer(model, background)
-    shap_values = e.shap_values(x_test[1: 3])
-    shap.image_plot(shap_values, -x_test[1: 3])
+    shap_values = e.shap_values(x_test[1: 5])
+    shap.image_plot(shap_values, -x_test[1: 5]) #, labels=list(y_test.columns))
     """
+    # Shap for specific Class
+    i = y_test.index[y_test['Salto C'] == 1]
+    pd.DataFrame(model.predict(x_test[i]), columns=y_test.columns).idxmax(axis=1)
+    background = x_train[np.random.choice(x_train.shape[0], 100, replace=False)]
+    e = shap.DeepExplainer(model, background)
+    shap_values = e.shap_values(x_test[i])
+    shap.image_plot(shap_values, -x_test[i])  # , labels=list(y_test.columns))
 
+    # Confusion matrix to find mistakes in classification
     cm = sklearn.metrics.confusion_matrix(y_test.idxmax(axis=1), pd.DataFrame(model.predict(x_test), columns=y_test.columns).idxmax(axis=1))
     disp = sklearn.metrics.ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=y_test.columns)
     disp.plot(cmap='flag')
