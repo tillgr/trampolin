@@ -5,8 +5,10 @@ from keras.models import Model
 from keras.layers import Dense, Conv2D, MaxPooling2D, Input, Flatten, Dropout, SpatialDropout2D, AveragePooling2D
 from keras import backend as k
 import matplotlib.pyplot as plt
+from matplotlib.colors import ListedColormap
 import tensorflow as tf
 import shap
+import sklearn
 
 
 def prepare_data():
@@ -84,18 +86,22 @@ def prepare_data_oneliner():
     data_train = pd.read_csv("Sprungdaten_processed/percentage/25/vector_percentage_25_train.csv")
     data_test = pd.read_csv("Sprungdaten_processed/percentage/25/vector_percentage_25_test.csv")
 
-    num_columns = len(data_train.columns) - 2
+    x_train = data_train.drop('Sprungtyp', axis=1)
+    x_train = x_train.drop(['SprungID', 'DJump_SIG_I_x LapEnd', 'DJump_SIG_I_y LapEnd', 'DJump_SIG_I_z LapEnd',
+                            'DJump_Abs_I_x LapEnd', 'DJump_Abs_I_y LapEnd', 'DJump_Abs_I_z LapEnd'], axis=1)
+    x_test = data_test.drop('Sprungtyp', axis=1)
+    x_test = x_test.drop(['SprungID', 'DJump_SIG_I_x LapEnd', 'DJump_SIG_I_y LapEnd', 'DJump_SIG_I_z LapEnd',
+                          'DJump_Abs_I_x LapEnd', 'DJump_Abs_I_y LapEnd', 'DJump_Abs_I_z LapEnd'], axis=1)
+    x_train = x_train.drop([col for col in x_train.columns if 'ACC_N_ROT_filtered' in col], axis=1)
+    x_test = x_test.drop([col for col in x_test.columns if 'ACC_N_ROT_filtered' in col], axis=1)
+
+    num_columns = len(x_train.columns)
 
     y_train = data_train['Sprungtyp']
     y_test = data_test['Sprungtyp']
 
     y_train = pd.get_dummies(y_train)
     y_test = pd.get_dummies(y_test)
-
-    x_train = data_train.drop('Sprungtyp', axis=1)
-    x_train = x_train.drop('SprungID', axis=1)
-    x_test = data_test.drop('Sprungtyp', axis=1)
-    x_test = x_test.drop('SprungID', axis=1)
 
     return x_train, y_train, x_test, y_test, num_columns
 
@@ -266,28 +272,50 @@ def main():
     # model = grid_search_build(x_train, y_train, x_test, y_test, jump_data_length)
     # model = build_model_testing(jump_data_length, x_train, y_train)
     # model = run_multiple_times(10, jump_data_length, 3, 3, 2, 2, 'tanh', 'kl_divergence', 'Nadam', x_train, y_train, x_test, y_test, 20)
-    model = run_multiple_times(jump_data_length, num_columns, runs=1, conv=1, kernel=3, pool=2, dense=2, act_func='tanh', loss='categorical_crossentropy', optim='Nadam', epochs=40, x_train=x_train, y_train=y_train, x_test=x_test, y_test=y_test)
+    model = run_multiple_times(jump_data_length, num_columns, runs=10, conv=1, kernel=3, pool=2, dense=2, act_func='tanh', loss='categorical_crossentropy', optim='Nadam', epochs=40, x_train=x_train, y_train=y_train, x_test=x_test, y_test=y_test)
     #model = run_multiple_times(jump_data_length, num_columns, runs=10, conv=3, kernel=3, pool=2, dense=2, act_func='tanh', loss='kl_divergence', optim='Nadam', epochs=30, x_train=x_train, y_train=y_train, x_test=x_test, y_test=y_test)
 
-    # model = run_multiple_times_oneliner(num_columns, runs=1, act_func='tanh', loss='kl_divergence', optim='adam', epochs=60, x_train=x_train, y_train=y_train, x_test=x_test, y_test=y_test)
+    #model = run_multiple_times_oneliner(num_columns, runs=1, act_func='tanh', loss='kl_divergence', optim='adam', epochs=60, x_train=x_train, y_train=y_train, x_test=x_test, y_test=y_test)
 
     model.evaluate(x_test, y_test, verbose=1)
 
     """
+    # DFF
     shap.initjs()
-    explainer = shap.KernelExplainer(model, x_train)
-    output = x_test.copy()
-    output['predict'] = pd.DataFrame(np.round(model.predict(output), 2)).idxmax(axis=1)
-    shap_values = explainer.shap_values(x_test, nsamples=1)
-    shap.force_plot(explainer.expected_value[0], shap_values[0], x_test, link="logit")
+    background = shap.sample(x_train, 100)
+    explainer = shap.KernelExplainer(model, background)
+    shap_values = explainer.shap_values(x_test, nsamples=100)
+
+    shap.summary_plot(shap_values, x_test, plot_type='bar')
+    shap.summary_plot(shap_values[0], x_test)
+    shap.plots.force(explainer.expected_value[0], shap_values[0])
+    shap.force_plot(explainer.expected_value[0], shap_values[0], x_test)
     """
 
+    """
+    # CNN
     shap.initjs()
-
     background = x_train[np.random.choice(x_train.shape[0], 100, replace=False)]
     e = shap.DeepExplainer(model, background)
-    shap_values = e.shap_values(x_test[1: 5])
-    shap.image_plot(shap_values, -x_test[1: 5])
+    shap_values = e.shap_values(x_test[1: 3])
+    shap.image_plot(shap_values, -x_test[1: 3])
+    """
+
+    cm = sklearn.metrics.confusion_matrix(y_test.idxmax(axis=1), pd.DataFrame(model.predict(x_test), columns=y_test.columns).idxmax(axis=1))
+    disp = sklearn.metrics.ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=y_test.columns)
+    disp.plot(cmap='flag')
+    disp.figure_.set_figwidth(30)
+    disp.figure_.set_figheight(25)
+    disp.figure_.autofmt_xdate()
+    plt.show()
+    #plt.savefig('CNN_confusion_matrix_flag.png')
+
+    disp.plot(cmap='Blues')
+    disp.figure_.set_figwidth(30)
+    disp.figure_.set_figheight(25)
+    disp.figure_.autofmt_xdate()
+    plt.show()
+    #plt.savefig('CNN_confusion_matrix.png')
 
 
     return
