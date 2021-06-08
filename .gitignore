@@ -50,3 +50,5 @@ Sprungdaten_processed/same_length/same_length_padding_0_train.csv
 Sprungdaten Innotramp/
 
 Sprungdaten_processed/all_data_*
+
+Sprungdaten_processed/with_preprocessed/data_only_jumps.csv

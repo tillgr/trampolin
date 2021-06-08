@@ -82,6 +82,12 @@ def correct_space_errors(data):
     data['Sprungtyp'].replace("Schraubensalto ", "Schraubensalto", inplace=True)
     data['Sprungtyp'].replace("Rudi ", "Rudi", inplace=True)
     data['Sprungtyp'].replace("Scharubensalto A", "Schraubensalto A", inplace=True)
+    data['Sprungtyp'].replace("40<", "Salto rw B", inplace=True)
+    data['Sprungtyp'].replace("40/", "Salto rw A", inplace=True)
+    data['Sprungtyp'].replace("40°", "Salto rw C", inplace=True)
+    data['Sprungtyp'].replace("41°", "Barani C", inplace=True)
+    data['Sprungtyp'].replace("41/", "Barani A", inplace=True)
+    data['Sprungtyp'].replace("43/", "Rudi", inplace=True)
 
     return data
 
@@ -661,12 +667,21 @@ def main():
         save_as_csv(vector_data, 'vector_' + name + percent, folder='percentage/' + percent)
     """
 
-    """
-    data_only_jumps = pd.read_csv("Sprungdaten_processed/old/data_only_jumps.csv")
-    data_only_jumps = correct_space_errors(data_only_jumps)
+    # create data_only_jumps
 
-    data_only_jumps = data_only_jumps.drop(['ACC_N_ROT_filtered', 'DJump_SIG_I_x LapEnd', 'DJump_SIG_I_y LapEnd', 'DJump_SIG_I_z LapEnd',
-                                            'DJump_Abs_I_x LapEnd', 'DJump_Abs_I_y LapEnd', 'DJump_Abs_I_z LapEnd'], axis=1)
+    #"""
+    files = [data for data in os.listdir('Sprungdaten_processed') if 'all_data' in data]
+    col_names = pd.read_csv('Sprungdaten_processed/' + files[0]).columns
+    all_data = pd.DataFrame(columns=col_names)
+    for file in files:
+        data = pd.read_csv('Sprungdaten_processed/' + file)
+        data.columns = col_names
+        all_data = all_data.append(data, ignore_index=True)
+    all_data.to_csv("Sprungdaten_processed/all_data.csv", index=False)
+    #"""
+    #all_data = pd.read_csv("Sprungdaten_processed/all.data.csv")
+    data_only_jumps = sort_out_errors(all_data)
+    data_only_jumps = correct_space_errors(data_only_jumps)
 
     # undersample strecksprung
     subframe = data_only_jumps[data_only_jumps['Sprungtyp'] == 'Strecksprung']
@@ -676,51 +691,36 @@ def main():
     ids_to_delete = list(set(ids) - set(chosen_ids))
     data_only_jumps = data_only_jumps[~data_only_jumps['SprungID'].isin(ids_to_delete)]
 
-    # save_as_csv(data_only_jumps, "data_only_jumps", folder="without_preprocessed")
+    save_as_csv(data_only_jumps, "data_only_jumps", folder="with_preprocessed")
+
+
+    # with preprocessed data
+    """
+    averaged_data, std_data = calc_avg(data_only_jumps)
+    save_as_csv(averaged_data, "averaged_data", folder="with_preprocessed/averaged_data")
+    save_as_csv(std_data, "std_data", folder="with_preprocessed/std_data")
+    avg_std_data = combine_avg_std(averaged_data, std_data)
+    save_as_csv(avg_std_data, "avg_std_data", folder="with_preprocessed/avg_std_data")
     """
 
     """
-    # merge with preprocessed data
-    files = os.listdir('Sprungdaten Innotramp/preprocessed data')
+    param = 'mean'
+    for percent in [0.25, 0.20, 0.10, 0.05, 0.02, 0.01]:
+        data = percentage_cutting(data_only_jumps, percent, param)
+        save_as_csv(data, 'percentage_' + param + '_' + str(int(percent * 100)),
+                    folder='with_preprocessed/percentage/' + str(int(percent * 100)))
 
-    preprocessed_data = pd.DataFrame(columns=['SprungID', 'Messung', 'Lap#',
-                                              'DJump_SIG_I_x LapEnd', 'DJump_SIG_I_y LapEnd', 'DJump_SIG_I_z LapEnd',
-                                              'DJump_I_ABS_x LapEnd', 'DJump_I_ABS_y LapEnd', 'DJump_I_ABS_z LapEnd',
-                                              'DJump_ABS_I_x LapEnd', 'DJump_ABS_I_y LapEnd', 'DJump_ABS_I_z LapEnd',
-                                              'DJump_SIG_I_S1_x LapEnd', 'DJump_SIG_I_S1_y LapEnd', 'DJump_SIG_I_S1_z LapEnd',
-                                              'DJump_SIG_I_S2_x LapEnd', 'DJump_SIG_I_S2_y LapEnd', 'DJump_SIG_I_S2_z LapEnd',
-                                              'DJump_SIG_I_S3_x LapEnd', 'DJump_SIG_I_S3_y LapEnd', 'DJump_SIG_I_S3_z LapEnd',
-                                              'DJump_SIG_I_S4_x LapEnd', 'DJump_SIG_I_S4_y LapEnd', 'DJump_SIG_I_S4_z LapEnd',
-                                              'DJump_I_ABS_S1_x LapEnd', 'DJump_I_ABS_S1_y LapEnd', 'DJump_I_ABS_S1_z LapEnd',
-                                              'DJump_I_ABS_S2_x LapEnd', 'DJump_I_ABS_S2_y LapEnd', 'DJump_I_ABS_S2_z LapEnd',
-                                              'DJump_I_ABS_S3_x LapEnd', 'DJump_I_ABS_S3_y LapEnd', 'DJump_I_ABS_S3_z LapEnd',
-                                              'DJump_I_ABS_S4_x LapEnd', 'DJump_I_ABS_S4_y LapEnd', 'DJump_I_ABS_S4_z LapEnd',
-                                              'DJump_ABS_I_S1_x LapEnd', 'DJump_ABS_I_S1_y LapEnd', 'DJump_ABS_I_S1_z LapEnd',
-                                              'DJump_ABS_I_S2_x LapEnd', 'DJump_ABS_I_S2_y LapEnd', 'DJump_ABS_I_S2_z LapEnd',
-                                              'DJump_ABS_I_S3_x LapEnd', 'DJump_ABS_I_S3_y LapEnd', 'DJump_ABS_I_S3_z LapEnd',
-                                              'DJump_ABS_I_S4_x LapEnd', 'DJump_ABS_I_S4_y LapEnd', 'DJump_ABS_I_S4_z LapEnd'])
+        train_data, test_data = split_train_test(data)
 
-    for file in files:
-        data = pd.read_excel("Sprungdaten Innotramp/preprocessed data/" + file, engine="openpyxl")
-        data = data.drop(['Event', 'Lap ID', 'Total laps', 'Zeit', 'Meter'], axis=1)
-        id_list = []
-        for row in data.iterrows():
-            jump_id = row[1]['Messung'] + "-" + str(row[1]['Lap#'])
-            id_list.append(jump_id)
-        data.insert(0, "SprungID", id_list)
-
-        preprocessed_data = preprocessed_data.append(data, ignore_index=True)
-
-    preprocessed_data = preprocessed_data.drop(['Messung', 'Lap#'], axis=1)
-
-    # huge
-    data = pd.merge(data_only_jumps, preprocessed_data, on='SprungID', how='left')
-
-    # save_as_csv(data, "data_only_jumps")
+        save_as_csv(train_data, 'percentage_' + param + '_' + str(int(percent * 100)) + '_train',
+                    folder='with_preprocessed/percentage/' + str(int(percent * 100)))
+        save_as_csv(test_data, 'percentage_' + param + '_' + str(int(percent * 100)) + '_test',
+                    folder='with_preprocessed/percentage/' + str(int(percent * 100)))
     """
 
     # without preprocessed data
-    data_only_jumps = pd.read_csv("Sprungdaten_processed/without_preprocessed/data_only_jumps.csv")
+    data_only_jumps = pd.read_csv("Sprungdaten_processed/with_preprocessed/data_only_jumps.csv")
+    data_only_jumps = data_only_jumps.drop([col for col in data_only_jumps.columns if 'DJump' in col], axis=1)
 
     """
     averaged_data, std_data = calc_avg(data_only_jumps)
@@ -730,7 +730,8 @@ def main():
     save_as_csv(avg_std_data, "avg_std_data", folder="without_preprocessed/avg_std_data")
     """
 
-    param = 'mean_std'
+    """
+    param = 'mean'
     for percent in [0.25, 0.20, 0.10, 0.05, 0.02, 0.01]:
         data = percentage_cutting(data_only_jumps, percent, param)
         save_as_csv(data, 'percentage_' + param + '_' + str(int(percent * 100)),
@@ -742,6 +743,7 @@ def main():
                     folder='without_preprocessed/percentage/' + str(int(percent * 100)))
         save_as_csv(test_data, 'percentage_' + param + '_' + str(int(percent * 100)) + '_test',
                     folder='without_preprocessed/percentage/' + str(int(percent * 100)))
+    """
 
     return
 
