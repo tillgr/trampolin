@@ -44,7 +44,7 @@ def main():
     global_xlsx_col_names = []
 
     folders = os.listdir('Sprungdaten Innotramp')
-    folders = ['2019.09.30']
+    # folders = ['2019.09.30']              # for running only 1 folder
     for folder in folders:
         files = os.listdir("Sprungdaten Innotramp/" + folder)
         for i in range(len(files[:int(len(files) / 2)])):           # we can read the corresponding sprungzuordnung and rohdaten this way
@@ -71,7 +71,7 @@ def main():
                 sprungID = row[1]['Messung'] + "-" + str(row[1]['Lap#'])            # create an unique ID for each jump
 
 
-                multiply_array = np.array([sprungID, row[1]['Sprungtyp']])
+                multiply_array = np.array([sprungID, row[1]['Sprungtyp']])          # create xlsx array, with only columns that needed
                 for col in xlsx_data.columns:
                     if 'DJump' in col:
                         multiply_array = np.append(multiply_array, row[1][col])
@@ -79,9 +79,9 @@ def main():
                 if first_temp:                                                      # for fixing lower case problem in xlsx column names
                     global_xlsx_col_names = ['SprungID', 'Sprungtyp'] + [col for col in xlsx_data.columns if 'DJump' in col]
                 temp_sprungzuordnung = pd.DataFrame(multiply_array, columns=global_xlsx_col_names)
-                temp_sprungzuordnung['Time'] = np.round(join_times, 3)
+                temp_sprungzuordnung['Time'] = np.round(join_times, 3)              # add time column for merging with Rohdaten
                 if first_temp:
-                    sprungzuordnung = pd.DataFrame(columns=temp_sprungzuordnung.columns)
+                    sprungzuordnung = pd.DataFrame(columns=temp_sprungzuordnung.columns)    # create df with needed column names
 
                     first_temp = False
                 sprungzuordnung = sprungzuordnung.append(temp_sprungzuordnung)
@@ -89,18 +89,18 @@ def main():
                 start_time = end_time
 
             temp_data = pd.merge(temp_data, sprungzuordnung, on='Time', how='left')
-            temp_data.drop(temp_data[temp_data['Sprungtyp'] == 'nan'].index, inplace=True)
+            temp_data.drop(temp_data[temp_data['Sprungtyp'] == 'nan'].index, inplace=True)      # remove breaks to narrow dataset
             if first_round:
                 all_data = pd.DataFrame(columns=temp_data.columns)
                 first_round = False
             all_data = all_data.append(temp_data, ignore_index=True)
             sprungzuordnung = sprungzuordnung[0:0]
 
-        for col in all_data.columns:
+        for col in all_data.columns:        # moved all_data one tabulator, to create smaller datasets (one dataset for each folder)
             if col in ['Acc_N_Fil', 'Gyro_x_R', 'Gyro_y_R', 'Gyro_z_R', 'Gyro_x_Fil', 'Gyro_y_Fil', 'Gyro_z_Fil']:
                 all_data[col] = all_data[col].apply(convert_comma_to_dot)
 
-        all_data.to_csv('Sprungdaten_processed/all_data_' + folder + '.csv', index=False)
+        all_data.to_csv('Sprungdaten_processed/all_data_' + folder + '.csv', index=False)   # save smaller datasets with name of the folder
         all_data = all_data[0:0]
 
     return
