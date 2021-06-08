@@ -266,42 +266,40 @@ def run_multiple_times_oneliner(num_columns, runs, act_func, loss, optim, epochs
 
 def main():
 
-    x_train, y_train, x_test, y_test, jump_data_length, num_columns = prepare_data()
-    #x_train, y_train, x_test, y_test, num_columns = prepare_data_oneliner()
+    #x_train, y_train, x_test, y_test, jump_data_length, num_columns = prepare_data()
+    x_train, y_train, x_test, y_test, num_columns = prepare_data_oneliner()
 
     # model = grid_search_build(x_train, y_train, x_test, y_test, jump_data_length)
     # model = build_model_testing(jump_data_length, x_train, y_train)
     # model = run_multiple_times(10, jump_data_length, 3, 3, 2, 2, 'tanh', 'kl_divergence', 'Nadam', x_train, y_train, x_test, y_test, 20)
-    model = run_multiple_times(jump_data_length, num_columns, runs=10, conv=1, kernel=3, pool=2, dense=2, act_func='tanh', loss='categorical_crossentropy', optim='Nadam', epochs=40, x_train=x_train, y_train=y_train, x_test=x_test, y_test=y_test)
+    #model = run_multiple_times(jump_data_length, num_columns, runs=10, conv=1, kernel=3, pool=2, dense=2, act_func='tanh', loss='categorical_crossentropy', optim='Nadam', epochs=40, x_train=x_train, y_train=y_train, x_test=x_test, y_test=y_test)
     #model = run_multiple_times(jump_data_length, num_columns, runs=10, conv=3, kernel=3, pool=2, dense=2, act_func='tanh', loss='kl_divergence', optim='Nadam', epochs=30, x_train=x_train, y_train=y_train, x_test=x_test, y_test=y_test)
 
-    #model = run_multiple_times_oneliner(num_columns, runs=1, act_func='tanh', loss='kl_divergence', optim='adam', epochs=60, x_train=x_train, y_train=y_train, x_test=x_test, y_test=y_test)
+    model = run_multiple_times_oneliner(num_columns, runs=10, act_func='tanh', loss='kl_divergence', optim='adam', epochs=60, x_train=x_train, y_train=y_train, x_test=x_test, y_test=y_test)
 
     model.evaluate(x_test, y_test, verbose=1)
 
-    """
-    # DFF
     shap.initjs()
+    #"""
+    # DFF
     background = shap.sample(x_train, 100)
     explainer = shap.KernelExplainer(model, background)
     shap_values = explainer.shap_values(x_test, nsamples=100)
 
     shap.summary_plot(shap_values, x_test, plot_type='bar')
     shap.summary_plot(shap_values[0], x_test)
-    shap.plots.force(explainer.expected_value[0], shap_values[0])
-    shap.force_plot(explainer.expected_value[0], shap_values[0], x_test)
-    """
+
+    #"""
 
 
     # CNN
-    shap.initjs()
     """
     
     background = x_train[np.random.choice(x_train.shape[0], 100, replace=False)]
     e = shap.DeepExplainer(model, background)
-    shap_values = e.shap_values(x_test[1: 5])
-    shap.image_plot(shap_values, -x_test[1: 5]) #, labels=list(y_test.columns))
-    """
+    shap_values = e.shap_values(x_test[0: 5])
+    shap.image_plot(shap_values, -x_test[0: 5]) #, labels=list(y_test.columns))
+    
     # Shap for specific Class
     i = y_test.index[y_test['Salto C'] == 1]
     pd.DataFrame(model.predict(x_test[i]), columns=y_test.columns).idxmax(axis=1)
@@ -326,6 +324,7 @@ def main():
     disp.figure_.autofmt_xdate()
     plt.show()
     #plt.savefig('CNN_confusion_matrix.png')
+    """
 
 
     return
