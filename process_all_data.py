@@ -20,6 +20,12 @@ def sort_out_errors(all_data):
     all_data['Sprungtyp'].replace("", nan_value, inplace=True)
     all_data.dropna(subset=['Sprungtyp'], inplace=True)
 
+    # delete jumps where DJumps all 0
+    djumps = [col for col in all_data.columns if 'DJump' in col]
+    # zero = pd.DataFrame(np.zeros((1, len(djumps))), columns=djumps)
+
+    all_data_djumps = all_data[djumps]
+    all_data = all_data[(all_data_djumps == 0).sum(1) < len(djumps)]
     all_data = all_data.reset_index(drop=True)
 
     return all_data
@@ -669,7 +675,7 @@ def main():
 
     # create data_only_jumps
 
-    #"""
+    """
     files = [data for data in os.listdir('Sprungdaten_processed') if 'all_data' in data]
     col_names = pd.read_csv('Sprungdaten_processed/' + files[0]).columns
     all_data = pd.DataFrame(columns=col_names)
@@ -678,8 +684,8 @@ def main():
         data.columns = col_names
         all_data = all_data.append(data, ignore_index=True)
     all_data.to_csv("Sprungdaten_processed/all_data.csv", index=False)
-    #"""
-    #all_data = pd.read_csv("Sprungdaten_processed/all.data.csv")
+    """
+    all_data = pd.read_csv("Sprungdaten_processed/all_data.csv")
     data_only_jumps = sort_out_errors(all_data)
     data_only_jumps = correct_space_errors(data_only_jumps)
 
