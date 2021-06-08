@@ -1,10 +1,12 @@
 import pandas as pd
 from pandas import DataFrame
 import logging
+import shap
 
 from sklearn.metrics import accuracy_score, f1_score
 from sklearn.naive_bayes import GaussianNB
 from sklearn.svm import SVC
+import numpy as np
 
 from random_classifier import metrics
 
@@ -30,8 +32,6 @@ def prediction_and_evaludate(classifier: SVC, testing_sample: DataFrame, test_ac
     mean_prec, mean_rec, mean_f, mean_youden = metrics(test_actual.to_numpy(), predicted)
     logger.info("Random classifier: Youden score: " + str(mean_youden.round(4)))
     logger.info("Random classifier: F1 score: " + str(mean_f.round(4)))
-
-    return score
 
 
 def get_samples_features(data: DataFrame, start_column: str, end_column: str):
@@ -103,8 +103,28 @@ def gnb_classify(datasets: list, feature_start: str, feature_end: str, drops: li
     y = get_targets(train)
     test_actual = get_targets(test)
     gnb.fit(X, y)
-    prediction_and_evaludate(gnb,get_samples_features(test, feature_start, feature_end), test_actual)
+    prediction_and_evaludate(gnb, get_samples_features(test, feature_start, feature_end), test_actual)
 
+
+def explain_model(datasets: list, feature_start: str, feature_end: str, drops: list):
+    train, test = get_train_test_data(datasets)
+    logger.info("Classify with data set: " + str(datasets) +
+                ". Feature start at column: " + feature_start + ", feature end: " + feature_end +
+                ". Drops :" + str(drops))
+    train = train.drop(columns=drops)
+    test = test.drop(columns=drops)
+    X = get_samples_features(train, feature_start, feature_end)
+    y = get_targets(train)
+    y_test = get_targets(test)
+    clf_linear = SVC(kernel='linear')
+    clf_linear.fit(X, y)
+    X_test = get_samples_features(test, feature_start, feature_end)
+    index = y_test[y_test == 'Salto A'].index[0]
+    explainer = shap.KernelExplainer(clf_linear.decision_function, X.sample(n=50), link='identity')
+    shap_values = explainer.shap_values(X_test.sample(n=10))
+    shap.summary_plot(shap_values[0], X_test.sample(n=10))
+
+    # shap.force_plot(explainer.expected_value[0], shap_values[0][0,:], X_test.iloc[0,:], link="logit")
 
 def run_svc():
     # logger.info("------------start of new run------------")
@@ -160,7 +180,7 @@ def run_svc():
         drops.append(str(i) + "-std_ACC_N_ROT_filtered")
         i += 20
     logger.info("------------p20 std-----without processed, without n rot filtered-------")
-    classify(['percentage/20/vector_percentage_mean_std_20'], '0-mean_ACC_N', '80-std_Gyro_z_Fil', drops)
+    explain_model(['percentage/20/vector_percentage_mean_std_20'], '0-mean_ACC_N', '80-std_Gyro_z_Fil', drops)
 
     # logger.info("------------p25 ------------")
     # classify(['percentage/25/vector_percentage_25'], 'DJump_SIG_I_x LapEnd', '75-Gyro_z_Fil', [])
@@ -253,4 +273,4 @@ def run_gnb():
 
 
 if __name__ == '__main__':
-    run_gnb()
+    run_svc()
