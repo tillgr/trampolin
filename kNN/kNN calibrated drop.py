@@ -1,4 +1,5 @@
 import pandas as pd
+import shap
 from sklearn import metrics
 from sklearn.model_selection import train_test_split
 from sklearn import neighbors
@@ -40,7 +41,7 @@ if __name__ == '__main__':
         '70-ACC_N_ROT_filtered',
         '80-ACC_N_ROT_filtered',
         '90-ACC_N_ROT_filtered'
-                                                                 ], axis=1).to_numpy()
+                                                                 ], axis=1)#.to_numpy()
 
     # get X_test
 
@@ -55,7 +56,7 @@ if __name__ == '__main__':
         '70-ACC_N_ROT_filtered',
         '80-ACC_N_ROT_filtered',
         '90-ACC_N_ROT_filtered'
-                                                                 ], axis=1).to_numpy()
+                                                                 ], axis=1)#.to_numpy()
 
     # create labelEncoder
     le = preprocessing.LabelEncoder()
@@ -89,3 +90,7 @@ if __name__ == '__main__':
     print(f"Accuracy youden score: {str(mean_youden.round(4))}")
     print(f"Accuracy f1 score: {str(mean_f.round(4))}")
     print("--------------------------------------------------------------")
+
+    explainer = shap.KernelExplainer(clf, X_test.sample(n=50), link='identity')
+    shap_values = explainer.shap_values(X_test.sample(n=10))
+    shap.summary_plot(shap_values[0], X_test.sample(n=10))

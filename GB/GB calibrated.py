@@ -8,6 +8,8 @@ from sklearn.ensemble import GradientBoostingClassifier
 from sklearn import preprocessing
 from sklearn.metrics import accuracy_score, f1_score
 from random_classifier import metrics as rc_metrics
+import shap
+import matplotlib.pyplot as plt
 
 if __name__ == '__main__':
     # read individual data sets
@@ -93,3 +95,26 @@ if __name__ == '__main__':
     print(f"Accuracy youden score: {str(mean_youden.round(4))}")
     print(f"Accuracy f1 score: {str(mean_f.round(4))}")
     print("--------------------------------------------------------------")
+
+    #shap
+    # shap.initjs()
+    # shap_values = shap.TreeExplainer(clf).shap_values(X_train)
+    # shap.summary_plot(shap_values, X_train, plot_type="bar")
+    #
+    # f = plt.figure()
+    # shap.summary_plot(shap_values, X_test)
+    # f.savefig("/summary_plot1.png", bbox_inches='tight', dpi=600)
+
+
+    # explain the model's predictions using SHAP
+    # (same syntax works for LightGBM, CatBoost, scikit-learn, transformers, Spark, etc.)
+    explainer = shap.Explainer(clf)
+    shap_values = explainer(X_train)
+
+    # visualize the first prediction's explanation
+    shap.plots.waterfall(shap_values[0])
+
+    # background = X_train[np.random.choice(X_train.shape[0], 100, replace=False)]
+    # e = shap.KernelExplainer(clf, background)
+    # shap_values = e.shap_values(X_test[1: 5])
+    # shap.image_plot(shap_values, -X_test[1: 5]) #, labels=list(y_test.columns))
