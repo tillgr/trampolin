@@ -41,20 +41,12 @@ def convert_comma_to_dot(x):
 def main():
     first_round = True
     first_temp = True
-    """
-    all_data = pd.DataFrame(columns=['Time', 'TimeInJump', 'ACC_N', 'ACC_N_ROT_filtered', 'Acc_x_Fil', 'Acc_y_Fil', 'Acc_z_Fil',
-                                     'Gyro_x_Fil', 'Gyro_y_Fil', 'Gyro_z_Fil', 'SprungID', 'Sprungtyp',
-                                     'DJump_SIG_I_x LapEnd', 'DJump_SIG_I_y LapEnd', 'DJump_SIG_I_z LapEnd',
-                                     'DJump_Abs_I_x LapEnd', 'DJump_Abs_I_y LapEnd', 'DJump_Abs_I_z LapEnd'])
-    """
+
     folders = os.listdir('Sprungdaten Innotramp')
     for folder in folders:
         files = os.listdir("Sprungdaten Innotramp/" + folder)
         for i in range(len(files[:int(len(files) / 2)])):           # we can read the corresponding sprungzuordnung and rohdaten this way
-            """
-            temp_data = pd.DataFrame(columns=['Time', 'TimeInJump', 'ACC_N', 'ACC_N_ROT_filtered', 'Acc_x_Fil', 'Acc_y_Fil', 'Acc_z_Fil',
-                         'Gyro_x_Fil', 'Gyro_y_Fil', 'Gyro_z_Fil'])
-            """
+
             csv_data = read_csv_data("Sprungdaten Innotramp/" + folder + "/" + files[i])
             xlsx_data = read_xlsx_data("Sprungdaten Innotramp/" + folder + "/" + files[i + int(len(files) / 2)])
 
@@ -69,11 +61,7 @@ def main():
             xlsx_data['cumultime'] = cumultime
 
             start_time = csv_data['Time'][0]
-            """
-            sprungzuordnung = pd.DataFrame(columns=['Time', 'SprungID', 'Sprungtyp',
-                         'DJump_SIG_I_x LapEnd', 'DJump_SIG_I_y LapEnd', 'DJump_SIG_I_z LapEnd',
-                         'DJump_Abs_I_x LapEnd', 'DJump_Abs_I_y LapEnd', 'DJump_Abs_I_z LapEnd'])
-            """
+
             for row in xlsx_data.iterrows():
 
                 end_time = row[1]['cumultime']
@@ -104,25 +92,16 @@ def main():
             all_data = all_data.append(temp_data, ignore_index=True)
             sprungzuordnung = sprungzuordnung[0:0]
 
-    for col in all_data.columns:
-        if col not in ['Sprungtyp', 'SprungID']:
-            all_data[col] = all_data[col].apply(convert_comma_to_dot)
-    """
-    all_data['TimeInJump'] = all_data['TimeInJump'].apply(convert_comma_to_dot)
-    all_data['ACC_N'] = all_data['ACC_N'].apply(convert_comma_to_dot)
-    all_data['ACC_N_ROT_filtered'] = all_data['ACC_N_ROT_filtered'].apply(convert_comma_to_dot)
-    all_data['Acc_x_Fil'] = all_data['Acc_x_Fil'].apply(convert_comma_to_dot)
-    all_data['Acc_y_Fil'] = all_data['Acc_y_Fil'].apply(convert_comma_to_dot)
-    all_data['Acc_z_Fil'] = all_data['Acc_z_Fil'].apply(convert_comma_to_dot)
-    all_data['Gyro_x_Fil'] = all_data['Gyro_x_Fil'].apply(convert_comma_to_dot)
-    all_data['Gyro_y_Fil'] = all_data['Gyro_y_Fil'].apply(convert_comma_to_dot)
-    all_data['Gyro_z_Fil'] = all_data['Gyro_z_Fil'].apply(convert_comma_to_dot)
-    """
+        for col in all_data.columns:
+            if col in ['Acc_N_Fil', 'Gyro_x_R', 'Gyro_y_R', 'Gyro_z_R', 'Gyro_x_Fil', 'Gyro_y_Fil', 'Gyro_z_Fil']:
+                all_data[col] = all_data[col].apply(convert_comma_to_dot)
 
-
-    all_data.to_csv('Sprungdaten_processed/all_data.csv', index=False)
+        all_data.to_csv('Sprungdaten_processed/all_data_' + folder + '.csv', index=False)
+        all_data = all_data[0:0]
 
     return
+
+    # TODO: 30.09.2019, 01.10.2019, 07.10.2019
 
 
 if __name__ == '__main__':
