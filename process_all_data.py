@@ -379,6 +379,7 @@ def percentage_cutting(data, percent_steps, method=None):
             if len(index_list) != 100 / (percent_steps * 100):
                 index_list = index_list[:-1]
             df = df.append(subframe.iloc[index_list], ignore_index=True)
+        df = df.drop(['Time'], axis=1)
 
     if method == 'mean':
         df = pd.DataFrame(columns=data.columns)
@@ -397,11 +398,12 @@ def percentage_cutting(data, percent_steps, method=None):
                 end = int(index_list[i + 1])
                 temp = subframe.iloc[start:end].mean()
                 temp = temp.to_frame().transpose()
-                temp = temp.drop(['Time', 'TimeInJump'], axis=1)
+                temp = temp.drop(['Time'], axis=1)
                 temp.insert(0, 'SprungID', id)
                 temp.insert(1, 'Sprungtyp', jump_type)
 
                 df = df.append(temp, ignore_index=True)
+        df = df.drop(['Time'], axis=1)
 
     if method == 'mean_std':
         cols = [value for value in list(data.columns) if value not in [col for col in data.columns if 'DJump' in col]]
@@ -465,51 +467,32 @@ def percentage_cutting(data, percent_steps, method=None):
     return df
 
 
-def vectorize(data, std=None):
+def vectorize(data):
     first = True
     for jump in data['SprungID'].unique():
         print(jump)
         subframe = data[data['SprungID'] == jump]
         subframe.reset_index(drop=True, inplace=True)
-        equal_data = subframe[['SprungID', 'Sprungtyp', 'DJump_SIG_I_x LapEnd', 'DJump_SIG_I_y LapEnd',
-                               'DJump_SIG_I_z LapEnd', 'DJump_Abs_I_x LapEnd', 'DJump_Abs_I_y LapEnd',
-                               'DJump_Abs_I_z LapEnd']].iloc[0]
+        equal_data_names = ['SprungID', 'Sprungtyp']
+        equal_data_names.extend([col for col in subframe.columns if 'DJump' in col])
+        equal_data = subframe[equal_data_names].iloc[0]
         equal_data = equal_data.to_frame().transpose()
         percentage_list = np.rint(np.arange(0, 100, 100 / len(subframe)))
-        if std is None:
-            for row in range(len(subframe)):
-                name = str(int(percentage_list[row]))
+        # new
+        for row in range(len(subframe)):
+            name = str(int(percentage_list[row]))
+            diff_names = [value for value in list(data.columns) if value not in equal_data_names]
+            copy = subframe[diff_names].iloc[
+                int(row)]  # data.columns - equal_data.columns --> to get not equal data column names for every dataset
+            copy = copy.to_frame().transpose()
+            # percantage 'name' combined with diff_names
+            percentage_name = [name + '_'] * len(copy.columns)
+            full_name = list(map(str.__add__, percentage_name, diff_names))
+            copy.columns = full_name
 
-                copy = subframe[['ACC_N', 'ACC_N_ROT_filtered', 'Acc_x_Fil', 'Acc_y_Fil', 'Acc_z_Fil',
-                                 'Gyro_x_Fil', 'Gyro_y_Fil', 'Gyro_z_Fil']].iloc[int(row)]
-                copy = copy.to_frame().transpose()
-                copy.columns = [name + '-ACC_N', name + '-ACC_N_ROT_filtered', name + '-Acc_x_Fil',
-                                name + '-Acc_y_Fil', name + '-Acc_z_Fil', name + '-Gyro_x_Fil',
-                                name + '-Gyro_y_Fil', name + '-Gyro_z_Fil']
-                copy.reset_index(drop=True, inplace=True)
-                equal_data = pd.concat([equal_data, copy], axis=1)
-        else:
-            for row in range(len(subframe)):
-                name = str(int(percentage_list[row]))
-                copy = subframe[['mean_ACC_N', 'std_ACC_N',
-                                 'mean_ACC_N_ROT_filtered', 'std_ACC_N_ROT_filtered',
-                                 'mean_Acc_x_Fil', 'std_Acc_x_Fil',
-                                 'mean_Acc_y_Fil', 'std_Acc_y_Fil',
-                                 'mean_Acc_z_Fil', 'std_Acc_z_Fil',
-                                 'mean_Gyro_x_Fil', 'std_Gyro_x_Fil',
-                                 'mean_Gyro_y_Fil', 'std_Gyro_y_Fil',
-                                 'mean_Gyro_z_Fil', 'std_Gyro_z_Fil']].iloc[int(row)]
-                copy = copy.to_frame().transpose()
-                copy.columns = [name + '-mean_ACC_N', name + '-std_ACC_N',
-                                name + '-mean_ACC_N_ROT_filtered', name + '-std_ACC_N_ROT_filtered',
-                                name + '-mean_Acc_x_Fil', name + '-std_Acc_x_Fil',
-                                name + '-mean_Acc_y_Fil', name + '-std_Acc_y_Fil',
-                                name + '-mean_Acc_z_Fil', name + '-std_Acc_z_Fil',
-                                name + '-mean_Gyro_x_Fil', name + '-std_Gyro_x_Fil',
-                                name + '-mean_Gyro_y_Fil', name + '-std_Gyro_y_Fil',
-                                name + '-mean_Gyro_z_Fil', name + '-std_Gyro_z_Fil']
-                copy.reset_index(drop=True, inplace=True)
-                equal_data = pd.concat([equal_data, copy], axis=1)
+            copy.reset_index(drop=True, inplace=True)
+            equal_data = pd.concat([equal_data, copy], axis=1)
+
         if first is True:
             df = pd.DataFrame(columns=equal_data.columns)
             first = False
@@ -606,35 +589,7 @@ def main():
 
     """
 
-    # template for vectorisation
-    """
-    name = 'percentage_mean_std_'
-    for percent in ['25', '20', '10', '5', '2', '1']:
-        data = pd.read_csv('Sprungdaten_processed/percentage/' + percent + '/' + name + percent + '.csv')
-        train_data = pd.read_csv('Sprungdaten_processed/percentage/' + percent + '/' + name + percent + '_train' + '.csv')
-        test_data = pd.read_csv('Sprungdaten_processed/percentage/' + percent + '/' + name + percent +'_test'+ '.csv')
-        if 'mean' not in name:
-            data = data.drop(columns=['Time', 'TimeInJump'])
-            train_data = train_data.drop(columns=['Time', 'TimeInJump'])
-            test_data = test_data.drop(columns=['Time', 'TimeInJump'])
-
-        if 'std' in name:
-            vector_data = vectorize(data, 'std')
-
-            vector_train_data = vectorize(train_data, 'std')
-            vector_test_data = vectorize(test_data, 'std')
-        else:
-            vector_data = vectorize(data)
-
-            vector_train_data = vectorize(train_data)
-            vector_test_data = vectorize(test_data)
-        save_as_csv(vector_train_data, 'vector_' + name + percent + '_train', folder='percentage/' + percent)
-        save_as_csv(vector_test_data,  'vector_' + name + percent + '_test', folder='percentage/' + percent)
-        save_as_csv(vector_data, 'vector_' + name + percent, folder='percentage/' + percent)
-    """
-
     # create data_only_jumps
-
     """
     files = [data for data in os.listdir('Sprungdaten_processed') if 'all_data' in data]
     col_names = pd.read_csv('Sprungdaten_processed/' + files[0]).columns
@@ -661,82 +616,77 @@ def main():
     save_as_csv(data_only_jumps, "data_only_jumps", folder="with_preprocessed")
     """
 
-    # with preprocessed data
-    data_only_jumps = pd.read_csv("Sprungdaten_processed/with_preprocessed/data_only_jumps.csv")
+    # ___________________________________________________
+    # with preprocessed data or without preprocessed data
+    # pp = 'with_preprocessed'
+    # data_only_jumps = pd.read_csv("Sprungdaten_processed/" + pp + "/data_only_jumps.csv")
 
     """
-    averaged_data = pd.read_csv('Sprungdaten_processed/with_preprocessed/averaged_data/averaged_data.csv')
-    std_data = pd.read_csv('Sprungdaten_processed/with_preprocessed/std_data/std_data.csv')
-    avg_std_data = pd.read_csv('Sprungdaten_processed/with_preprocessed/avg_std_data/avg_std_data.csv')
+    averaged_data = pd.read_csv('Sprungdaten_processed/' + pp + '/averaged_data/averaged_data.csv')
+    std_data = pd.read_csv('Sprungdaten_processed/' + pp + '/std_data/std_data.csv')
+    avg_std_data = pd.read_csv('Sprungdaten_processed/' + pp + '/avg_std_data/avg_std_data.csv')
 
     train_data, test_data = split_train_test(averaged_data)
-    save_as_csv(train_data, 'averaged_data_train', folder='with_preprocessed/averaged_data')
-    save_as_csv(test_data, 'averaged_data_test', folder='with_preprocessed/averaged_data')
+    save_as_csv(train_data, 'averaged_data_train', folder=pp + '/averaged_data')
+    save_as_csv(test_data, 'averaged_data_test', folder=pp + '/averaged_data')
 
     train_data, test_data = split_train_test(std_data)
-    save_as_csv(train_data, 'std_data_train', folder='with_preprocessed/std_data')
-    save_as_csv(test_data, 'std_data_test', folder='with_preprocessed/std_data')
+    save_as_csv(train_data, 'std_data_train', folder=pp + '/std_data')
+    save_as_csv(test_data, 'std_data_test', folder=pp + '/std_data')
 
     train_data, test_data = split_train_test(avg_std_data)
-    save_as_csv(train_data, 'avg_std_data_train', folder='with_preprocessed/avg_std_data')
-    save_as_csv(test_data, 'avg_std_data_test', folder='with_preprocessed/avg_std_data')
+    save_as_csv(train_data, 'avg_std_data_train', folder=pp + '/avg_std_data')
+    save_as_csv(test_data, 'avg_std_data_test', folder=pp + '/avg_std_data')
     """
 
+    # for percentage
     """
-    averaged_data, std_data = calc_avg(data_only_jumps)
-    save_as_csv(averaged_data, "averaged_data", folder="with_preprocessed/averaged_data")
-    save_as_csv(std_data, "std_data", folder="with_preprocessed/std_data")
+    param = 'mean_std'  # 'mean' or None
+    for percent in [0.25, 0.20, 0.10, 0.05, 0.02, 0.01]:
+        if param is None:
+            data = percentage_cutting(data_only_jumps, percent)
+            save_as_csv(data, 'percentage_'+ str(int(percent * 100)), 
+                        folder=pp + '/percentage/' + str(int(percent * 100)))
     
-    averaged_data = pd.read_csv('Sprungdaten_processed/with_preprocessed/averaged_data/averaged_data.csv')
-    std_data = pd.read_csv('Sprungdaten_processed/with_preprocessed/std_data/std_data.csv')
-    avg_std_data = combine_avg_std(averaged_data, std_data)
-    save_as_csv(avg_std_data, "avg_std_data", folder="with_preprocessed/avg_std_data")
+            train_data, test_data = split_train_test(data)
+    
+            save_as_csv(train_data, 'percentage_' + str(int(percent * 100)) + '_train', 
+                        folder=pp + '/percentage/' + str(int(percent * 100)))
+            save_as_csv(test_data, 'percentage_' + str(int(percent * 100)) + '_test', 
+                        folder=pp + '/percentage/' + str(int(percent * 100)))
+        else:
+            data = percentage_cutting(data_only_jumps, percent, param)
+            save_as_csv(data, 'percentage_' + param + '_' + str(int(percent * 100)),
+                        folder=pp + '/percentage/' + str(int(percent * 100)))
+
+            train_data, test_data = split_train_test(data)
+
+            save_as_csv(train_data, 'percentage_' + param + '_' + str(int(percent * 100)) + '_train',
+                        folder=pp + '/percentage/' + str(int(percent * 100)))
+            save_as_csv(test_data, 'percentage_' + param + '_' + str(int(percent * 100)) + '_test',
+                        folder=pp + '/percentage/' + str(int(percent * 100)))
     """
 
-    #"""
-    param = 'mean_std'
-    for percent in [0.25, 0.20, 0.10, 0.05, 0.02, 0.01]:
-        data = percentage_cutting(data_only_jumps, percent, param)
-        save_as_csv(data, 'percentage_' + param + '_' + str(int(percent * 100)),
-                    folder='with_preprocessed/percentage/' + str(int(percent * 100)))
-
-        train_data, test_data = split_train_test(data)
-
-        save_as_csv(train_data, 'percentage_' + param + '_' + str(int(percent * 100)) + '_train',
-                    folder='with_preprocessed/percentage/' + str(int(percent * 100)))
-        save_as_csv(test_data, 'percentage_' + param + '_' + str(int(percent * 100)) + '_test',
-                    folder='with_preprocessed/percentage/' + str(int(percent * 100)))
-    #"""
-
+    # for vectorisation
     """
-    # without preprocessed data
-    data_only_jumps = pd.read_csv("Sprungdaten_processed/with_preprocessed/data_only_jumps.csv")
-    data_only_jumps = data_only_jumps.drop([col for col in data_only_jumps.columns if 'DJump' in col], axis=1)
-    save_as_csv(data_only_jumps, "data_only_jumps", folder="without_preprocessed")
+    name = 'percentage_mean_' # percentage_mean_std  / percentage_
+    for percent in ['25', '20', '10', '5', '2', '1']:
+        data = pd.read_csv('Sprungdaten_processed/' + pp + '/percentage/' + percent + '/' + name + percent + '.csv')
+        train_data = pd.read_csv(
+            'Sprungdaten_processed/' + pp + '/percentage/' + percent + '/' + name + percent + '_train' + '.csv')
+        test_data = pd.read_csv('Sprungdaten_processed/' + pp + '/percentage/' + percent + '/' + name + percent + '_test' + '.csv')
+
+        vector_data = vectorize(data)
+
+        vector_train_data = vectorize(train_data)
+        vector_test_data = vectorize(test_data)
+
+        save_as_csv(vector_train_data, 'vector_' + name + percent + '_train', folder=pp + '/percentage/' + percent)
+        save_as_csv(vector_test_data, 'vector_' + name + percent + '_test', folder=pp + '/percentage/' + percent)
+        save_as_csv(vector_data, 'vector_' + name + percent, folder=pp + '/percentage/' + percent)
     """
 
-    """
-    averaged_data, std_data = calc_avg(data_only_jumps)
-    save_as_csv(averaged_data, "averaged_data", folder="without_preprocessed/averaged_data")
-    save_as_csv(std_data, "std_data", folder="without_preprocessed/std_data")
-    avg_std_data = combine_avg_std(averaged_data, std_data)
-    save_as_csv(avg_std_data, "avg_std_data", folder="without_preprocessed/avg_std_data")
-    """
 
-    """
-    param = 'mean'
-    for percent in [0.25, 0.20, 0.10, 0.05, 0.02, 0.01]:
-        data = percentage_cutting(data_only_jumps, percent, param)
-        save_as_csv(data, 'percentage_' + param + '_' + str(int(percent * 100)),
-                    folder='without_preprocessed/percentage/' + str(int(percent * 100)))
-
-        train_data, test_data = split_train_test(data)
-
-        save_as_csv(train_data, 'percentage_' + param + '_' + str(int(percent * 100)) + '_train',
-                    folder='without_preprocessed/percentage/' + str(int(percent * 100)))
-        save_as_csv(test_data, 'percentage_' + param + '_' + str(int(percent * 100)) + '_test',
-                    folder='without_preprocessed/percentage/' + str(int(percent * 100)))
-    """
 
     return
 
