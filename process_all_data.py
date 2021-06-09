@@ -2,6 +2,7 @@ import numpy as np
 import pandas as pd
 import os
 from sklearn.model_selection import train_test_split
+import itertools
 
 
 def read_data(name):
@@ -118,56 +119,53 @@ def convert_comma_to_dot(x):
     return float(x.replace(',', '.'))
 
 
-def calc_avg(data, with_preprocessed=False):
-    if with_preprocessed:
-        averaged_data = pd.DataFrame(columns=['Sprungtyp', 'SprungID', 'ACC_N',
-                                              'Acc_x_Fil', 'Acc_y_Fil', 'Acc_z_Fil', 'Gyro_x_Fil', 'Gyro_y_Fil',
-                                              'Gyro_z_Fil',
-                                              'DJump_SIG_I_x LapEnd', 'DJump_SIG_I_y LapEnd', 'DJump_SIG_I_z LapEnd',
-                                              'DJump_Abs_I_x LapEnd', 'DJump_Abs_I_y LapEnd', 'DJump_Abs_I_z LapEnd']) # TODO
+def calc_avg(data):
 
-    else:
-        averaged_data = pd.DataFrame(columns=['Sprungtyp', 'SprungID', 'ACC_N',
-                                              'Acc_x_Fil', 'Acc_y_Fil', 'Acc_z_Fil', 'Gyro_x_Fil', 'Gyro_y_Fil', 'Gyro_z_Fil'])
+    avg_cols = list(data.columns)
+    avg_ = ['avg_'] * (len(avg_cols) - 2)
+    avg_cols.remove('Sprungtyp')
+    avg_cols.remove('SprungID')
+    avg_cols = list(map(str.__add__, avg_, list(avg_cols)))
+    avg_cols.insert(0, 'Sprungtyp')
+    avg_cols.insert(0, 'SprungID')
 
-    std_data = pd.DataFrame(columns=['Sprungtyp', 'SprungID', 'ACC_N', 'Acc_x_Fil', 'Acc_y_Fil', 'Acc_z_Fil', 'Gyro_x_Fil', 'Gyro_y_Fil', 'Gyro_z_Fil'])
+    std_cols = [value for value in list(data.columns) if value not in [col for col in data.columns if 'DJump' in col]]
+    std_ = ['std_'] * (len(std_cols) - 2)
+    std_cols.remove('Sprungtyp')
+    std_cols.remove('SprungID')
+    std_cols = list(map(str.__add__, std_, list(std_cols)))
+    std_cols.insert(0, 'Sprungtyp')
+    std_cols.insert(0, 'SprungID')
+
+    averaged_data = pd.DataFrame(columns=avg_cols)
+
+    std_data = pd.DataFrame(columns=std_cols)
 
     for id in data['SprungID'].unique():
         subframe = data[data['SprungID'] == id]
 
-        mean = subframe.mean()
-        std = subframe.std()
+        mean = subframe.mean().to_frame().T
+        std = subframe.std().to_frame().T
+
+        avg_ = ['avg_'] * len(mean.columns)
+        mean.columns = list(map(str.__add__, avg_, mean.columns))
+        std_ = ['std_'] * len(std.columns)
+        std.columns = list(map(str.__add__, std_, std.columns))
+
+        mean['Sprungtyp'] = subframe['Sprungtyp'].unique()[0]
+        mean['SprungID'] = subframe['SprungID'].unique()[0]
+        std['Sprungtyp'] = subframe['Sprungtyp'].unique()[0]
+        std['SprungID'] = subframe['SprungID'].unique()[0]
 
         averaged_data = averaged_data.append(mean, ignore_index=True)
         std_data = std_data.append(std, ignore_index=True)
 
-        averaged_data['Sprungtyp'].iloc[len(averaged_data) - 1] = subframe['Sprungtyp'].unique()[0]
-        averaged_data['SprungID'].iloc[len(averaged_data) - 1] = subframe['SprungID'].unique()[0]
-
-        std_data['Sprungtyp'].iloc[len(std_data) - 1] = subframe['Sprungtyp'].unique()[0]
-        std_data['SprungID'].iloc[len(std_data) - 1] = subframe['SprungID'].unique()[0]
-
         print(len(averaged_data) - 1)
 
-    averaged_data = averaged_data.drop(columns=['Time', 'TimeInJump'])
-    if with_preprocessed:
-        std_data = std_data.drop(columns=['Time', 'DJump_SIG_I_x LapEnd', 'DJump_SIG_I_y LapEnd', 'DJump_SIG_I_z LapEnd', # TODO
-                                          'DJump_Abs_I_x LapEnd', 'DJump_Abs_I_y LapEnd', 'DJump_Abs_I_z LapEnd',
-                                          'TimeInJump'])
+    averaged_data = averaged_data.drop(columns=['avg_Time'])
+    std_data = std_data.drop(columns=['std_Time'])
 
-        averaged_data = averaged_data.round({'ACC_N': 3,
-                                             'Acc_x_Fil': 3, 'Acc_y_Fil': 3, 'Acc_z_Fil': 3, 'Gyro_x_Fil': 3,
-                                             'Gyro_y_Fil': 3, 'Gyro_z_Fil': 3,
-                                             'DJump_SIG_I_x LapEnd': 3, 'DJump_SIG_I_y LapEnd': 3,
-                                             'DJump_SIG_I_z LapEnd': 3,
-                                             'DJump_Abs_I_x LapEnd': 3, 'DJump_Abs_I_y LapEnd': 3,
-                                             'DJump_Abs_I_z LapEnd': 3}) # TODO
-    else:
-        std_data = std_data.drop(columns=['Time', 'TimeInJump'])
-
-        averaged_data = averaged_data.round({'ACC_N': 3, 'Acc_x_Fil': 3, 'Acc_y_Fil': 3, 'Acc_z_Fil': 3, 'Gyro_x_Fil': 3, 'Gyro_y_Fil': 3, 'Gyro_z_Fil': 3})
-
-    std_data = std_data.round({'ACC_N': 3, 'Acc_x_Fil': 3, 'Acc_y_Fil': 3, 'Acc_z_Fil': 3, 'Gyro_x_Fil': 3, 'Gyro_y_Fil': 3, 'Gyro_z_Fil': 3})
+    std_data = std_data.drop(columns=[col for col in std_data.columns if 'DJump' in col])
 
     print(averaged_data)
     print(std_data)
@@ -214,7 +212,7 @@ def class_std_mean(avg, std):
 
 
 def normalize(data):
-    for (column_name, column_data) in data.iteritems():
+    for (column_name, column_data) in data.iteritems(): # TODO
 
         if column_name in ['ACC_N', 'ACC_N_ROT_filtered', 'Acc_x_Fil', 'Acc_y_Fil', 'Acc_z_Fil',
                            'Gyro_x_Fil', 'Gyro_y_Fil', 'Gyro_z_Fil',
@@ -293,32 +291,14 @@ def split_train_test(data):
     return train_data, test_data
 
 
-def combine_avg_std(avg_data, std_data, with_preprocessed=False):
-    avg_data.rename(columns={'ACC_N': 'avg_ACC_N',
-                             'Acc_x_Fil': 'avg_Acc_x_Fil', 'Acc_y_Fil': 'avg_Acc_y_Fil', 'Acc_z_Fil': 'avg_Acc_z_Fil',
-                             'Gyro_x_Fil': 'avg_Gyro_x_Fil', 'Gyro_y_Fil': 'avg_Gyro_y_Fil',
-                             'Gyro_z_Fil': 'avg_Gyro_z_Fil'}, inplace=True)
-
-    std_data.rename(columns={'ACC_N': 'std_ACC_N',
-                             'Acc_x_Fil': 'std_Acc_x_Fil', 'Acc_y_Fil': 'std_Acc_y_Fil', 'Acc_z_Fil': 'std_Acc_z_Fil',
-                             'Gyro_x_Fil': 'std_Gyro_x_Fil', 'Gyro_y_Fil': 'std_Gyro_y_Fil',
-                             'Gyro_z_Fil': 'std_Gyro_z_Fil'}, inplace=True)
+def combine_avg_std(avg_data, std_data):
 
     avg_std_data = pd.merge(avg_data, std_data, on=['SprungID', 'Sprungtyp'], how='left')
 
-    if with_preprocessed:  # TODO
-        avg_std_data = avg_std_data[
-            ['Sprungtyp', 'SprungID', 'avg_ACC_N', 'std_ACC_N',
-             'avg_Acc_x_Fil', 'std_Acc_x_Fil', 'avg_Acc_y_Fil', 'std_Acc_y_Fil', 'avg_Acc_z_Fil', 'std_Acc_z_Fil',
-             'avg_Gyro_x_Fil', 'std_Gyro_x_Fil', 'avg_Gyro_y_Fil', 'std_Gyro_y_Fil', 'avg_Gyro_z_Fil', 'std_Gyro_z_Fil',
-             'DJump_SIG_I_x LapEnd', 'DJump_SIG_I_y LapEnd', 'DJump_SIG_I_z LapEnd',
-             'DJump_Abs_I_x LapEnd', 'DJump_Abs_I_y LapEnd', 'DJump_Abs_I_z LapEnd']]
+    cols = [x for x in itertools.chain.from_iterable(itertools.zip_longest(list(avg_data.columns), list(std_data.columns))) if x]
+    cols = list(dict.fromkeys(cols))
 
-    else:
-        avg_std_data = avg_std_data[
-            ['Sprungtyp', 'SprungID', 'avg_ACC_N', 'std_ACC_N',
-             'avg_Acc_x_Fil', 'std_Acc_x_Fil', 'avg_Acc_y_Fil', 'std_Acc_y_Fil', 'avg_Acc_z_Fil', 'std_Acc_z_Fil',
-             'avg_Gyro_x_Fil', 'std_Gyro_x_Fil', 'avg_Gyro_y_Fil', 'std_Gyro_y_Fil', 'avg_Gyro_z_Fil', 'std_Gyro_z_Fil']]
+    avg_std_data = avg_std_data[cols]
 
     return avg_std_data
 
@@ -685,6 +665,7 @@ def main():
         all_data = all_data.append(data, ignore_index=True)
     all_data.to_csv("Sprungdaten_processed/all_data.csv", index=False)
     """
+    """
     all_data = pd.read_csv("Sprungdaten_processed/all_data.csv")
     data_only_jumps = sort_out_errors(all_data)
     data_only_jumps = correct_space_errors(data_only_jumps)
@@ -698,13 +679,34 @@ def main():
     data_only_jumps = data_only_jumps[~data_only_jumps['SprungID'].isin(ids_to_delete)]
 
     save_as_csv(data_only_jumps, "data_only_jumps", folder="with_preprocessed")
-
+    """
 
     # with preprocessed data
+    #data_only_jumps = pd.read_csv("Sprungdaten_processed/with_preprocessed/data_only_jumps.csv")
+
+    averaged_data = pd.read_csv('Sprungdaten_processed/with_preprocessed/averaged_data/averaged_data.csv')
+    std_data = pd.read_csv('Sprungdaten_processed/with_preprocessed/std_data/std_data.csv')
+    avg_std_data = pd.read_csv('Sprungdaten_processed/with_preprocessed/avg_std_data/avg_std_data.csv')
+
+    train_data, test_data = split_train_test(averaged_data)
+    save_as_csv(train_data, 'averaged_data_train', folder='with_preprocessed/averaged_data')
+    save_as_csv(test_data, 'averaged_data_test', folder='with_preprocessed/averaged_data')
+
+    train_data, test_data = split_train_test(std_data)
+    save_as_csv(train_data, 'std_data_train', folder='with_preprocessed/std_data')
+    save_as_csv(test_data, 'std_data_test', folder='with_preprocessed/std_data')
+
+    train_data, test_data = split_train_test(avg_std_data)
+    save_as_csv(train_data, 'avg_std_data_train', folder='with_preprocessed/avg_std_data')
+    save_as_csv(test_data, 'avg_std_data_test', folder='with_preprocessed/avg_std_data')
+
     """
     averaged_data, std_data = calc_avg(data_only_jumps)
     save_as_csv(averaged_data, "averaged_data", folder="with_preprocessed/averaged_data")
     save_as_csv(std_data, "std_data", folder="with_preprocessed/std_data")
+    
+    averaged_data = pd.read_csv('Sprungdaten_processed/with_preprocessed/averaged_data/averaged_data.csv')
+    std_data = pd.read_csv('Sprungdaten_processed/with_preprocessed/std_data/std_data.csv')
     avg_std_data = combine_avg_std(averaged_data, std_data)
     save_as_csv(avg_std_data, "avg_std_data", folder="with_preprocessed/avg_std_data")
     """
@@ -724,9 +726,12 @@ def main():
                     folder='with_preprocessed/percentage/' + str(int(percent * 100)))
     """
 
+    """
     # without preprocessed data
     data_only_jumps = pd.read_csv("Sprungdaten_processed/with_preprocessed/data_only_jumps.csv")
     data_only_jumps = data_only_jumps.drop([col for col in data_only_jumps.columns if 'DJump' in col], axis=1)
+    save_as_csv(data_only_jumps, "data_only_jumps", folder="without_preprocessed")
+    """
 
     """
     averaged_data, std_data = calc_avg(data_only_jumps)
