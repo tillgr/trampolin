@@ -271,12 +271,22 @@ def main():
     print(model.best_score_)
     print(model.best_params_)
     """
-    #"""
-    model = run_multiple_times(jump_data_length, num_columns, runs=2, conv=3, kernel=3, pool=2, dense=2,
+    # randomized Grid Search
+    param_grid = {'jump_data_length': [jump_data_length], 'num_columns': [num_columns], 'epochs': [40],
+                  'batch_size': [32], 'optim': ['adam', 'Nadam'], 'c': [1, 2, 3, 4],
+                  'act_func': ['tanh', 'relu'], 'loss': ['categorical_crossentropy', 'kl_divergence']}
+    model = KerasClassifier(build_fn=build_model_grid, verbose=0)
+    grid = RandomizedSearchCV(estimator=model, param_distributions=param_grid, verbose=1, n_iter=2, n_jobs=1)
+    grid_result = grid.fit(x_test, y_test)
+    cv_results_df = pd.DataFrame(grid_result.cv_results_)
+    # cv_results_df.to_csv('gridsearch.csv')
+    print(cv_results_df)  # via debugger
+    """
+    model = run_multiple_times(jump_data_length, num_columns, runs=5, conv=1, kernel=3, pool=2, dense=2,
                                act_func='tanh', loss='kl_divergence', optim='Nadam', epochs=40,
                                x_train=x_train, y_train=y_train, x_test=x_test, y_test=y_test)
     model.evaluate(x_test, y_test, verbose=1)
-    #"""
+    """
 
     shap.initjs()
     """
