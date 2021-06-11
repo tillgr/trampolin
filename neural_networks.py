@@ -15,17 +15,21 @@ from keras.wrappers.scikit_learn import KerasClassifier
 
 def prepare_data():
 
-    data_train = pd.read_csv("Sprungdaten_processed/without_preprocessed/percentage/1/percentage_mean_1_train.csv")
-    data_test = pd.read_csv("Sprungdaten_processed/without_preprocessed/percentage/1/percentage_mean_1_test.csv")
+    data_train = pd.read_csv("Sprungdaten_processed/with_preprocessed/percentage/5/percentage_mean_5_train.csv")
+    data_test = pd.read_csv("Sprungdaten_processed/with_preprocessed/percentage/5/percentage_mean_5_test.csv")
 
     # data_train = pd.read_csv("Sprungdaten_processed/percentage/5/val/percentage_mean_5_80_10_10_train.csv")
     # data_test = pd.read_csv("Sprungdaten_processed/percentage/5/val/percentage_mean_5_80_10_10_test.csv")
     # data_val = pd.read_csv("Sprungdaten_processed/percentage/5/val/percentage_mean_5_80_10_10_val.csv")
 
     # DJump_SIG_I_S , DJump_ABS_I_S , DJump_I_ABS_S
+    first_djumps = set([col for col in data_train.columns if 'DJump' in col]) - set([col for col in data_train.columns if 'DJump_SIG_I_S' in col])\
+    - set([col for col in data_train.columns if 'DJump_ABS_I_S' in col]) - set([col for col in data_train.columns if 'DJump_I_ABS_S' in col])
+    data_train = data_train.drop(first_djumps, axis=1)
     #data_train = data_train.drop([col for col in data_train.columns if 'DJump_SIG_I_S' in col], axis=1)
     #data_train = data_train.drop([col for col in data_train.columns if 'DJump_ABS_I_S' in col], axis=1)
     #data_train = data_train.drop([col for col in data_train.columns if 'DJump_I_ABS_S' in col], axis=1)
+    data_test = data_test.drop(first_djumps, axis=1)
     #data_test = data_test.drop([col for col in data_test.columns if 'DJump_SIG_I_S' in col], axis=1)
     #data_test = data_test.drop([col for col in data_test.columns if 'DJump_ABS_I_S' in col], axis=1)
     #data_test = data_test.drop([col for col in data_test.columns if 'DJump_I_ABS_S' in col], axis=1)
@@ -268,7 +272,7 @@ def main():
     print(model.best_params_)
     """
     #"""
-    model = run_multiple_times(jump_data_length, num_columns, runs=5, conv=1, kernel=3, pool=2, dense=2,
+    model = run_multiple_times(jump_data_length, num_columns, runs=2, conv=3, kernel=3, pool=2, dense=2,
                                act_func='tanh', loss='kl_divergence', optim='Nadam', epochs=40,
                                x_train=x_train, y_train=y_train, x_test=x_test, y_test=y_test)
     model.evaluate(x_test, y_test, verbose=1)
