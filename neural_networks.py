@@ -92,8 +92,24 @@ def prepare_data():
 
 def prepare_data_oneliner():
 
-    data_train = pd.read_csv("Sprungdaten_processed/with_preprocessed/percentage/25/vector_percentage_25_train.csv")
-    data_test = pd.read_csv("Sprungdaten_processed/with_preprocessed/percentage/25/vector_percentage_25_test.csv")
+    data_train = pd.read_csv("Sprungdaten_processed/with_preprocessed/avg_std_data/avg_std_data_train.csv")
+    data_test = pd.read_csv("Sprungdaten_processed/with_preprocessed/avg_std_data/avg_std_data_test.csv")
+
+    first_djumps = set([col for col in data_train.columns if 'DJump' in col]) - set([col for col in data_train.columns if 'DJump_SIG_I_S' in col]) \
+    - set([col for col in data_train.columns if 'DJump_ABS_I_S' in col]) - set([col for col in data_train.columns if 'DJump_I_ABS_S' in col])
+    pp_list = [4]
+    if 1 not in pp_list:
+        data_train = data_train.drop(first_djumps, axis=1)
+        data_test = data_test.drop(first_djumps, axis=1)
+    if 2 not in pp_list:
+        data_train = data_train.drop([col for col in data_train.columns if 'DJump_SIG_I_S' in col], axis=1)
+        data_test = data_test.drop([col for col in data_test.columns if 'DJump_SIG_I_S' in col], axis=1)
+    if 3 not in pp_list:
+        data_train = data_train.drop([col for col in data_train.columns if 'DJump_ABS_I_S' in col], axis=1)
+        data_test = data_test.drop([col for col in data_test.columns if 'DJump_ABS_I_S' in col], axis=1)
+    if 4 not in pp_list:
+        data_train = data_train.drop([col for col in data_train.columns if 'DJump_I_ABS_S' in col], axis=1)
+        data_test = data_test.drop([col for col in data_test.columns if 'DJump_I_ABS_S' in col], axis=1)
 
     x_train = data_train.drop('Sprungtyp', axis=1)
     x_train = x_train.drop(['SprungID'], axis=1)
@@ -211,7 +227,7 @@ def build_model_oneliner(num_columns, act_func, loss, optim):
     x = Dense(512, activation=act_func)(x)
     x = Dense(256, activation=act_func)(x)
     x = Dense(128, activation=act_func)(x)
-    x = Dense(41, activation='softmax', name="output")(x)
+    x = Dense(45, activation='softmax', name="output")(x)
 
     model = Model(inputs=first_input, outputs=x)
     model.compile(loss=loss, optimizer=optim, metrics=['accuracy', keras.metrics.TruePositives(), keras.metrics.TrueNegatives(), keras.metrics.FalsePositives(), keras.metrics.FalseNegatives()])
@@ -256,15 +272,15 @@ def run_multiple_times_oneliner(num_columns, runs, act_func, loss, optim, epochs
 
 def main():
 
-    x_train, y_train, x_test, y_test, jump_data_length, num_columns = prepare_data()
-    # x_train, y_train, x_test, y_test, num_columns = prepare_data_oneliner()
+    #x_train, y_train, x_test, y_test, jump_data_length, num_columns = prepare_data()
+    x_train, y_train, x_test, y_test, num_columns = prepare_data_oneliner()
 
     # model = grid_search_build(x_train, y_train, x_test, y_test, jump_data_length)
     # model = run_multiple_times(10, jump_data_length, 3, 3, 2, 2, 'tanh', 'kl_divergence', 'Nadam', x_train, y_train, x_test, y_test, 20)
     #model = run_multiple_times(jump_data_length, num_columns, runs=1, conv=1, kernel=3, pool=2, dense=2, act_func='tanh', loss='categorical_crossentropy', optim='Nadam', epochs=40, x_train=x_train, y_train=y_train, x_test=x_test, y_test=y_test)
     #model = run_multiple_times(jump_data_length, num_columns, runs=1, conv=3, kernel=3, pool=2, dense=2, act_func='tanh', loss='kl_divergence', optim='Nadam', epochs=40, x_train=x_train, y_train=y_train, x_test=x_test, y_test=y_test)
 
-    # model = run_multiple_times_oneliner(num_columns, runs=10, act_func='tanh', loss='kl_divergence', optim='adam', epochs=60, x_train=x_train, y_train=y_train, x_test=x_test, y_test=y_test)
+    model = run_multiple_times_oneliner(num_columns, runs=6, act_func='tanh', loss='kl_divergence', optim='adam', epochs=40, x_train=x_train, y_train=y_train, x_test=x_test, y_test=y_test)
 
     """
     param_grid = {'jump_data_length': [jump_data_length], 'num_columns': [num_columns], 'epochs': [40],
@@ -288,13 +304,14 @@ def main():
     # cv_results_df.to_csv('gridsearch.csv')
     print(cv_results_df)  # via debugger
     """
-    # """
+    """
     model = run_multiple_times(jump_data_length, num_columns, runs=5, conv=3, kernel=3, pool=2, dense=2,
                                act_func='tanh', loss='kl_divergence', optim='Nadam', epochs=40,
                                x_train=x_train, y_train=y_train, x_test=x_test, y_test=y_test)
     model.evaluate(x_test, y_test, verbose=1)
-    # """
+    """
 
+    model.evaluate(x_test, y_test, verbose=1)
     shap.initjs()
     """
     # DFF
