@@ -1,4 +1,3 @@
-from scipy.sparse import data
 import numpy as np
 import pandas as pd
 import shap
@@ -15,36 +14,10 @@ if __name__ == '__main__':
     start_column: str = '0-mean_ACC_N'
     end_column: str = '80-std_Gyro_z_Fil'
 
-    X_train = train_data.loc[:, start_column:end_column].drop([
-        '0-mean_ACC_N_ROT_filtered',
-        '0-std_ACC_N_ROT_filtered',
-        '20-mean_ACC_N_ROT_filtered',
-        '20-std_ACC_N_ROT_filtered',
-        '40-mean_ACC_N_ROT_filtered',
-        '40-std_ACC_N_ROT_filtered',
-        '60-mean_ACC_N_ROT_filtered',
-        '60-std_ACC_N_ROT_filtered',
-        '80-mean_ACC_N_ROT_filtered',
-        '80-std_ACC_N_ROT_filtered'
-    ], axis=1)   #.to_numpy()
-
-    '''X_train = train_data.loc[:, start_column:end_column].to_numpy()'''
+    X_train = train_data.loc[:, start_column:end_column]
     y_train = np.array((train_data['Sprungtyp']))
 
-    X_test = test_data.loc[:, start_column:end_column].drop([
-        '0-mean_ACC_N_ROT_filtered',
-        '0-std_ACC_N_ROT_filtered',
-        '20-mean_ACC_N_ROT_filtered',
-        '20-std_ACC_N_ROT_filtered',
-        '40-mean_ACC_N_ROT_filtered',
-        '40-std_ACC_N_ROT_filtered',
-        '60-mean_ACC_N_ROT_filtered',
-        '60-std_ACC_N_ROT_filtered',
-        '80-mean_ACC_N_ROT_filtered',
-        '80-std_ACC_N_ROT_filtered'
-    ], axis=1)    #.to_numpy()
-
-    '''X_test = test_data.loc[:, start_column:end_column].to_numpy()'''
+    X_test = test_data.loc[:, start_column:end_column]
     y_test = np.array((test_data['Sprungtyp']))
 
     clf = SGDClassifier(loss='modified_huber', penalty='l1', alpha=0.0001,
@@ -61,6 +34,6 @@ if __name__ == '__main__':
         print(f"Accuracy youden score: {str(mean_youden.round(4))}")
         print(f"Accuracy f1 score: {str(mean_f.round(4))}")
 
-    '''explainer = shap.KernelExplainer(clf.decision_function, X_test.sample(n=50), link='identity')
+    explainer = shap.KernelExplainer(clf.decision_function, X_test.sample(n=50), link='identity')
     shap_values = explainer.shap_values(X_test.sample(n=10))
-    shap.summary_plot(shap_values[0], X_test.sample(n=10))'''
+    shap.summary_plot(shap_values[0], X_test.sample(n=10))
