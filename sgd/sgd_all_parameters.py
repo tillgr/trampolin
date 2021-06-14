@@ -7,12 +7,12 @@ from random_classifier import metrics
 
 if __name__ == '__main__':
 
-    train_data = pd.read_csv('../Sprungdaten_processed/percentage/20/vector_percentage_mean_std_20_train.csv')
-    test_data = pd.read_csv('../Sprungdaten_processed/percentage/20/vector_percentage_mean_std_20_test.csv')
+    train_data = pd.read_csv('../Sprungdaten_processed/with_preprocessed/percentage/10/vector_percentage_mean_std_10_train.csv')
+    test_data = pd.read_csv('../Sprungdaten_processed/with_preprocessed/percentage/10/vector_percentage_mean_std_10_test.csv')
 
     # get_features (X)
-    start_column: str = '0-mean_ACC_N'
-    end_column: str = '80-std_Gyro_z_Fil'
+    start_column: str = 'DJump_SIG_I_x LapEnd'
+    end_column: str = 'DJump_ABS_I_z LapEnd'
 
     X_train = train_data.loc[:, start_column:end_column].to_numpy()
     y_train = np.array((train_data['Sprungtyp']))
@@ -31,7 +31,7 @@ if __name__ == '__main__':
                                     n_iter_no_change=5, class_weight=None,
                                     warm_start=False, average=False).fit(X_train, y_train)
                 y_pred = clf.predict(X_test)
-                if accuracy_score(y_test, y_pred) > 0:
+                if accuracy_score(y_test, y_pred) > 0.9:
                     print(
                         f"Accuracy score: {losses} , {penalty} , {maxi}:  {str(accuracy_score(y_test, y_pred).__round__(4))}")
                     mean_prec, mean_rec, mean_f, mean_youden = metrics(y_test, y_pred)

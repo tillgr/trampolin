@@ -7,12 +7,12 @@ from random_classifier import metrics
 
 if __name__ == '__main__':
 
-    train_data = pd.read_csv('../Sprungdaten_processed/with_preprocessed/percentage/10/vector_percentage_mean_std_10_train.csv')
-    test_data = pd.read_csv('../Sprungdaten_processed/with_preprocessed/percentage/10/vector_percentage_mean_std_10_test.csv')
+    train_data = pd.read_csv('../Sprungdaten_processed/with_preprocessed/std_data/std_data_train.csv')
+    test_data = pd.read_csv('../Sprungdaten_processed/with_preprocessed/std_data/std_data_test.csv')
 
     # get_features (X)
-    start_column: str = 'DJump_SIG_I_x LapEnd'
-    end_column: str = '90_std_Gyro_z_Fil'
+    start_column: str = 'std_Acc_N_Fil'
+    end_column: str = 'std_Gyro_z_Fil'
 
     p = train_data.drop([col for col in train_data.columns if 'DJump_SIG_I_S' in col], axis=1)
     t = test_data.drop([col for col in test_data.columns if 'DJump_SIG_I_S' in col], axis=1)
@@ -31,7 +31,7 @@ if __name__ == '__main__':
                         n_iter_no_change=5, class_weight=None,
                         warm_start=False, average=False).fit(X_train, y_train)
     y_pred = clf.predict(X_test)
-    if accuracy_score(y_test, y_pred) > 0.9:
+    if accuracy_score(y_test, y_pred) > 0:
         print(f"Accuracy score:  {str(accuracy_score(y_test, y_pred).__round__(4))}")
         mean_prec, mean_rec, mean_f, mean_youden = metrics(y_test, y_pred)
         print(f"Accuracy youden score: {str(mean_youden.round(4))}")
