@@ -1,10 +1,14 @@
 import pandas as pd
+import shap
 from sklearn import metrics
 from sklearn.model_selection import train_test_split
 from sklearn import neighbors
 from sklearn import preprocessing
 from sklearn.metrics import accuracy_score, f1_score
 from random_classifier import metrics as rc_metrics
+import shap
+import matplotlib.pyplot as plt
+import numpy as np
 
 if __name__ == '__main__':
     # read individual data sets
@@ -96,3 +100,4 @@ if __name__ == '__main__':
     print(f"Accuracy youden score: {str(mean_youden.round(4))}")
     print(f"Accuracy f1 score: {str(mean_f.round(4))}")
     print("--------------------------------------------------------------")
+
