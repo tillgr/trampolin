@@ -8,6 +8,9 @@ from sklearn.naive_bayes import GaussianNB
 from sklearn.svm import SVC
 import numpy as np
 from sklearn.metrics import confusion_matrix, plot_confusion_matrix
+from os import listdir, walk
+from os.path import isfile, join
+
 
 
 from random_classifier import metrics
@@ -70,11 +73,11 @@ def get_jumps_by_type(data: DataFrame, type: str):
 
 def get_train_test_data(datasets: list):
     next = 1
-    train = read_processed_data("Sprungdaten_processed/" + datasets[0] + "_train.csv")
-    test = read_processed_data("Sprungdaten_processed/" + datasets[0] + "_test.csv")
+    train = read_processed_data(datasets[0] + "_train.csv")
+    test = read_processed_data(datasets[0] + "_test.csv")
     while next < len(datasets):
-        next_train = read_processed_data("Sprungdaten_processed/" + datasets[next] + "_train.csv")
-        next_test = read_processed_data("Sprungdaten_processed/" + datasets[next] + "_test.csv")
+        next_train = read_processed_data(datasets[next] + "_train.csv")
+        next_test = read_processed_data(datasets[next] + "_test.csv")
         train.set_index('SprungID')
         test.set_index('SprungID')
         train = train.merge(next_train)
@@ -83,8 +86,13 @@ def get_train_test_data(datasets: list):
     return train, test
 
 
-def classify(datasets: list, feature_start: str, feature_end: str, drops: list):
+def classify(datasets: list, feature_start: str, feature_end: str, drops: list, manual_feature: bool):
     train, test = get_train_test_data(datasets)
+    if not manual_feature:
+        feature_start = train.columns.tolist()[2]
+        feature_end = train.columns.tolist()[-1]
+        print(feature_start)
+        print(feature_end)
     logger.info("Classify with data set: " + str(datasets) +
                 ". Feature start at column: " + feature_start + ", feature end: " + feature_end +
                 ". Drops :" + str(drops))
@@ -136,81 +144,34 @@ def explain_model(datasets: list, feature_start: str, feature_end: str, drops: l
     index = y_test[y_test == 'Salto A'].index[0]
     explainer = shap.KernelExplainer(clf_linear.decision_function, X.sample(n=50), link='identity')
     df = X_test.iloc[index].to_frame().transpose()
-    shap_values = explainer.shap_values(X_test.iloc[index].to_frame().transpose())
+    shap_values = explainer.shap_values(X_test.iloc[index].to_frame().transposei())
     shap.summary_plot(shap_values[0], X_test.iloc[index].to_frame().transpose())
 
 
-def run_svc():
-    # logger.info("------------start of new run------------")
-    # classify(['percentage/2/vector_percentage_2'], '0-ACC_N', '98-Gyro_z_Fil', [])
-    # logger.info("------------p2------------")
-    #
-    # classify(['percentage/2/vector_percentage_2'], 'DJump_SIG_I_x LapEnd', '98-Gyro_z_Fil', [])
-    # classify(['percentage/2/vector_percentage_2', 'avg_std_data/avg_std_data'], 'DJump_SIG_I_x LapEnd', 'std_Gyro_z_Fil', [])
-    # i = 0
-    # drops = []
-    # while i < 100:
-    #     drops.append(str(i) + "-ACC_N")
-    #     drops.append(str(i) + "-ACC_N_ROT_filtered")
-    #     i += 2
-    # classify(['percentage/2/vector_percentage_2', 'avg_std_data/avg_std_data'], 'DJump_SIG_I_x LapEnd', 'std_Gyro_z_Fil', drops)
-    # classify(['percentage/2/vector_percentage_mean_2'], '0-ACC_N', '98-Gyro_z_Fil', [])
-    # logger.info("------------p2 mean------------")
-    # classify(['percentage/2/vector_percentage_mean_2'], 'DJump_SIG_I_x LapEnd', '98-Gyro_z_Fil', [])
-    # logger.info("------------p2 std------------")
-    # classify(['percentage/2/vector_percentage_mean_std_2'], 'DJump_SIG_I_x LapEnd', '98-std_Gyro_z_Fil', [])
-    # logger.info("------------p1 ------------")
-    # classify(['percentage/1/vector_percentage_1'], 'DJump_SIG_I_x LapEnd', '99-Gyro_z_Fil', [])
-    # logger.info("------------p1 mean------------")
-    # classify(['percentage/1/vector_percentage_mean_1'], 'DJump_SIG_I_x LapEnd', '99-Gyro_z_Fil', [])
-    # logger.info("------------p1 std------------")
-    # classify(['percentage/1/vector_percentage_mean_std_1'], 'DJump_SIG_I_x LapEnd', '99-std_Gyro_z_Fil', [])
-    # logger.info("------------p5 ------------")
-    # classify(['percentage/5/vector_percentage_5'], 'DJump_SIG_I_x LapEnd', '95-Gyro_z_Fil', [])
-    # logger.info("------------p5 mean------------")
-    # classify(['percentage/5/vector_percentage_mean_5'], 'DJump_SIG_I_x LapEnd', '95-Gyro_z_Fil', [])
-    # logger.info("------------p5 std------------")
-    # classify(['percentage/5/vector_percentage_mean_std_5'], 'DJump_SIG_I_x LapEnd', '95-std_Gyro_z_Fil', [])
-    # logger.info("------------p10 ------------")
-    # classify(['percentage/10/vector_percentage_10'], 'DJump_SIG_I_x LapEnd', '90-Gyro_z_Fil', [])
-    # logger.info("------------p10 mean------------")
-    # classify(['percentage/10/vector_percentage_mean_10'], 'DJump_SIG_I_x LapEnd', '90-Gyro_z_Fil', [])
-    # logger.info("------------p10 std------------")
-    # classify(['percentage/10/vector_percentage_mean_std_10'], 'DJump_SIG_I_x LapEnd', '90-std_Gyro_z_Fil', [])
+def find_leaf_file(folder: str, data_sets: set):
+    dirs = listdir(folder)
+    for d in dirs:
+        path = join(folder, d)
+        if not isfile(path):
+            find_leaf_file(path, data_sets)
+        else:
+            if not d.endswith("_train.csv") and not d.endswith("_test.csv"):
+                if "percentage" in path:
+                    if d.startswith("vector_"):
+                        path = path.replace(".csv", "")
+                        data_sets.add(path)
 
-    # logger.info("------------p20 ------------")
-    # classify(['percentage/20/vector_percentage_20'], 'DJump_SIG_I_x LapEnd', '80-Gyro_z_Fil', [])
-    # logger.info("------------p20 mean------------")
-    # classify(['percentage/20/vector_percentage_mean_20'], 'DJump_SIG_I_x LapEnd', '80-Gyro_z_Fil', [])
-    # logger.info("------------p20 std------------")
-    #     # classify(['percentage/20/vector_percentage_mean_std_20'], 'DJump_SIG_I_x LapEnd', '80-std_Gyro_z_Fil', [])
-    # logger.info("------------p20 std-----only processed-------")
-    # classify(['percentage/20/vector_percentage_mean_std_20'], 'DJump_SIG_I_x LapEnd', 'DJump_Abs_I_z LapEnd', [])
+                else:
+                    path = path.replace(".csv", "")
+                    data_sets.add(path)
 
-    i = 0
-    drops = []
-    while i < 100:
-        drops.append(str(i) + "-mean_ACC_N_ROT_filtered")
-        drops.append(str(i) + "-std_ACC_N_ROT_filtered")
-        i += 20
-    logger.info("------------p20 std-----without processed, without n rot filtered-------")
-    explain_model(['percentage/20/vector_percentage_mean_std_20'], '0-mean_ACC_N', '80-std_Gyro_z_Fil', drops)
 
-    # logger.info("------------p25 ------------")
-    # classify(['percentage/25/vector_percentage_25'], 'DJump_SIG_I_x LapEnd', '75-Gyro_z_Fil', [])
-    # logger.info("------------p25 mean------------")
-    # classify(['percentage/25/vector_percentage_mean_25'], 'DJump_SIG_I_x LapEnd', '75-Gyro_z_Fil', [])
-    # logger.info("------------p25 std------------")
-    # classify(['percentage/25/vector_percentage_mean_std_25'], 'DJump_SIG_I_x LapEnd', '75-std_Gyro_z_Fil', [])
-
-    '''
-    logger.info("------------avg ------------")
-    classify(['averaged_data/averaged_data'], 'ACC_N', 'DJump_Abs_I_z LapEnd', [])
-    logger.info("------------avg std------------")
-    classify(['avg_std_data/avg_std_data'], 'avg_ACC_N', 'DJump_Abs_I_z LapEnd', [])
-    logger.info("------------std------------")
-    classify(['std_data/std_data'], 'ACC_N', 'Gyro_z_Fil', [])
-    '''
+def run_svc_auto():
+    folder = "Sprungdaten_processed/with_preprocessed/"
+    data_sets = set()
+    find_leaf_file(folder, data_sets)
+    for ds in data_sets:
+        classify([ds], "", "", [], False)
 
 
 def run_gnb():
@@ -287,4 +248,4 @@ def run_gnb():
 
 
 if __name__ == '__main__':
-    run_svc()
+    run_svc_auto()
