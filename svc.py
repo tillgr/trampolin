@@ -106,8 +106,13 @@ def classify(datasets: list, feature_start: str, feature_end: str, drops: list, 
     prediction_and_evaludate(clf_linear, get_samples_features(test, feature_start, feature_end), test_actual)
 
 
-def gnb_classify(datasets: list, feature_start: str, feature_end: str, drops: list):
+def gnb_classify(datasets: list, feature_start: str, feature_end: str, drops: list, manual_feature: bool):
     train, test = get_train_test_data(datasets)
+    if not manual_feature:
+        feature_start = train.columns.tolist()[2]
+        feature_end = train.columns.tolist()[-1]
+        print(feature_start)
+        print(feature_end)
     gnb = GaussianNB()
     X = get_samples_features(train, feature_start, feature_end)
     y = get_targets(train)
@@ -148,12 +153,12 @@ def explain_model(datasets: list, feature_start: str, feature_end: str, drops: l
     shap.summary_plot(shap_values[0], X_test.iloc[index].to_frame().transpose())
 
 
-def find_leaf_file(folder: str, data_sets: set):
+def collect_all_data_sets(folder: str, data_sets: set):
     dirs = listdir(folder)
     for d in dirs:
         path = join(folder, d)
         if not isfile(path):
-            find_leaf_file(path, data_sets)
+            collect_all_data_sets(path, data_sets)
         else:
             if not d.endswith("_train.csv") and not d.endswith("_test.csv"):
                 if "percentage" in path:
@@ -167,11 +172,19 @@ def find_leaf_file(folder: str, data_sets: set):
 
 
 def run_svc_auto():
-    folder = "Sprungdaten_processed/with_preprocessed/"
+    folder = "Sprungdaten_processed/without_preprocessed/"
     data_sets = set()
-    find_leaf_file(folder, data_sets)
+    collect_all_data_sets(folder, data_sets)
     for ds in data_sets:
         classify([ds], "", "", [], False)
+
+
+def run_gnb_auto():
+    folder = "Sprungdaten_processed/without_preprocessed/"
+    data_sets = set()
+    collect_all_data_sets(folder, data_sets)
+    for ds in data_sets:
+        gnb_classify([ds], "", "", [], False)
 
 
 def run_gnb():
@@ -248,4 +261,4 @@ def run_gnb():
 
 
 if __name__ == '__main__':
-    run_svc_auto()
+    run_gnb_auto()
