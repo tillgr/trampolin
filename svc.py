@@ -2,11 +2,13 @@ import pandas as pd
 from pandas import DataFrame
 import logging
 import shap
-
+import matplotlib.pyplot as plt
 from sklearn.metrics import accuracy_score, f1_score
 from sklearn.naive_bayes import GaussianNB
 from sklearn.svm import SVC
 import numpy as np
+from sklearn.metrics import confusion_matrix, plot_confusion_matrix
+
 
 from random_classifier import metrics
 
@@ -119,12 +121,24 @@ def explain_model(datasets: list, feature_start: str, feature_end: str, drops: l
     clf_linear = SVC(kernel='linear')
     clf_linear.fit(X, y)
     X_test = get_samples_features(test, feature_start, feature_end)
+
+    y_pred = clf_linear.predict(X_test)
+    # cm = confusion_matrix(y_test, y_pred)
+    # title = 'Confusion matrix for SVC classifier'
+    # disp = plot_confusion_matrix(clf_linear,
+    #                              X_test,
+    #                              y_test,
+    #                              display_labels=set(y),
+    #                              cmap=plt.cm.Blues,
+    #                              normalize=None,
+    #                              )
+    # plt.show()
     index = y_test[y_test == 'Salto A'].index[0]
     explainer = shap.KernelExplainer(clf_linear.decision_function, X.sample(n=50), link='identity')
-    shap_values = explainer.shap_values(X_test.sample(n=10))
-    shap.summary_plot(shap_values[0], X_test.sample(n=10))
+    df = X_test.iloc[index].to_frame().transpose()
+    shap_values = explainer.shap_values(X_test.iloc[index].to_frame().transpose())
+    shap.summary_plot(shap_values[0], X_test.iloc[index].to_frame().transpose())
 
-    # shap.force_plot(explainer.expected_value[0], shap_values[0][0,:], X_test.iloc[0,:], link="logit")
 
 def run_svc():
     # logger.info("------------start of new run------------")
