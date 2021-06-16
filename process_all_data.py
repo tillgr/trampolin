@@ -500,7 +500,62 @@ def vectorize(data):
     return df
 
 
+def create_shap_samples(data):
+    unique_jumps = data['Sprungtyp'].unique()
+    df = pd.DataFrame()
+    for jump in unique_jumps:
+        subframe = data[data['Sprungtyp'] == jump]
+        ids = subframe['SprungID'].unique()
+        if len(ids) > 2:
+            random = np.random.choice(ids, size=3, replace=False)
+            df = df.append(data[data['SprungID'].isin(random)], ignore_index=True)
+    return df
+
+
+def mean_jump_generator(data):
+    # only for vectorized data
+    unique_jumps = data['Sprungtyp'].unique()
+    df = pd.DataFrame()
+    for jump in unique_jumps:
+        subframe = data[data['Sprungtyp'] == jump]
+        mean_jump = subframe.mean().to_frame().T
+        mean_jump['Sprungtyp'] = jump
+        mean_jump['SprungID'] = 'generated_Mean_' + jump
+        df = df.append(mean_jump, ignore_index=True)
+    return df
+
+
+def devectorize(data):
+    percent = 100 / ((len([col for col in data.columns if 'DJump' not in col]) - 2) / len([col for col in data.columns if col.startswith('0')]))
+    percent_list = np.rint(np.arange(0, 100, percent))
+    names = [col for col in data.columns if col.startswith(str(int(percent_list[0])))]
+    without_percent_name = []
+    for name in names:
+        without_percent_name.append(name.replace('0_', ''))
+    namelist = ['SprungID', 'Sprungtyp']
+    namelist.extend(without_percent_name)
+    namelist.extend([col for col in data.columns if 'DJump' in col])
+    df = pd.DataFrame(columns=namelist)
+    for row in data.iterrows():
+        temp = pd.DataFrame()
+        row = row[1]    # get the series
+        row = row.to_frame().T.reset_index(drop=True)
+        for p in percent_list:
+            n = row[[col for col in row.columns if col.startswith(str(int(p)))]]
+            n.columns = without_percent_name
+            temp = temp.append(n, ignore_index=True)
+        temp['Sprungtyp'] = row['Sprungtyp'][0]
+        temp['SprungID'] = row['SprungID'][0]
+        djumps = row[[col for col in row.columns if 'DJump' in col]]
+        djumps['SprungID'] = row['SprungID'][0]
+        temp = pd.merge(temp, djumps, on='SprungID')
+
+        df = df.append(temp, ignore_index=True)
+    return df
+
+
 def main():
+
     """
     all_data = read_data("all_data")
     data_only_jumps = sort_out_errors(all_data)
@@ -560,6 +615,7 @@ def main():
         #save_as_csv(test_data, "same_length_" + file + "_test", folder="same_length")
     """
 
+    # for generating avg data
     """
     averaged_data = read_data("averaged_data")
     std_data = read_data("std_data")
@@ -567,26 +623,12 @@ def main():
     save_as_csv(avg_std_data, "avg_std_data", folder="avg_std_data")
     """
 
+    # for Cutting jumps on same length
     """
     for method in ['cut_first', 'cut_last', 'padding_0']:
         data_point_jumps = read_data("data_point_jumps")
         data = make_jump_length_consistent(data_point_jumps, method=method)
         save_as_csv(data, "same_length_" + method, folder="same_length")
-    """
-    # template for creating datasets percentage
-
-    """
-    data_point_jumps = read_data("data_point_jumps")
-    param = 'mean_std'
-    for percent in [0.25, 0.20, 0.10, 0.05, 0.02, 0.01]:
-        data = percentage_cutting(data_point_jumps, percent, param)
-        save_as_csv(data, 'percentage_' + param + '_' + str(int(percent * 100)), folder='percentage/' + str(int(percent * 100)))
-
-        train_data, test_data = split_train_test(data)
-
-        save_as_csv(train_data, 'percentage_' + param + '_' + str(int(percent * 100)) + '_train', folder='percentage/' + str(int(percent * 100)))
-        save_as_csv(test_data, 'percentage_' + param + '_' + str(int(percent * 100)) + '_test', folder='percentage/' + str(int(percent * 100)))
-
     """
 
     # create data_only_jumps
@@ -600,6 +642,8 @@ def main():
         all_data = all_data.append(data, ignore_index=True)
     all_data.to_csv("Sprungdaten_processed/all_data.csv", index=False)
     """
+
+    # Sorting Out Errors and undersampling Strecksprünge
     """
     all_data = pd.read_csv("Sprungdaten_processed/all_data.csv")
     data_only_jumps = sort_out_errors(all_data)
@@ -684,6 +728,20 @@ def main():
         save_as_csv(vector_train_data, 'vector_' + name + percent + '_train', folder=pp + '/percentage/' + percent)
         save_as_csv(vector_test_data, 'vector_' + name + percent + '_test', folder=pp + '/percentage/' + percent)
         save_as_csv(vector_data, 'vector_' + name + percent, folder=pp + '/percentage/' + percent)
+    """
+
+    # Generating Mean Data and devectoring it
+    """
+    data = pd.read_csv('Sprungdaten_processed/with_preprocessed/percentage/25/vector_percentage_25.csv')
+    df = mean_jump_generator(data)
+    devec_df = devectorize(df)
+    """
+
+    # TODO
+    """
+    data = pd.read_csv('Sprungdaten_processed/with_preprocessed/data_only_jumps.csv')
+    df = create_shap_samples(data)
+    save_as_csv(df, 'shap_samples', 'with_preprocessed')
     """
 
 
