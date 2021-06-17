@@ -11,6 +11,8 @@ import shap
 import sklearn
 from sklearn.model_selection import GridSearchCV, RandomizedSearchCV
 from keras.wrappers.scikit_learn import KerasClassifier
+from holoviews.plotting.util import process_cmap
+import holoviews as hv
 
 
 def prepare_data():
@@ -92,12 +94,12 @@ def prepare_data():
 
 def prepare_data_oneliner():
 
-    data_train = pd.read_csv("Sprungdaten_processed/with_preprocessed/avg_std_data/avg_std_data_train.csv")
-    data_test = pd.read_csv("Sprungdaten_processed/with_preprocessed/avg_std_data/avg_std_data_test.csv")
+    data_train = pd.read_csv("Sprungdaten_processed/without_preprocessed/percentage/20/vector_percentage_mean_std_20_train.csv")
+    data_test = pd.read_csv("Sprungdaten_processed/without_preprocessed/percentage/20/vector_percentage_mean_std_20_test.csv")
 
     first_djumps = set([col for col in data_train.columns if 'DJump' in col]) - set([col for col in data_train.columns if 'DJump_SIG_I_S' in col]) \
     - set([col for col in data_train.columns if 'DJump_ABS_I_S' in col]) - set([col for col in data_train.columns if 'DJump_I_ABS_S' in col])
-    pp_list = [4]
+    pp_list = [3]
     if 1 not in pp_list:
         data_train = data_train.drop(first_djumps, axis=1)
         data_test = data_test.drop(first_djumps, axis=1)
@@ -270,6 +272,26 @@ def run_multiple_times_oneliner(num_columns, runs, act_func, loss, optim, epochs
     return best_model
 
 
+def sample_x_test(x_test, y_test):
+    df = x_test.copy()
+    df['Sprungtyp'] = y_test.idxmax(axis=1)
+    counts = df['Sprungtyp'].value_counts()
+    counts = counts.where(counts < 3, other=3)
+    x = pd.DataFrame(columns=df.columns)
+
+    for jump in df['Sprungtyp'].unique():
+        subframe = df[df['Sprungtyp'] == jump]
+        x = x.append(subframe.sample(counts[jump], random_state=1), ignore_index=True)
+
+    y = x['Sprungtyp']
+    x = x.sample(frac=1)        # shuffle
+    x = x.drop(['Sprungtyp'], axis=1)
+    for column in x.columns:
+        x[column] = x[column].astype(float).round(3)
+
+    return x, y
+
+
 def main():
 
     #x_train, y_train, x_test, y_test, jump_data_length, num_columns = prepare_data()
@@ -280,7 +302,7 @@ def main():
     #model = run_multiple_times(jump_data_length, num_columns, runs=1, conv=1, kernel=3, pool=2, dense=2, act_func='tanh', loss='categorical_crossentropy', optim='Nadam', epochs=40, x_train=x_train, y_train=y_train, x_test=x_test, y_test=y_test)
     #model = run_multiple_times(jump_data_length, num_columns, runs=1, conv=3, kernel=3, pool=2, dense=2, act_func='tanh', loss='kl_divergence', optim='Nadam', epochs=40, x_train=x_train, y_train=y_train, x_test=x_test, y_test=y_test)
 
-    model = run_multiple_times_oneliner(num_columns, runs=6, act_func='tanh', loss='kl_divergence', optim='adam', epochs=40, x_train=x_train, y_train=y_train, x_test=x_test, y_test=y_test)
+    model = run_multiple_times_oneliner(num_columns, runs=10, act_func='relu', loss='categorical_crossentropy', optim='Nadam', epochs=60, x_train=x_train, y_train=y_train, x_test=x_test, y_test=y_test)
 
     """
     param_grid = {'jump_data_length': [jump_data_length], 'num_columns': [num_columns], 'epochs': [40],
@@ -294,14 +316,15 @@ def main():
     """
     """
     # randomized Grid Search for cnn
-    param_grid = {'jump_data_length': [jump_data_length], 'num_columns': [num_columns], 'epochs': [40],
-                  'batch_size': [32], 'optim': ['adam', 'Nadam', 'SGD'], 'c': [1, 2, 3],
+    param_grid = {'num_columns': [num_columns], 'epochs': [40],
+                  'batch_size': [32], 'optim': ['adam', 'Nadam', 'SGD'],
                   'act_func': ['tanh', 'relu', 'sigmoid'], 'loss': ['categorical_crossentropy', 'kl_divergence']}
-    model = KerasClassifier(build_fn=build_model_grid, verbose=0)
-    grid = RandomizedSearchCV(estimator=model, param_distributions=param_grid, verbose=1, n_iter=2, n_jobs=1)
+    model = KerasClassifier(build_fn=build_model_oneliner, verbose=0)
+    grid = RandomizedSearchCV(estimator=model, param_distributions=param_grid, verbose=1, n_iter=3, n_jobs=1)
     grid_result = grid.fit(x_test, y_test)
     cv_results_df = pd.DataFrame(grid_result.cv_results_)
     # cv_results_df.to_csv('gridsearch.csv')
+    print(grid_result.best_params_)
     print(cv_results_df)  # via debugger
     """
     """
@@ -311,17 +334,26 @@ def main():
     model.evaluate(x_test, y_test, verbose=1)
     """
 
-    model.evaluate(x_test, y_test, verbose=1)
+    #model.evaluate(x_test, y_test, verbose=1)
     shap.initjs()
-    """
+    #"""
     # DFF
-    background = shap.sample(x_train, 100)
+    shap_x_test, y = sample_x_test(x_test, y_test)
+    background = shap.sample(x_train, 400, random_state=1)
     explainer = shap.KernelExplainer(model, background)
-    shap_values = explainer.shap_values(x_test, nsamples=100)
+    shap_values = explainer.shap_values(shap_x_test)
 
-    shap.summary_plot(shap_values, x_test, plot_type='bar')
-    shap.summary_plot(shap_values[0], x_test)
-    """
+    cmap = ['#393b79','#5254a3','#6b6ecf','#9c9ede','#637939','#8ca252','#b5cf6b','#cedb9c','#8c6d31','#bd9e39','#e7ba52',
+     '#e7cb94','#843c39','#ad494a','#d6616b','#e7969c','#7b4173','#a55194','#ce6dbd','#de9ed6','#3182bd','#6baed6',
+     '#9ecae1','#c6dbef','#e6550d','#fd8d3c','#fdae6b','#fdd0a2','#31a354','#74c476','#a1d99b','#c7e9c0','#756bb1',
+     '#9e9ac8','#bcbddc','#dadaeb','#636363','#969696','#969696','#d9d9d9','#f0027f','#f781bf','#f7b6d2','#fccde5',
+     '#8dd3c7','#ffffb3','#bebada','#fb8072','#80b1d3','#fdb462','#b3de69','#fccde5','#d9d9d9','#bc80bd','#ccebc5','#ffed6f']
+
+    hv.extension('matplotlib')
+    #ListedColormap(process_cmap('winter'))
+    shap.summary_plot(shap_values, shap_x_test, plot_type='bar', plot_size=(15, 17), color=ListedColormap(cmap), class_names=y.unique())
+    shap.summary_plot(shap_values[0], shap_x_test, plot_size=(12, 12), title=y[0])
+    #"""
 
 
     # CNN
