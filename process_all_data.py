@@ -95,6 +95,7 @@ def correct_space_errors(data):
     data['Sprungtyp'].replace("41°", "Barani C", inplace=True)
     data['Sprungtyp'].replace("41/", "Barani A", inplace=True)
     data['Sprungtyp'].replace("43/", "Rudi", inplace=True)
+    data['Sprungtyp'].replace("00V", "Grätschwinkel", inplace=True)
 
     return data
 
@@ -518,10 +519,11 @@ def mean_jump_generator(data):
     df = pd.DataFrame()
     for jump in unique_jumps:
         subframe = data[data['Sprungtyp'] == jump]
-        mean_jump = subframe.mean().to_frame().T
-        mean_jump['Sprungtyp'] = jump
-        mean_jump['SprungID'] = 'generated_Mean_' + jump
-        df = df.append(mean_jump, ignore_index=True)
+        if len(subframe) > 2:
+            mean_jump = subframe.mean().to_frame().T
+            mean_jump['Sprungtyp'] = jump
+            mean_jump['SprungID'] = 'generated_Mean_' + jump
+            df = df.append(mean_jump, ignore_index=True)
     return df
 
 
@@ -732,9 +734,13 @@ def main():
 
     # Generating Mean Data and devectoring it
     """
-    data = pd.read_csv('Sprungdaten_processed/with_preprocessed/percentage/25/vector_percentage_25.csv')
+    name = '25'
+    pp = 'with'
+    data = pd.read_csv('Sprungdaten_processed/' + pp + '_preprocessed/percentage/' + name +'/vector_percentage_' + name + '.csv')
     df = mean_jump_generator(data)
+    save_as_csv(df, 'vector_averaged_jumps_percentage_' + name, folder=pp + '_preprocessed/percentage/' + name)
     devec_df = devectorize(df)
+    save_as_csv(devec_df, 'averaged_jumps_percentage_' + name, folder=pp + '_preprocessed/percentage/' + name)
     """
 
     # TODO
