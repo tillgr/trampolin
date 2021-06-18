@@ -94,8 +94,8 @@ def prepare_data():
 
 def prepare_data_oneliner():
 
-    data_train = pd.read_csv("Sprungdaten_processed/without_preprocessed/percentage/20/vector_percentage_mean_std_20_train.csv")
-    data_test = pd.read_csv("Sprungdaten_processed/without_preprocessed/percentage/20/vector_percentage_mean_std_20_test.csv")
+    data_train = pd.read_csv("Sprungdaten_processed/with_preprocessed/percentage/25/vector_percentage_mean_std_25_train.csv")
+    data_test = pd.read_csv("Sprungdaten_processed/with_preprocessed/percentage/25/vector_percentage_mean_std_25_test.csv")
 
     first_djumps = set([col for col in data_train.columns if 'DJump' in col]) - set([col for col in data_train.columns if 'DJump_SIG_I_S' in col]) \
     - set([col for col in data_train.columns if 'DJump_ABS_I_S' in col]) - set([col for col in data_train.columns if 'DJump_I_ABS_S' in col])
@@ -283,8 +283,8 @@ def sample_x_test(x_test, y_test):
         subframe = df[df['Sprungtyp'] == jump]
         x = x.append(subframe.sample(counts[jump], random_state=1), ignore_index=True)
 
-    y = x['Sprungtyp']
     x = x.sample(frac=1)        # shuffle
+    y = x['Sprungtyp']
     x = x.drop(['Sprungtyp'], axis=1)
     for column in x.columns:
         x[column] = x[column].astype(float).round(3)
@@ -349,9 +349,10 @@ def main():
      '#9e9ac8','#bcbddc','#dadaeb','#636363','#969696','#969696','#d9d9d9','#f0027f','#f781bf','#f7b6d2','#fccde5',
      '#8dd3c7','#ffffb3','#bebada','#fb8072','#80b1d3','#fdb462','#b3de69','#fccde5','#d9d9d9','#bc80bd','#ccebc5','#ffed6f']
 
-    hv.extension('matplotlib')
-    #ListedColormap(process_cmap('winter'))
-    shap.summary_plot(shap_values, shap_x_test, plot_type='bar', plot_size=(15, 17), color=ListedColormap(cmap), class_names=y.unique())
+    # hv.extension('matplotlib')
+    # ListedColormap(process_cmap('winter'))
+    shap.summary_plot(shap_values, shap_x_test, plot_type='bar', plot_size=(15, 17), color=ListedColormap(cmap), class_names=y.unique(), max_display=20)
+    shap.summary_plot(shap_values, shap_x_test, plot_type='bar', plot_size=(15, 17), color=ListedColormap(cmap), class_names=y.unique(), max_display=68)
     shap.summary_plot(shap_values[0], shap_x_test, plot_size=(12, 12), title=y[0])
     #"""
 
