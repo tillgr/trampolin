@@ -1,0 +1,173 @@
+SprungID,Sprungtyp,Acc_N_Fil,Gyro_x_R,Gyro_y_R,Gyro_z_R,Gyro_x_Fil,Gyro_y_Fil,Gyro_z_Fil
+generated_Mean_Salto C,Salto C,27.918,-0.017,87.719,-2.599,0.173,90.33,-2.578
+generated_Mean_Salto C,Salto C,14.167,10.081,386.776,-4.111,9.954,383.245,-4.187
+generated_Mean_Salto C,Salto C,4.084,6.123,133.804,-3.895,6.175,134.331,-3.979
+generated_Mean_Salto C,Salto C,17.484,3.874,133.386,-3.306,3.603,131.936,-3.122
+generated_Mean_Strecksprung,Strecksprung,23.733,-0.791,46.069,2.153,-0.748,46.391,1.977
+generated_Mean_Strecksprung,Strecksprung,1.041,0.452,-28.883,1.122,0.459,-28.715,1.166
+generated_Mean_Strecksprung,Strecksprung,0.983,-1.707,-32.109,1.823,-1.695,-32.088,1.782
+generated_Mean_Strecksprung,Strecksprung,17.873,-0.361,19.093,-0.586,-0.36,18.856,-0.568
+generated_Mean_Salto B,Salto B,28.251,1.247,21.735,-5.217,1.827,24.41,-5.714
+generated_Mean_Salto B,Salto B,17.91,14.495,394.042,-10.548,14.247,390.432,-10.576
+generated_Mean_Salto B,Salto B,6.344,7.521,168.536,-12.744,7.656,169.841,-12.634
+generated_Mean_Salto B,Salto B,19.275,5.622,144.188,-8.464,5.279,142.881,-7.952
+generated_Mean_Salto A,Salto A,25.518,4.026,122.934,-10.472,4.262,123.001,-11.32
+generated_Mean_Salto A,Salto A,7.562,4.814,157.491,-11.053,4.775,156.906,-11.051
+generated_Mean_Salto A,Salto A,6.883,1.844,127.693,-9.886,1.856,127.88,-9.921
+generated_Mean_Salto A,Salto A,20.61,1.5,136.874,-15.063,1.235,136.713,-13.598
+generated_Mean_Barani A,Barani A,28.452,-24.415,-146.04,66.961,-24.266,-145.593,66.564
+generated_Mean_Barani A,Barani A,9.369,-109.928,-84.073,172.399,-109.458,-83.112,172.085
+generated_Mean_Barani A,Barani A,8.937,-61.585,109.477,148.068,-61.696,109.063,147.903
+generated_Mean_Barani A,Barani A,20.966,-0.584,224.739,5.549,-0.797,224.351,6.595
+generated_Mean_Doppelsalto C,Doppelsalto C,30.705,9.123,165.511,-15.041,9.313,169.685,-15.863
+generated_Mean_Doppelsalto C,Doppelsalto C,47.204,5.601,719.969,-12.201,5.947,715.524,-11.719
+generated_Mean_Doppelsalto C,Doppelsalto C,28.833,47.597,523.79,-18.015,47.171,523.146,-17.995
+generated_Mean_Doppelsalto C,Doppelsalto C,20.249,9.381,218.726,-19.869,9.452,217.283,-19.057
+generated_Mean_3/4 Salto rw A,3/4 Salto rw A,25.394,3.525,83.946,4.266,3.664,84.087,4.401
+generated_Mean_3/4 Salto rw A,3/4 Salto rw A,4.047,5.893,110.32,-6.251,5.88,110.267,-6.237
+generated_Mean_3/4 Salto rw A,3/4 Salto rw A,4.286,3.192,135.788,-8.862,3.177,135.777,-8.908
+generated_Mean_3/4 Salto rw A,3/4 Salto rw A,19.814,8.503,133.898,-16.684,8.396,131.958,-16.058
+generated_Mean_Cody C,Cody C,37.453,-11.626,11.925,16.322,-11.655,15.489,15.631
+generated_Mean_Cody C,Cody C,23.892,-1.739,346.88,-14.327,-1.646,345.179,-13.831
+generated_Mean_Cody C,Cody C,6.587,-9.473,125.897,-2.466,-9.416,126.17,-2.941
+generated_Mean_Cody C,Cody C,18.232,-3.489,145.054,-6.098,-3.948,145.144,-5.397
+generated_Mean_Schraubensalto,Schraubensalto,24.734,30.484,178.376,53.71,31.362,178.173,53.96
+generated_Mean_Schraubensalto,Schraubensalto,6.621,97.983,-57.727,127.484,97.316,-57.252,127.551
+generated_Mean_Schraubensalto,Schraubensalto,10.775,-14.207,-15.279,183.654,-13.81,-15.088,183.014
+generated_Mean_Schraubensalto,Schraubensalto,18.711,-10.468,209.001,40.639,-10.702,207.353,40.911
+generated_Mean_Rudi,Rudi,30.289,-18.614,-217.998,203.765,-17.63,-216.374,205.302
+generated_Mean_Rudi,Rudi,17.265,187.8,-56.926,622.896,186.021,-57.375,621.329
+generated_Mean_Rudi,Rudi,13.246,65.566,73.029,402.389,66.332,73.191,401.663
+generated_Mean_Rudi,Rudi,22.129,24.548,269.4,42.887,24.019,269.614,43.731
+generated_Mean_Fliffis- Rudi C,Fliffis- Rudi C,49.63,-38.173,-529.276,65.611,-37.331,-528.61,60.349
+generated_Mean_Fliffis- Rudi C,Fliffis- Rudi C,47.574,-91.279,-495.846,240.102,-88.197,-494.888,245.424
+generated_Mean_Fliffis- Rudi C,Fliffis- Rudi C,37.255,253.779,-71.71,844.211,249.592,-70.202,836.401
+generated_Mean_Fliffis- Rudi C,Fliffis- Rudi C,27.968,87.11,330.201,156.313,86.496,324.563,165.124
+generated_Mean_Barani C,Barani C,32.703,-5.665,-270.17,44.195,-5.8,-268.386,44.187
+generated_Mean_Barani C,Barani C,10.871,-28.711,-124.117,189.203,-28.733,-124.734,188.741
+generated_Mean_Barani C,Barani C,6.333,-54.83,80.884,174.749,-54.559,80.688,174.557
+generated_Mean_Barani C,Barani C,20.601,-5.136,166.363,39.58,-5.285,166.386,39.981
+generated_Mean_Grätschwinkel,Grätschwinkel,24.264,-1.046,-6.761,4.562,-0.647,-8.314,4.665
+generated_Mean_Grätschwinkel,Grätschwinkel,7.8,-4.191,-125.665,5.3,-4.26,-124.236,5.269
+generated_Mean_Grätschwinkel,Grätschwinkel,5.198,-3.729,95.37,-2.29,-3.643,94.372,-2.388
+generated_Mean_Grätschwinkel,Grätschwinkel,18.271,0.178,42.255,4.401,-0.059,43.699,4.645
+generated_Mean_Fliffis C,Fliffis C,48.068,-22.758,-465.162,17.937,-22.17,-462.365,17.643
+generated_Mean_Fliffis C,Fliffis C,47.802,-31.67,-583.672,54.679,-31.722,-581.497,55.474
+generated_Mean_Fliffis C,Fliffis C,19.215,-50.456,-4.03,210.517,-50.158,-5.611,208.777
+generated_Mean_Fliffis C,Fliffis C,22.416,1.202,253.713,27.763,0.511,251.66,29.285
+generated_Mean_1/2 ein 1/2 aus C,1/2 ein 1/2 aus C,31.354,-24.572,152.974,-0.852,-23.297,150.107,-0.674
+generated_Mean_1/2 ein 1/2 aus C,1/2 ein 1/2 aus C,43.078,-10.058,-529.691,-10.677,-10.563,-525.68,-11.969
+generated_Mean_1/2 ein 1/2 aus C,1/2 ein 1/2 aus C,23.678,-2.341,-51.568,-17.158,-2.438,-52.467,-16.716
+generated_Mean_1/2 ein 1/2 aus C,1/2 ein 1/2 aus C,24.026,-4.887,234.335,28.718,-5.221,231.195,29.52
+generated_Mean_Doppelsalto B,Doppelsalto B,27.845,3.968,123.231,-19.738,4.356,126.548,-19.999
+generated_Mean_Doppelsalto B,Doppelsalto B,32.886,-24.209,627.946,1.282,-23.67,624.473,1.175
+generated_Mean_Doppelsalto B,Doppelsalto B,29.117,39.533,544.826,-6.842,39.138,543.77,-6.762
+generated_Mean_Doppelsalto B,Doppelsalto B,21.973,13.175,213.319,-14.853,13.028,212.327,-14.188
+generated_Mean_1 3/4 Salto vw B,1 3/4 Salto vw B,43.889,-58.274,-487.271,99.072,-57.431,-482.612,98.379
+generated_Mean_1 3/4 Salto vw B,1 3/4 Salto vw B,20.224,-38.352,-400.175,57.503,-38.233,-399.83,57.102
+generated_Mean_1 3/4 Salto vw B,1 3/4 Salto vw B,10.259,-22.745,-180.236,28.318,-23.04,-182.304,28.874
+generated_Mean_1 3/4 Salto vw B,1 3/4 Salto vw B,33.845,-36.124,-371.115,53.847,-35.93,-373.166,52.935
+generated_Mean_Fliffis aus C,Fliffis aus C,48.159,44.141,-524.505,-10.49,43.751,-522.522,-10.457
+generated_Mean_Fliffis aus C,Fliffis aus C,48.374,33.917,-637.975,8.73,33.516,-635.648,11.717
+generated_Mean_Fliffis aus C,Fliffis aus C,18.825,32.611,35.301,239.66,32.817,34.784,235.762
+generated_Mean_Fliffis aus C,Fliffis aus C,26.863,3.697,329.439,-0.205,4.054,330.318,1.408
+generated_Mean_Salto rw B,Salto rw B,25.896,2.017,33.298,3.054,1.702,36.2,1.465
+generated_Mean_Salto rw B,Salto rw B,16.008,-0.472,385.798,-16.672,-0.645,380.605,-15.429
+generated_Mean_Salto rw B,Salto rw B,8.884,-9.501,221.429,4.645,-9.454,221.651,4.087
+generated_Mean_Salto rw B,Salto rw B,22.333,-8.443,176.753,-12.088,-8.084,175.886,-11.7
+generated_Mean_Salto rw A,Salto rw A,22.558,-7.811,236.027,-11.948,-7.995,233.465,-10.835
+generated_Mean_Salto rw A,Salto rw A,7.416,-9.461,216.921,12.544,-9.315,216.011,12.371
+generated_Mean_Salto rw A,Salto rw A,6.766,2.623,153.019,-8.354,2.483,153.786,-8.329
+generated_Mean_Salto rw A,Salto rw A,24.409,-20.414,210.968,-13.389,-19.799,212.222,-13.518
+generated_Mean_Salto rw C,Salto rw C,22.434,3.634,49.525,27.002,2.421,51.502,24.007
+generated_Mean_Salto rw C,Salto rw C,14.501,12.718,534.076,-19.361,12.837,520.904,-19.33
+generated_Mean_Salto rw C,Salto rw C,4.762,0.568,95.287,-9.302,0.523,98.292,-8.816
+generated_Mean_Salto rw C,Salto rw C,23.769,-17.92,163.294,-10.808,-17.79,165.632,-10.941
+generated_Mean_3/4 Salto vw A,3/4 Salto vw A,22.131,8.493,-15.822,9.441,8.361,-16.436,8.484
+generated_Mean_3/4 Salto vw A,3/4 Salto vw A,1.546,3.229,-82.882,9.629,3.302,-82.792,9.715
+generated_Mean_3/4 Salto vw A,3/4 Salto vw A,4.587,5.948,-166.61,16.934,5.829,-166.866,16.804
+generated_Mean_3/4 Salto vw A,3/4 Salto vw A,24.089,1.752,-146.793,11.356,1.994,-147.02,11.298
+generated_Mean_Baby- Fliffis C,Baby- Fliffis C,36.547,1.239,-212.908,14.455,1.035,-211.827,15.704
+generated_Mean_Baby- Fliffis C,Baby- Fliffis C,21.005,-28.476,-226.7,188.037,-28.087,-226.267,187.911
+generated_Mean_Baby- Fliffis C,Baby- Fliffis C,10.58,-18.023,63.568,267.175,-18.378,63.467,265.856
+generated_Mean_Baby- Fliffis C,Baby- Fliffis C,23.58,9.09,214.249,19.495,8.89,214.917,21.07
+generated_Mean_Fliffis aus B,Fliffis aus B,48.095,14.573,-518.919,5.861,14.528,-515.637,5.618
+generated_Mean_Fliffis aus B,Fliffis aus B,30.764,35.031,-445.986,-83.545,35.035,-446.064,-82.866
+generated_Mean_Fliffis aus B,Fliffis aus B,18.595,210.458,8.421,27.492,209.126,8.512,25.807
+generated_Mean_Fliffis aus B,Fliffis aus B,26.51,16.982,314.44,-14.517,18.31,313.971,-13.053
+generated_Mean_Bücksprung,Bücksprung,32.374,4.677,50.54,23.331,5.179,46.304,17.822
+generated_Mean_Bücksprung,Bücksprung,10.646,14.52,13.466,-4.177,14.708,14.365,-3.587
+generated_Mean_Bücksprung,Bücksprung,4.272,-4.358,-76.248,7.135,-4.143,-76.963,6.465
+generated_Mean_Bücksprung,Bücksprung,13.363,3.898,7.818,-4.879,4.157,8.37,-2.828
+generated_Mean_Hocksprung,Hocksprung,29.266,3.971,55.15,18.789,4.688,50.206,9.243
+generated_Mean_Hocksprung,Hocksprung,8.673,4.747,-37.383,-1.647,4.78,-35.823,-0.844
+generated_Mean_Hocksprung,Hocksprung,2.757,1.862,-36.922,20.596,1.657,-37.506,20.067
+generated_Mean_Hocksprung,Hocksprung,13.937,-7.412,1.592,-22.015,-6.617,2.523,-19.973
+generated_Mean_Schraubensalto A,Schraubensalto A,25.454,74.429,124.02,126.883,75.49,123.272,127.768
+generated_Mean_Schraubensalto A,Schraubensalto A,10.795,154.871,-93.624,358.996,153.427,-92.242,358.721
+generated_Mean_Schraubensalto A,Schraubensalto A,11.704,-32.061,78.97,296.066,-30.924,78.41,295.126
+generated_Mean_Schraubensalto A,Schraubensalto A,20.541,36.196,272.866,27.545,35.094,271.746,28.887
+generated_Mean_Fliffis B,Fliffis B,49.428,-38.072,-499.266,37.939,-37.35,-494.418,37.33
+generated_Mean_Fliffis B,Fliffis B,30.954,-30.963,-425.123,93.947,-31.597,-425.266,94.317
+generated_Mean_Fliffis B,Fliffis B,19.423,-82.057,57.726,230.783,-81.375,56.751,229.692
+generated_Mean_Fliffis B,Fliffis B,23.933,18.204,293.169,39.495,17.232,291.069,40.871
+generated_Mean_Barani B,Barani B,34.065,25.145,-369.492,23.622,24.415,-366.567,23.712
+generated_Mean_Barani B,Barani B,9.937,23.558,-73.094,251.901,23.459,-74.858,251.369
+generated_Mean_Barani B,Barani B,8.414,-2.313,150.34,177.502,-1.993,149.935,178.224
+generated_Mean_Barani B,Barani B,20.558,4.307,223.713,-6.081,4.682,221.744,-5.664
+generated_Mean_Fliffis- Rudi B,Fliffis- Rudi B,51.451,-34.446,-551.435,39.184,-34.003,-547.692,39.031
+generated_Mean_Fliffis- Rudi B,Fliffis- Rudi B,34.203,-93.114,-327.382,-22.872,-92.776,-327.204,-21.973
+generated_Mean_Fliffis- Rudi B,Fliffis- Rudi B,30.891,55.694,-127.246,145.823,55.147,-126.615,144.041
+generated_Mean_Fliffis- Rudi B,Fliffis- Rudi B,28.498,42.34,327.173,11.465,41.318,325.691,13.059
+generated_Mean_Halb ein Triffis C,Halb ein Triffis C,33.084,-296.827,23.476,-179.227,-295.793,20.8,-177.328
+generated_Mean_Halb ein Triffis C,Halb ein Triffis C,71.662,-437.849,-737.666,136.531,-437.822,-736.465,134.637
+generated_Mean_Halb ein Triffis C,Halb ein Triffis C,48.813,0.475,-469.336,-269.304,-0.906,-468.394,-268.665
+generated_Mean_Halb ein Triffis C,Halb ein Triffis C,27.283,23.384,206.883,-174.765,24.316,204.467,-174.922
+generated_Mean_Triffis C,Triffis C,57.433,-83.586,-538.041,20.545,-82.504,-536.303,20.622
+generated_Mean_Triffis C,Triffis C,76.668,-152.179,-859.79,64.355,-151.918,-859.526,63.748
+generated_Mean_Triffis C,Triffis C,49.736,27.434,-471.806,-271.27,27.491,-470.208,-270.196
+generated_Mean_Triffis C,Triffis C,28.562,81.492,242.558,-150.787,79.609,239.616,-152.624
+generated_Mean_Voll- ein- Rudi- aus B,Voll- ein- Rudi- aus B,43.939,-77.383,-294.734,-274.2,-77.954,-286.791,-273.006
+generated_Mean_Voll- ein- Rudi- aus B,Voll- ein- Rudi- aus B,37.957,-524.925,-218.811,-448.462,-524.46,-221.734,-450.976
+generated_Mean_Voll- ein- Rudi- aus B,Voll- ein- Rudi- aus B,37.839,-365.14,-100.272,-654.936,-364.704,-100.634,-650.82
+generated_Mean_Voll- ein- Rudi- aus B,Voll- ein- Rudi- aus B,30.348,-15.198,331.164,-100.95,-15.339,329.149,-103.284
+generated_Mean_Voll- ein- voll- aus B,Voll- ein- voll- aus B,35.007,-261.359,129.143,-375.955,-260.053,130.372,-377.708
+generated_Mean_Voll- ein- voll- aus B,Voll- ein- voll- aus B,42.505,-494.762,-88.397,-602.46,-494.557,-89.345,-599.808
+generated_Mean_Voll- ein- voll- aus B,Voll- ein- voll- aus B,30.009,-76.938,-164.371,-381.713,-78.316,-164.13,-381.012
+generated_Mean_Voll- ein- voll- aus B,Voll- ein- voll- aus B,27.74,6.653,270.345,-63.486,6.052,266.832,-64.352
+generated_Mean_Voll- ein- halb- aus B,Voll- ein- halb- aus B,42.966,-57.359,-322.762,-207.247,-57.811,-315.986,-209.101
+generated_Mean_Voll- ein- halb- aus B,Voll- ein- halb- aus B,40.993,-520.342,-269.788,-386.69,-517.946,-273.515,-385.62
+generated_Mean_Voll- ein- halb- aus B,Voll- ein- halb- aus B,29.998,-110.673,-280.976,-357.469,-111.162,-280.68,-355.376
+generated_Mean_Voll- ein- halb- aus B,Voll- ein- halb- aus B,27.954,27.221,283.122,-121.043,25.655,281.482,-122.353
+generated_Mean_Voll- ein- voll- aus A,Voll- ein- voll- aus A,34.033,-243.401,213.688,-346.328,-240.002,212.544,-349.003
+generated_Mean_Voll- ein- voll- aus A,Voll- ein- voll- aus A,43.038,-201.038,153.297,-648.345,-203.58,150.237,-645.211
+generated_Mean_Voll- ein- voll- aus A,Voll- ein- voll- aus A,39.169,-147.455,-94.58,-560.955,-148.86,-90.435,-558.112
+generated_Mean_Voll- ein- voll- aus A,Voll- ein- voll- aus A,30.094,-23.042,328.557,-26.564,-22.253,327.838,-29.959
+generated_Mean_Voll- ein- voll- aus C,Voll- ein- voll- aus C,33.067,-249.218,142.362,-397.249,-246.008,141.29,-397.333
+generated_Mean_Voll- ein- voll- aus C,Voll- ein- voll- aus C,38.586,-411.459,65.943,-554.317,-411.279,63.705,-551.172
+generated_Mean_Voll- ein- voll- aus C,Voll- ein- voll- aus C,39.334,-252.438,-291.848,-391.787,-254.414,-287.185,-389.892
+generated_Mean_Voll- ein- voll- aus C,Voll- ein- voll- aus C,31.648,-25.027,293.66,-119.725,-25.908,290.116,-122.133
+generated_Mean_Voll- ein 1 3/4 Salto vw C,Voll- ein 1 3/4 Salto vw C,31.851,-58.746,-211.369,103.967,-59.811,-209.495,104.459
+generated_Mean_Voll- ein 1 3/4 Salto vw C,Voll- ein 1 3/4 Salto vw C,22.09,154.651,-33.9,431.653,154.448,-37.22,428.504
+generated_Mean_Voll- ein 1 3/4 Salto vw C,Voll- ein 1 3/4 Salto vw C,29.353,270.97,-445.506,-3.478,271.432,-442.707,-1.488
+generated_Mean_Voll- ein 1 3/4 Salto vw C,Voll- ein 1 3/4 Salto vw C,27.3,10.496,-197.273,19.592,10.779,-197.004,19.737
+generated_Mean_1 3/4 Salto vw C,1 3/4 Salto vw C,40.909,13.566,-398.006,-1.416,13.33,-395.716,-1.607
+generated_Mean_1 3/4 Salto vw C,1 3/4 Salto vw C,30.506,6.173,-383.309,6.291,6.454,-385.147,6.473
+generated_Mean_1 3/4 Salto vw C,1 3/4 Salto vw C,5.752,5.226,-285.883,-4.019,4.904,-284.584,-4.089
+generated_Mean_1 3/4 Salto vw C,1 3/4 Salto vw C,27.066,0.943,-276.367,2.403,1.026,-277.903,1.637
+generated_Mean_Triffis B,Triffis B,58.594,-121.778,-592.469,46.234,-121.782,-591.424,45.757
+generated_Mean_Triffis B,Triffis B,55.3,-314.624,-753.049,17.501,-313.513,-752.643,17.59
+generated_Mean_Triffis B,Triffis B,32.485,-52.06,-384.485,-285.476,-52.203,-382.895,-283.546
+generated_Mean_Triffis B,Triffis B,28.948,90.399,244.827,-158.062,88.868,242.966,-160.009
+generated_Mean_Bauchsprung,Bauchsprung,22.422,-3.099,-3.754,0.771,-2.957,-3.803,0.657
+generated_Mean_Bauchsprung,Bauchsprung,0.864,-2.861,-77.073,-7.382,-2.794,-76.828,-7.339
+generated_Mean_Bauchsprung,Bauchsprung,1.443,6.423,-64.38,-0.101,6.311,-64.283,-0.128
+generated_Mean_Bauchsprung,Bauchsprung,21.359,-8.493,61.351,-10.891,-8.068,60.452,-10.308
+generated_Mean_Von Bauch in Stand,Von Bauch in Stand,26.173,3.273,-25.222,4.146,2.835,-24.317,3.494
+generated_Mean_Von Bauch in Stand,Von Bauch in Stand,0.99,3.198,4.929,4.358,3.276,4.932,4.388
+generated_Mean_Von Bauch in Stand,Von Bauch in Stand,1.139,1.743,21.813,-1.704,1.69,21.741,-1.618
+generated_Mean_Von Bauch in Stand,Von Bauch in Stand,18.176,0.593,87.331,9.106,0.59,87.865,9.1
+generated_Mean_Schraubensalto C,Schraubensalto C,24.537,88.775,165.475,143.787,89.388,164.287,144.298
+generated_Mean_Schraubensalto C,Schraubensalto C,12.871,129.541,-100.031,438.696,128.251,-98.232,436.743
+generated_Mean_Schraubensalto C,Schraubensalto C,9.009,-68.002,138.367,233.53,-67.571,137.052,233.833
+generated_Mean_Schraubensalto C,Schraubensalto C,18.457,18.083,174.184,36.232,17.609,172.846,36.634
