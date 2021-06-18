@@ -15,19 +15,10 @@ from holoviews.plotting.util import process_cmap
 import holoviews as hv
 
 
-def prepare_data():
+def prepare_data(data_train, data_test, pp_list):
 
-    data_train = pd.read_csv("Sprungdaten_processed/with_preprocessed/percentage/20/percentage_mean_std_20_train.csv")
-    data_test = pd.read_csv("Sprungdaten_processed/with_preprocessed/percentage/20/percentage_mean_std_20_test.csv")
-
-    # data_train = pd.read_csv("Sprungdaten_processed/percentage/5/val/percentage_mean_5_80_10_10_train.csv")
-    # data_test = pd.read_csv("Sprungdaten_processed/percentage/5/val/percentage_mean_5_80_10_10_test.csv")
-    # data_val = pd.read_csv("Sprungdaten_processed/percentage/5/val/percentage_mean_5_80_10_10_val.csv")
-
-    # DJump_SIG_I_S , DJump_ABS_I_S , DJump_I_ABS_S
     first_djumps = set([col for col in data_train.columns if 'DJump' in col]) - set([col for col in data_train.columns if 'DJump_SIG_I_S' in col])\
     - set([col for col in data_train.columns if 'DJump_ABS_I_S' in col]) - set([col for col in data_train.columns if 'DJump_I_ABS_S' in col])
-    pp_list = [3]
     if 1 not in pp_list:
         data_train = data_train.drop(first_djumps, axis=1)
         data_test = data_test.drop(first_djumps, axis=1)
@@ -45,8 +36,6 @@ def prepare_data():
     y_train = []
     x_test = []
     y_test = []
-    #x_val = []
-    #y_val = []
 
     num_columns = len(data_train.columns) - 2
 
@@ -67,39 +56,21 @@ def prepare_data():
         x_test.append(subframe)
         print("Preparing test data: " + str(len(x_test)))
 
-    """
-    for id in data_val['SprungID'].unique():
-        subframe = data_val[data_val['SprungID'] == id]
-        y_val.append(subframe['Sprungtyp'].unique()[0])
-        subframe = subframe.drop(['Time', 'TimeInJump', 'SprungID', 'Sprungtyp'], axis=1)
-        x_val.append(subframe)
-        print("Preparing validation data: " + str(len(x_val)))
-    """
-
     x_train = np.array(x_train)
     x_train = x_train.reshape(x_train.shape[0], jump_data_length, num_columns, 1)
     x_test = np.array(x_test)
     x_test = x_test.reshape(x_test.shape[0], jump_data_length, num_columns, 1)
-    #x_val = np.array(x_val)
-    #x_val = x_val.reshape(x_val.shape[0], jump_data_length, num_columns, 1)
 
     y_train = pd.get_dummies(y_train)
     y_test = pd.get_dummies(y_test)
-    #y_val = pd.get_dummies(y_val)
-
-    #val = (x_val, y_val)
 
     return x_train, y_train, x_test, y_test, jump_data_length, num_columns
 
 
-def prepare_data_oneliner():
-
-    data_train = pd.read_csv("Sprungdaten_processed/with_preprocessed/percentage/25/vector_percentage_mean_std_25_train.csv")
-    data_test = pd.read_csv("Sprungdaten_processed/with_preprocessed/percentage/25/vector_percentage_mean_std_25_test.csv")
+def prepare_data_oneliner(data_train, data_test, pp_list):
 
     first_djumps = set([col for col in data_train.columns if 'DJump' in col]) - set([col for col in data_train.columns if 'DJump_SIG_I_S' in col]) \
     - set([col for col in data_train.columns if 'DJump_ABS_I_S' in col]) - set([col for col in data_train.columns if 'DJump_I_ABS_S' in col])
-    pp_list = [3]
     if 1 not in pp_list:
         data_train = data_train.drop(first_djumps, axis=1)
         data_test = data_test.drop(first_djumps, axis=1)
@@ -158,16 +129,6 @@ def build_model_grid(jump_data_length=20, num_columns=16, c=1, act_func='tanh', 
     model.add(Dense(64, activation=act_func))
     model.add(Dense(45, activation='softmax', name="output"))
 
-    """first_input = Input(shape=(jump_data_length, num_columns, 1), name="first_input")
-    x = Conv2D(32, kernel_size=(3, 3), padding="same", activation=act_func)(first_input)
-    x = Conv2D(64, kernel_size=(3, 3), padding="same", activation=act_func)(x)
-    x = MaxPooling2D(pool_size=(2, 2), padding="same")(x)
-    #x = Dropout(dropout_rate)
-    x = Flatten()(x)
-    x = Dense(64, activation=act_func)(x)
-    x = Dense(45, activation='softmax', name="output")(x)
-
-    model = Model(inputs=first_input, outputs=x)"""
     model.compile(loss=loss, optimizer=optim, metrics=['accuracy', keras.metrics.TruePositives(), keras.metrics.TrueNegatives(), keras.metrics.FalsePositives(), keras.metrics.FalseNegatives()])
 
     return model
@@ -293,56 +254,57 @@ def sample_x_test(x_test, y_test):
 
 
 def main():
+    neural_network = 'dff'  # 'dff'  'cnn'
+    run_modus = 'multi'     # 'multi' 'grid'
+    run = 10               # for multi runs or how often random grid search runs
+    data_train = pd.read_csv("Sprungdaten_processed/with_preprocessed/percentage/20/vector_percentage_20_train.csv")
+    data_test = pd.read_csv("Sprungdaten_processed/with_preprocessed/percentage/20/vector_percentage_20_test.csv")
+    pp_list = []
 
-    #x_train, y_train, x_test, y_test, jump_data_length, num_columns = prepare_data()
-    x_train, y_train, x_test, y_test, num_columns = prepare_data_oneliner()
+    if neural_network == 'cnn':
+        x_train, y_train, x_test, y_test, jump_data_length, num_columns = prepare_data(data_train, data_test, pp_list)
+        if run_modus == 'multi':
+            model = run_multiple_times(jump_data_length, num_columns, runs=run, conv=1, kernel=3, pool=2, dense=2,
+                                       act_func='tanh', loss='categorical_crossentropy', optim='Nadam', epochs=40,
+                                       x_train=x_train, y_train=y_train, x_test=x_test, y_test=y_test)
+            model.evaluate(x_test, y_test, verbose=1)
+        if run_modus == 'grid':
+            param_grid = {'num_columns': [num_columns], 'epochs': [30, 40, 50],
+                          'conv': [1, 2, 3],
+                          'batch_size': [32], 'optim': ['adam', 'Nadam'],
+                          'act_func': ['tanh', 'relu', 'sigmoid'],
+                          'loss': ['categorical_crossentropy', 'kl_divergence']}
+            model = KerasClassifier(build_fn=build_model_grid, verbose=0)
+            grid = RandomizedSearchCV(estimator=model, param_distributions=param_grid, verbose=1, n_iter=run, n_jobs=1)
+            grid_result = grid.fit(x_test, y_test)
+            print(grid_result.best_params_)
 
-    # model = grid_search_build(x_train, y_train, x_test, y_test, jump_data_length)
-    # model = run_multiple_times(10, jump_data_length, 3, 3, 2, 2, 'tanh', 'kl_divergence', 'Nadam', x_train, y_train, x_test, y_test, 20)
-    #model = run_multiple_times(jump_data_length, num_columns, runs=1, conv=1, kernel=3, pool=2, dense=2, act_func='tanh', loss='categorical_crossentropy', optim='Nadam', epochs=40, x_train=x_train, y_train=y_train, x_test=x_test, y_test=y_test)
-    #model = run_multiple_times(jump_data_length, num_columns, runs=1, conv=3, kernel=3, pool=2, dense=2, act_func='tanh', loss='kl_divergence', optim='Nadam', epochs=40, x_train=x_train, y_train=y_train, x_test=x_test, y_test=y_test)
+    if neural_network == 'dff':
+        x_train, y_train, x_test, y_test, num_columns = prepare_data_oneliner(data_train, data_test, pp_list)
+        if run_modus == 'multi':
+            model = run_multiple_times_oneliner(num_columns, runs=run, act_func='relu', loss='categorical_crossentropy',
+                                                optim='adam', epochs=40, x_train=x_train, y_train=y_train,
+                                                x_test=x_test, y_test=y_test)
+            model.evaluate(x_test, y_test, verbose=1)
+        if run_modus == 'grid':
+            param_grid = {'num_columns': [num_columns], 'epochs': [30, 40, 50, 60, 80],
+                          'batch_size': [32], 'optim': ['adam', 'Nadam'],
+                          'act_func': ['tanh', 'relu', 'sigmoid'],
+                          'loss': ['categorical_crossentropy', 'kl_divergence']}
+            model = KerasClassifier(build_fn=build_model_oneliner, verbose=0)
+            grid = RandomizedSearchCV(estimator=model, param_distributions=param_grid, verbose=1, n_iter=run, n_jobs=1)
+            grid_result = grid.fit(x_test, y_test)
+            print(grid_result.best_params_)
 
-    model = run_multiple_times_oneliner(num_columns, runs=10, act_func='relu', loss='categorical_crossentropy', optim='Nadam', epochs=60, x_train=x_train, y_train=y_train, x_test=x_test, y_test=y_test)
-
-    """
-    param_grid = {'jump_data_length': [jump_data_length], 'num_columns': [num_columns], 'epochs': [40],
-                  'batch_size': [32], 'optim': ['adam', 'Nadam'], 'c': [1, 2, 3],
-                  'act_func': ['tanh', 'relu'], 'loss': ['categorical_crossentropy', 'kl_divergence']}
-    model = KerasClassifier(build_fn=build_model_grid, verbose=0)
-    model, pred = grid_search_build(x_train, x_test, y_train, y_test, model, param_grid, cv=2, scoring_fit='neg_log_loss')
-
-    print(model.best_score_)
-    print(model.best_params_)
-    """
-    """
-    # randomized Grid Search for cnn
-    param_grid = {'num_columns': [num_columns], 'epochs': [40],
-                  'batch_size': [32], 'optim': ['adam', 'Nadam', 'SGD'],
-                  'act_func': ['tanh', 'relu', 'sigmoid'], 'loss': ['categorical_crossentropy', 'kl_divergence']}
-    model = KerasClassifier(build_fn=build_model_oneliner, verbose=0)
-    grid = RandomizedSearchCV(estimator=model, param_distributions=param_grid, verbose=1, n_iter=3, n_jobs=1)
-    grid_result = grid.fit(x_test, y_test)
-    cv_results_df = pd.DataFrame(grid_result.cv_results_)
-    # cv_results_df.to_csv('gridsearch.csv')
-    print(grid_result.best_params_)
-    print(cv_results_df)  # via debugger
-    """
-    """
-    model = run_multiple_times(jump_data_length, num_columns, runs=5, conv=3, kernel=3, pool=2, dense=2,
-                               act_func='tanh', loss='kl_divergence', optim='Nadam', epochs=40,
-                               x_train=x_train, y_train=y_train, x_test=x_test, y_test=y_test)
-    model.evaluate(x_test, y_test, verbose=1)
-    """
-
-    #model.evaluate(x_test, y_test, verbose=1)
     shap.initjs()
-    #"""
+
     # DFF
     shap_x_test, y = sample_x_test(x_test, y_test)
     background = shap.sample(x_train, 400, random_state=1)
     explainer = shap.KernelExplainer(model, background)
     shap_values = explainer.shap_values(shap_x_test)
 
+    # colormap
     cmap = ['#393b79','#5254a3','#6b6ecf','#9c9ede','#637939','#8ca252','#b5cf6b','#cedb9c','#8c6d31','#bd9e39','#e7ba52',
      '#e7cb94','#843c39','#ad494a','#d6616b','#e7969c','#7b4173','#a55194','#ce6dbd','#de9ed6','#3182bd','#6baed6',
      '#9ecae1','#c6dbef','#e6550d','#fd8d3c','#fdae6b','#fdd0a2','#31a354','#74c476','#a1d99b','#c7e9c0','#756bb1',
@@ -354,8 +316,6 @@ def main():
     shap.summary_plot(shap_values, shap_x_test, plot_type='bar', plot_size=(15, 17), color=ListedColormap(cmap), class_names=y.unique(), max_display=20)
     shap.summary_plot(shap_values, shap_x_test, plot_type='bar', plot_size=(15, 17), color=ListedColormap(cmap), class_names=y.unique(), max_display=68)
     shap.summary_plot(shap_values[0], shap_x_test, plot_size=(12, 12), title=y[0])
-    #"""
-
 
     # CNN
     """
@@ -373,6 +333,7 @@ def main():
     shap_values = e.shap_values(x_test[i])
     shap.image_plot(shap_values, -x_test[i])  # , labels=list(y_test.columns))
     
+    
     # Confusion matrix to find mistakes in classification
     cm = sklearn.metrics.confusion_matrix(y_test.idxmax(axis=1), pd.DataFrame(model.predict(x_test), columns=y_test.columns).idxmax(axis=1))
     disp = sklearn.metrics.ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=y_test.columns)
@@ -382,7 +343,7 @@ def main():
     disp.figure_.autofmt_xdate()
     plt.show()
     #plt.savefig('CNN_confusion_matrix_flag.png')
-
+    
     disp.plot(cmap='Blues')
     disp.figure_.set_figwidth(30)
     disp.figure_.set_figheight(25)
