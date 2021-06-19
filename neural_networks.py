@@ -64,7 +64,9 @@ def prepare_data(data_train, data_test, pp_list):
     y_train = pd.get_dummies(y_train)
     y_test = pd.get_dummies(y_test)
 
-    return x_train, y_train, x_test, y_test, jump_data_length, num_columns
+    num_classes = len(y_train.columns)
+
+    return x_train, y_train, x_test, y_test, jump_data_length, num_columns, num_classes
 
 
 def prepare_data_oneliner(data_train, data_test, pp_list):
@@ -97,10 +99,12 @@ def prepare_data_oneliner(data_train, data_test, pp_list):
     y_train = pd.get_dummies(y_train)
     y_test = pd.get_dummies(y_test)
 
-    return x_train, y_train, x_test, y_test, num_columns
+    num_classes = len(y_train.columns)
+
+    return x_train, y_train, x_test, y_test, num_columns, num_classes
 
 
-def build_model(jump_data_length, num_columns, c, kernel, pool, d, act_func, loss, optim):
+def build_model(jump_data_length, num_columns, num_classes, c, kernel, pool, d, act_func, loss, optim):
 
     first_input = Input(shape=(jump_data_length, num_columns, 1), name="first_input")
     x = Conv2D(32, kernel_size=(kernel, kernel), padding="same", activation=act_func)(first_input)
@@ -110,7 +114,7 @@ def build_model(jump_data_length, num_columns, c, kernel, pool, d, act_func, los
     x = Flatten()(x)
     for i in range(d):
         x = Dense(32 * d, activation=act_func)(x)
-    x = Dense(45, activation='softmax', name="output")(x)
+    x = Dense(num_classes, activation='softmax', name="output")(x)
 
     model = Model(inputs=first_input, outputs=x)
     model.compile(loss=loss, optimizer=optim, metrics=['accuracy', keras.metrics.TruePositives(), keras.metrics.TrueNegatives(), keras.metrics.FalsePositives(), keras.metrics.FalseNegatives()])
@@ -118,7 +122,7 @@ def build_model(jump_data_length, num_columns, c, kernel, pool, d, act_func, los
     return model
 
 
-def build_model_grid(jump_data_length=20, num_columns=16, c=1, act_func='tanh', loss='categorical_crossentropy', optim='Nadam'):
+def build_model_grid(jump_data_length=20, num_columns=16, num_classes=43, c=1, act_func='tanh', loss='categorical_crossentropy', optim='Nadam'):
 
     model = Sequential()
     model.add(Conv2D(32, kernel_size=(3, 3), padding="same", activation=act_func, input_shape=(jump_data_length, num_columns, 1)))
@@ -127,7 +131,7 @@ def build_model_grid(jump_data_length=20, num_columns=16, c=1, act_func='tanh', 
     model.add(MaxPooling2D(pool_size=(2, 2), padding="same"))
     model.add(Flatten())
     model.add(Dense(64, activation=act_func))
-    model.add(Dense(45, activation='softmax', name="output"))
+    model.add(Dense(num_classes, activation='softmax', name="output"))
 
     model.compile(loss=loss, optimizer=optim, metrics=['accuracy', keras.metrics.TruePositives(), keras.metrics.TrueNegatives(), keras.metrics.FalsePositives(), keras.metrics.FalseNegatives()])
 
@@ -144,14 +148,14 @@ def grid_search_build(x_train, x_test, y_train, y_test, model, param_grid, cv=10
     return fitted_model, pred
 
 
-def run_multiple_times(jump_data_length, num_columns, runs, conv, kernel, pool, dense, act_func, loss, optim, epochs, x_train, y_train, x_test, y_test):
+def run_multiple_times(jump_data_length, num_columns, num_classes, runs, conv, kernel, pool, dense, act_func, loss, optim, epochs, x_train, y_train, x_test, y_test):
 
     best_score = 0
     mean_score = 0
 
     for i in range(runs):
         #callback = keras.callbacks.EarlyStopping(monitor='loss', patience=6)
-        model = build_model(jump_data_length, num_columns, conv, kernel, pool, dense, act_func, loss, optim)
+        model = build_model(jump_data_length, num_columns, num_classes, conv, kernel, pool, dense, act_func, loss, optim)
         #model = build_model_testing(jump_data_length, num_columns)
         model.fit(x_train, y_train, batch_size=32, epochs=epochs, verbose=1)
         score = model.evaluate(x_test, y_test, verbose=1)
@@ -180,7 +184,7 @@ def run_multiple_times(jump_data_length, num_columns, runs, conv, kernel, pool, 
     return best_model
 
 
-def build_model_oneliner(num_columns, act_func, loss, optim):
+def build_model_oneliner(num_columns, num_classes, act_func, loss, optim):
 
     first_input = Input(shape=(num_columns,), name="first_input")
     x = Dense(128, activation=act_func)(first_input)
@@ -190,7 +194,7 @@ def build_model_oneliner(num_columns, act_func, loss, optim):
     x = Dense(512, activation=act_func)(x)
     x = Dense(256, activation=act_func)(x)
     x = Dense(128, activation=act_func)(x)
-    x = Dense(45, activation='softmax', name="output")(x)
+    x = Dense(num_classes, activation='softmax', name="output")(x)
 
     model = Model(inputs=first_input, outputs=x)
     model.compile(loss=loss, optimizer=optim, metrics=['accuracy', keras.metrics.TruePositives(), keras.metrics.TrueNegatives(), keras.metrics.FalsePositives(), keras.metrics.FalseNegatives()])
@@ -198,15 +202,15 @@ def build_model_oneliner(num_columns, act_func, loss, optim):
     return model
 
 
-def run_multiple_times_oneliner(num_columns, runs, act_func, loss, optim, epochs, x_train, y_train, x_test, y_test):
+def run_multiple_times_oneliner(num_columns, num_classes, runs, act_func, loss, optim, epochs, x_train, y_train, x_test, y_test):
 
     best_score = 0
     mean_score = 0
 
     for i in range(runs):
-        #callback = keras.callbacks.EarlyStopping(monitor='loss', patience=6)
-        model = build_model_oneliner(num_columns, act_func, loss, optim)
-        model.fit(x_train, y_train, batch_size=32, epochs=epochs, verbose=1)
+        callback = keras.callbacks.EarlyStopping(monitor='accuracy', patience=11, restore_best_weights=True)
+        model = build_model_oneliner(num_columns, num_classes, act_func, loss, optim)
+        model.fit(x_train, y_train, batch_size=32, epochs=epochs, verbose=1, callbacks=[callback])
         score = model.evaluate(x_test, y_test, verbose=1)
         mean_score += score[1]
         if score[1] > best_score:
@@ -246,6 +250,7 @@ def sample_x_test(x_test, y_test):
 
     x = x.sample(frac=1)        # shuffle
     y = x['Sprungtyp']
+    y = y.reset_index(drop=True)
     x = x.drop(['Sprungtyp'], axis=1)
     for column in x.columns:
         x[column] = x[column].astype(float).round(3)
@@ -256,15 +261,15 @@ def sample_x_test(x_test, y_test):
 def main():
     neural_network = 'dff'  # 'dff'  'cnn'
     run_modus = 'multi'     # 'multi' 'grid'
-    run = 10               # for multi runs or how often random grid search runs
-    data_train = pd.read_csv("Sprungdaten_processed/with_preprocessed/percentage/20/vector_percentage_20_train.csv")
-    data_test = pd.read_csv("Sprungdaten_processed/with_preprocessed/percentage/20/vector_percentage_20_test.csv")
-    pp_list = []
+    run = 40               # for multi runs or how often random grid search runs
+    data_train = pd.read_csv("Sprungdaten_processed/without_preprocessed/percentage/20/vector_percentage_mean_std_20_train.csv")
+    data_test = pd.read_csv("Sprungdaten_processed/without_preprocessed/percentage/20/vector_percentage_mean_std_20_test.csv")
+    pp_list = [3]
 
     if neural_network == 'cnn':
-        x_train, y_train, x_test, y_test, jump_data_length, num_columns = prepare_data(data_train, data_test, pp_list)
+        x_train, y_train, x_test, y_test, jump_data_length, num_columns, num_classes = prepare_data(data_train, data_test, pp_list)
         if run_modus == 'multi':
-            model = run_multiple_times(jump_data_length, num_columns, runs=run, conv=1, kernel=3, pool=2, dense=2,
+            model = run_multiple_times(jump_data_length, num_columns, num_classes, runs=run, conv=1, kernel=3, pool=2, dense=2,
                                        act_func='tanh', loss='categorical_crossentropy', optim='Nadam', epochs=40,
                                        x_train=x_train, y_train=y_train, x_test=x_test, y_test=y_test)
             model.evaluate(x_test, y_test, verbose=1)
@@ -280,10 +285,10 @@ def main():
             print(grid_result.best_params_)
 
     if neural_network == 'dff':
-        x_train, y_train, x_test, y_test, num_columns = prepare_data_oneliner(data_train, data_test, pp_list)
+        x_train, y_train, x_test, y_test, num_columns, num_classes = prepare_data_oneliner(data_train, data_test, pp_list)
         if run_modus == 'multi':
-            model = run_multiple_times_oneliner(num_columns, runs=run, act_func='relu', loss='categorical_crossentropy',
-                                                optim='adam', epochs=40, x_train=x_train, y_train=y_train,
+            model = run_multiple_times_oneliner(num_columns, num_classes, runs=run, act_func='relu', loss='categorical_crossentropy',
+                                                optim='Nadam', epochs=100, x_train=x_train, y_train=y_train,
                                                 x_test=x_test, y_test=y_test)
             model.evaluate(x_test, y_test, verbose=1)
         if run_modus == 'grid':
@@ -296,8 +301,9 @@ def main():
             grid_result = grid.fit(x_test, y_test)
             print(grid_result.best_params_)
 
+    model.save("models/DFF_without_mean_std_20")
     shap.initjs()
-
+    """
     # DFF
     shap_x_test, y = sample_x_test(x_test, y_test)
     background = shap.sample(x_train, 400, random_state=1)
@@ -316,6 +322,7 @@ def main():
     shap.summary_plot(shap_values, shap_x_test, plot_type='bar', plot_size=(15, 17), color=ListedColormap(cmap), class_names=y.unique(), max_display=20)
     shap.summary_plot(shap_values, shap_x_test, plot_type='bar', plot_size=(15, 17), color=ListedColormap(cmap), class_names=y.unique(), max_display=68)
     shap.summary_plot(shap_values[0], shap_x_test, plot_size=(12, 12), title=y[0])
+    """
 
     # CNN
     """
