@@ -154,10 +154,10 @@ def run_multiple_times(jump_data_length, num_columns, num_classes, runs, conv, k
     mean_score = 0
 
     for i in range(runs):
-        #callback = keras.callbacks.EarlyStopping(monitor='loss', patience=6)
+        callback = keras.callbacks.EarlyStopping(monitor='accuracy', patience=11, restore_best_weights=True)
         model = build_model(jump_data_length, num_columns, num_classes, conv, kernel, pool, dense, act_func, loss, optim)
         #model = build_model_testing(jump_data_length, num_columns)
-        model.fit(x_train, y_train, batch_size=32, epochs=epochs, verbose=1)
+        model.fit(x_train, y_train, batch_size=32, epochs=epochs, verbose=1, callbacks=[callback])
         score = model.evaluate(x_test, y_test, verbose=1)
         mean_score += score[1]
         if score[1] > best_score:
@@ -259,18 +259,18 @@ def sample_x_test(x_test, y_test):
 
 
 def main():
-    neural_network = 'dff'  # 'dff'  'cnn'
+    neural_network = 'cnn'  # 'dff'  'cnn'
     run_modus = 'multi'     # 'multi' 'grid'
     run = 40               # for multi runs or how often random grid search runs
-    data_train = pd.read_csv("Sprungdaten_processed/without_preprocessed/percentage/20/vector_percentage_mean_std_20_train.csv")
-    data_test = pd.read_csv("Sprungdaten_processed/without_preprocessed/percentage/20/vector_percentage_mean_std_20_test.csv")
+    data_train = pd.read_csv("Sprungdaten_processed/without_preprocessed/percentage/5/percentage_mean_5_train.csv")
+    data_test = pd.read_csv("Sprungdaten_processed/without_preprocessed/percentage/5/percentage_mean_5_test.csv")
     pp_list = [3]
 
     if neural_network == 'cnn':
         x_train, y_train, x_test, y_test, jump_data_length, num_columns, num_classes = prepare_data(data_train, data_test, pp_list)
         if run_modus == 'multi':
-            model = run_multiple_times(jump_data_length, num_columns, num_classes, runs=run, conv=1, kernel=3, pool=2, dense=2,
-                                       act_func='tanh', loss='categorical_crossentropy', optim='Nadam', epochs=40,
+            model = run_multiple_times(jump_data_length, num_columns, num_classes, runs=run, conv=3, kernel=3, pool=2, dense=2,
+                                       act_func='tanh', loss='kl_divergence', optim='Nadam', epochs=100,
                                        x_train=x_train, y_train=y_train, x_test=x_test, y_test=y_test)
             model.evaluate(x_test, y_test, verbose=1)
         if run_modus == 'grid':
@@ -301,7 +301,7 @@ def main():
             grid_result = grid.fit(x_test, y_test)
             print(grid_result.best_params_)
 
-    model.save("models/DFF_without_mean_std_20")
+    model.save("models/CNN_without_mean_5")
     shap.initjs()
     """
     # DFF
