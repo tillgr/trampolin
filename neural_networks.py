@@ -154,7 +154,7 @@ def run_multiple_times(jump_data_length, num_columns, num_classes, runs, conv, k
     mean_score = 0
 
     for i in range(runs):
-        callback = keras.callbacks.EarlyStopping(monitor='accuracy', patience=11, restore_best_weights=True)
+        callback = keras.callbacks.EarlyStopping(monitor='loss', patience=4, restore_best_weights=True)
         model = build_model(jump_data_length, num_columns, num_classes, conv, kernel, pool, dense, act_func, loss, optim)
         #model = build_model_testing(jump_data_length, num_columns)
         model.fit(x_train, y_train, batch_size=32, epochs=epochs, verbose=1, callbacks=[callback])
@@ -259,18 +259,18 @@ def sample_x_test(x_test, y_test):
 
 
 def main():
-    neural_network = 'cnn'  # 'dff'  'cnn'
-    run_modus = 'multi'     # 'multi' 'grid'
-    run = 40               # for multi runs or how often random grid search runs
-    data_train = pd.read_csv("Sprungdaten_processed/without_preprocessed/percentage/5/percentage_mean_5_train.csv")
-    data_test = pd.read_csv("Sprungdaten_processed/without_preprocessed/percentage/5/percentage_mean_5_test.csv")
+    neural_network = 'dff'  # 'dff'  'cnn'
+    run_modus = ''     # 'multi' 'grid'
+    run = 50                # for multi runs or how often random grid search runs
+    data_train = pd.read_csv("Sprungdaten_processed/without_preprocessed/percentage/20/vector_percentage_mean_std_20_train.csv")
+    data_test = pd.read_csv("Sprungdaten_processed/without_preprocessed/percentage/20/vector_percentage_mean_std_20_test.csv")
     pp_list = [3]
 
     if neural_network == 'cnn':
         x_train, y_train, x_test, y_test, jump_data_length, num_columns, num_classes = prepare_data(data_train, data_test, pp_list)
         if run_modus == 'multi':
             model = run_multiple_times(jump_data_length, num_columns, num_classes, runs=run, conv=3, kernel=3, pool=2, dense=2,
-                                       act_func='tanh', loss='kl_divergence', optim='Nadam', epochs=100,
+                                       act_func='tanh', loss='categorical_crossentropy', optim='Nadam', epochs=40,
                                        x_train=x_train, y_train=y_train, x_test=x_test, y_test=y_test)
             model.evaluate(x_test, y_test, verbose=1)
         if run_modus == 'grid':
@@ -301,15 +301,11 @@ def main():
             grid_result = grid.fit(x_test, y_test)
             print(grid_result.best_params_)
 
-    model.save("models/CNN_without_mean_5")
+    #model.save("models/DFF_without_mean_std_20")
+    model = keras.models.load_model("models/DFF_without_mean_std_20")
+    model.summary()
+    model.evaluate(x_test, y_test, verbose=1)
     shap.initjs()
-    """
-    # DFF
-    shap_x_test, y = sample_x_test(x_test, y_test)
-    background = shap.sample(x_train, 400, random_state=1)
-    explainer = shap.KernelExplainer(model, background)
-    shap_values = explainer.shap_values(shap_x_test)
-
     # colormap
     cmap = ['#393b79','#5254a3','#6b6ecf','#9c9ede','#637939','#8ca252','#b5cf6b','#cedb9c','#8c6d31','#bd9e39','#e7ba52',
      '#e7cb94','#843c39','#ad494a','#d6616b','#e7969c','#7b4173','#a55194','#ce6dbd','#de9ed6','#3182bd','#6baed6',
@@ -317,8 +313,19 @@ def main():
      '#9e9ac8','#bcbddc','#dadaeb','#636363','#969696','#969696','#d9d9d9','#f0027f','#f781bf','#f7b6d2','#fccde5',
      '#8dd3c7','#ffffb3','#bebada','#fb8072','#80b1d3','#fdb462','#b3de69','#fccde5','#d9d9d9','#bc80bd','#ccebc5','#ffed6f']
 
-    # hv.extension('matplotlib')
+    cmap_cm = process_cmap('summer')
+    cmap_cm.insert(0, '#ffffff')
+    cmap_cm.insert(-1, '#000000')
+    cmap_cm = ListedColormap(cmap_cm)
     # ListedColormap(process_cmap('winter'))
+    """
+    # DFF
+    shap_x_test, y = sample_x_test(x_test, y_test)
+    background = shap.sample(x_train, 400, random_state=1)
+    explainer = shap.KernelExplainer(model, background)
+    shap_values = explainer.shap_values(shap_x_test)
+
+
     shap.summary_plot(shap_values, shap_x_test, plot_type='bar', plot_size=(15, 17), color=ListedColormap(cmap), class_names=y.unique(), max_display=20)
     shap.summary_plot(shap_values, shap_x_test, plot_type='bar', plot_size=(15, 17), color=ListedColormap(cmap), class_names=y.unique(), max_display=68)
     shap.summary_plot(shap_values[0], shap_x_test, plot_size=(12, 12), title=y[0])
@@ -339,25 +346,18 @@ def main():
     e = shap.DeepExplainer(model, background)
     shap_values = e.shap_values(x_test[i])
     shap.image_plot(shap_values, -x_test[i])  # , labels=list(y_test.columns))
-    
-    
+    """
+
+    #"""
     # Confusion matrix to find mistakes in classification
     cm = sklearn.metrics.confusion_matrix(y_test.idxmax(axis=1), pd.DataFrame(model.predict(x_test), columns=y_test.columns).idxmax(axis=1))
     disp = sklearn.metrics.ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=y_test.columns)
-    disp.plot(cmap='flag')
-    disp.figure_.set_figwidth(30)
+    disp.plot(cmap=cmap_cm)
+    disp.figure_.set_figwidth(35)
     disp.figure_.set_figheight(25)
     disp.figure_.autofmt_xdate()
     plt.show()
     #plt.savefig('CNN_confusion_matrix_flag.png')
-    
-    disp.plot(cmap='Blues')
-    disp.figure_.set_figwidth(30)
-    disp.figure_.set_figheight(25)
-    disp.figure_.autofmt_xdate()
-    plt.show()
-    #plt.savefig('CNN_confusion_matrix.png')
-    """
 
 
     return
