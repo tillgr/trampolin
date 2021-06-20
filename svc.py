@@ -1,7 +1,7 @@
 import pandas as pd
 from pandas import DataFrame
 import logging
-import shap
+# import shap
 import matplotlib.pyplot as plt
 from sklearn.metrics import accuracy_score, f1_score
 from sklearn.naive_bayes import GaussianNB
@@ -10,15 +10,13 @@ import numpy as np
 from sklearn.metrics import confusion_matrix, plot_confusion_matrix
 from os import listdir, walk
 from os.path import isfile, join
-
-
-
 from random_classifier import metrics
 
 logging.basicConfig(filename='svc_gnb.log', format='%(asctime)s[%(name)s] - %(levelname)s - %(message)s',
                     level=logging.DEBUG)
-logger = logging.getLogger('SVC')
+logger = logging.getLogger('COMMON')
 gnb_logger = logging.getLogger("GNB")
+svc_logger = logging.getLogger("SVC")
 
 
 def easy_classify(X: DataFrame, y: DataFrame, kernel: str):
@@ -86,18 +84,26 @@ def get_train_test_data(datasets: list):
     return train, test
 
 
-def classify(datasets: list, feature_start: str, feature_end: str, drops: list, manual_feature: bool):
+def classify(datasets: list, feature_start: str, feature_end: str, drops_keywords: list, reverse_drop: bool):
     train, test = get_train_test_data(datasets)
-    if not manual_feature:
-        feature_start = train.columns.tolist()[2]
-        feature_end = train.columns.tolist()[-1]
-        print(feature_start)
-        print(feature_end)
-    logger.info("Classify with data set: " + str(datasets) +
-                ". Feature start at column: " + feature_start + ", feature end: " + feature_end +
-                ". Drops :" + str(drops))
+
+    # any(substring in string for substring in substring_list)
+    drops = [col for col in train.columns if any(keyword in col for keyword in drops_keywords)]
+    if reverse_drop:
+        drops = [x for x in train.columns.tolist()[2:-1] if x not in drops]
+
     train = train.drop(columns=drops)
     test = test.drop(columns=drops)
+
+    if feature_start == "":
+        feature_start = train.columns.tolist()[2]
+    if feature_end == "":
+        feature_end = train.columns.tolist()[-1]
+
+    svc_logger.info("Classify with data set: " + str(datasets) +
+                ". Feature start at column: " + feature_start + ", feature end: " + feature_end +
+                ". Drops :" + str(drops_keywords))
+
     X = get_samples_features(train, feature_start, feature_end)
     y = get_targets(train)
     test_actual = get_targets(test)
@@ -106,13 +112,25 @@ def classify(datasets: list, feature_start: str, feature_end: str, drops: list, 
     prediction_and_evaludate(clf_linear, get_samples_features(test, feature_start, feature_end), test_actual)
 
 
-def gnb_classify(datasets: list, feature_start: str, feature_end: str, drops: list, manual_feature: bool):
+def gnb_classify(datasets: list, feature_start: str, feature_end: str, drops_keywords: list, reverse_drop: bool):
     train, test = get_train_test_data(datasets)
-    if not manual_feature:
+    # any(substring in string for substring in substring_list)
+    drops = [col for col in train.columns if any(keyword in col for keyword in drops_keywords)]
+    if reverse_drop:
+        drops = [x for x in train.columns.tolist()[2:-1] if x not in drops]
+
+    train = train.drop(columns=drops)
+    test = test.drop(columns=drops)
+
+    if feature_start == "":
         feature_start = train.columns.tolist()[2]
+    if feature_end == "":
         feature_end = train.columns.tolist()[-1]
-        print(feature_start)
-        print(feature_end)
+
+    gnb_logger.info("Classify with data set: " + str(datasets) +
+                ". Feature start at column: " + feature_start + ", feature end: " + feature_end +
+                ". Drops :" + str(drops_keywords))
+
     gnb = GaussianNB()
     X = get_samples_features(train, feature_start, feature_end)
     y = get_targets(train)
@@ -121,13 +139,25 @@ def gnb_classify(datasets: list, feature_start: str, feature_end: str, drops: li
     prediction_and_evaludate(gnb, get_samples_features(test, feature_start, feature_end), test_actual)
 
 
-def explain_model(datasets: list, feature_start: str, feature_end: str, drops: list):
+def explain_model(datasets: list, feature_start: str, feature_end: str, drops_keywords: list, reverse_drop: bool):
     train, test = get_train_test_data(datasets)
+
+    drops = [col for col in train.columns if any(keyword in col for keyword in drops_keywords)]
+    if reverse_drop:
+        drops = [x for x in train.columns.tolist()[2:-1] if x not in drops]
+
+    train = train.drop(columns=drops)
+    test = test.drop(columns=drops)
+
+    if feature_start == "":
+        feature_start = train.columns.tolist()[2]
+    if feature_end == "":
+        feature_end = train.columns.tolist()[-1]
+
     logger.info("Classify with data set: " + str(datasets) +
                 ". Feature start at column: " + feature_start + ", feature end: " + feature_end +
                 ". Drops :" + str(drops))
-    train = train.drop(columns=drops)
-    test = test.drop(columns=drops)
+
     X = get_samples_features(train, feature_start, feature_end)
     y = get_targets(train)
     y_test = get_targets(test)
@@ -146,11 +176,13 @@ def explain_model(datasets: list, feature_start: str, feature_end: str, drops: l
     #                              normalize=None,
     #                              )
     # plt.show()
+    '''
     index = y_test[y_test == 'Salto A'].index[0]
     explainer = shap.KernelExplainer(clf_linear.decision_function, X.sample(n=50), link='identity')
     df = X_test.iloc[index].to_frame().transpose()
     shap_values = explainer.shap_values(X_test.iloc[index].to_frame().transposei())
     shap.summary_plot(shap_values[0], X_test.iloc[index].to_frame().transpose())
+    '''
 
 
 def collect_all_data_sets(folder: str, data_sets: set):
@@ -160,105 +192,43 @@ def collect_all_data_sets(folder: str, data_sets: set):
         if not isfile(path):
             collect_all_data_sets(path, data_sets)
         else:
-            if not d.endswith("_train.csv") and not d.endswith("_test.csv"):
+            if not d.endswith("_train.csv") and not d.endswith("_test.csv") and "_AJ_" not in d:
                 if "percentage" in path:
                     if d.startswith("vector_"):
                         path = path.replace(".csv", "")
                         data_sets.add(path)
-
                 else:
                     path = path.replace(".csv", "")
                     data_sets.add(path)
 
 
-def run_svc_auto():
-    folder = "Sprungdaten_processed/without_preprocessed/"
+def run_svc_auto(folder: str, drops: list):
     data_sets = set()
     collect_all_data_sets(folder, data_sets)
     for ds in data_sets:
-        classify([ds], "", "", [], False)
+        classify([ds], "", "", drops, True)
 
 
-def run_gnb_auto():
-    folder = "Sprungdaten_processed/without_preprocessed/"
+def run_gnb_auto(folder: str, drops: list):
     data_sets = set()
     collect_all_data_sets(folder, data_sets)
     for ds in data_sets:
-        gnb_classify([ds], "", "", [], False)
-
-
-def run_gnb():
-    # logger.info("------------start of new run---GNB--with partial fit-------")
-    # logger.info("------------p1 ------------")
-    # gnb_classify(['percentage/1/vector_percentage_1'], 'DJump_SIG_I_x LapEnd', '99-Gyro_z_Fil', [])
-    # logger.info("------------p1 mean------------")
-    # gnb_classify(['percentage/1/vector_percentage_mean_1'], 'DJump_SIG_I_x LapEnd', '99-Gyro_z_Fil', [])
-    # logger.info("------------p1 std------------")
-    # gnb_classify(['percentage/1/vector_percentage_mean_std_1'], 'DJump_SIG_I_x LapEnd', '99-std_Gyro_z_Fil', [])
-    #
-    # logger.info("------------p2------------")
-    # gnb_classify(['percentage/2/vector_percentage_2'], 'DJump_SIG_I_x LapEnd', '98-Gyro_z_Fil', [])
-    # logger.info("------------p2 mean------------")
-    # gnb_classify(['percentage/2/vector_percentage_mean_2'], 'DJump_SIG_I_x LapEnd', '98-Gyro_z_Fil', [])
-    # logger.info("------------p2 std------------")
-    # gnb_classify(['percentage/2/vector_percentage_mean_std_2'], 'DJump_SIG_I_x LapEnd', '98-std_Gyro_z_Fil', [])
-    #
-    # logger.info("------------p5 ------------")
-    # gnb_classify(['percentage/5/vector_percentage_5'], 'DJump_SIG_I_x LapEnd', '95-Gyro_z_Fil', [])
-    # logger.info("------------p5 mean------------")
-    # gnb_classify(['percentage/5/vector_percentage_mean_5'], 'DJump_SIG_I_x LapEnd', '95-Gyro_z_Fil', [])
-    # logger.info("------------p5 std------------")
-    # gnb_classify(['percentage/5/vector_percentage_mean_std_5'], 'DJump_SIG_I_x LapEnd', '95-std_Gyro_z_Fil', [])
-    #
-    # logger.info("------------p10 ------------")
-    # gnb_classify(['percentage/10/vector_percentage_10'], 'DJump_SIG_I_x LapEnd', '90-Gyro_z_Fil', [])
-    # logger.info("------------p10 mean------------")
-    # gnb_classify(['percentage/10/vector_percentage_mean_10'], 'DJump_SIG_I_x LapEnd', '90-Gyro_z_Fil', [])
-    # logger.info("------------p10 std------------")
-    # gnb_classify(['percentage/10/vector_percentage_mean_std_10'], 'DJump_SIG_I_x LapEnd', '90-std_Gyro_z_Fil', [])
-
-    logger.info("------------p10 std----without processed--------")
-    gnb_classify(['percentage/10/vector_percentage_mean_std_10'], '0-mean_ACC_N', '90-std_Gyro_z_Fil', [])
-    logger.info("------------p10 std----only processed--------")
-    gnb_classify(['percentage/10/vector_percentage_mean_std_10'], 'DJump_SIG_I_x LapEnd', 'DJump_Abs_I_z LapEnd', [])
-
-    i = 0
-    drops = []
-    while i < 100:
-        drops.append(str(i) + "-mean_ACC_N_ROT_filtered")
-        drops.append(str(i) + "-std_ACC_N_ROT_filtered")
-        i += 10
-    logger.info("------------p10 std----without processed without n rot filtered--------")
-    gnb_classify(['percentage/10/vector_percentage_mean_std_10'], '0-mean_ACC_N', '90-std_Gyro_z_Fil', [])
-
-
-    # logger.info("------------p20 ------------")
-    # gnb_classify(['percentage/20/vector_percentage_20'], 'DJump_SIG_I_x LapEnd', '80-Gyro_z_Fil', [])
-    # logger.info("------------p20 mean------------")
-    # gnb_classify(['percentage/20/vector_percentage_mean_20'], 'DJump_SIG_I_x LapEnd', '80-Gyro_z_Fil', [])
-    # logger.info("------------p20 std------------")
-    # gnb_classify(['percentage/20/vector_percentage_mean_std_20'], 'DJump_SIG_I_x LapEnd', '80-std_Gyro_z_Fil', [])
-    # logger.info("------------p20 std-----only processed-------")
-    # gnb_classify(['percentage/20/vector_percentage_mean_std_20'], 'DJump_SIG_I_x LapEnd', 'DJump_Abs_I_z LapEnd', [])
-    #
-
-    # logger.info("------------p20 std-----without processed, without n rot filtered-------")
-    # gnb_classify(['percentage/20/vector_percentage_mean_std_20'], '0-mean_ACC_N', '80-std_Gyro_z_Fil', drops)
-
-    # logger.info("------------p25 ------------")
-    # gnb_classify(['percentage/25/vector_percentage_25'], 'DJump_SIG_I_x LapEnd', '75-Gyro_z_Fil', [])
-    # logger.info("------------p25 mean------------")
-    # gnb_classify(['percentage/25/vector_percentage_mean_25'], 'DJump_SIG_I_x LapEnd', '75-Gyro_z_Fil', [])
-    # logger.info("------------p25 std------------")
-    # gnb_classify(['percentage/25/vector_percentage_mean_std_25'], 'DJump_SIG_I_x LapEnd', '75-std_Gyro_z_Fil', [])
-
-    # logger.info("------------avg ------------")
-    # gnb_classify(['averaged_data/averaged_data'], 'ACC_N', 'DJump_Abs_I_z LapEnd', [])
-    # logger.info("------------avg std------------")
-    # gnb_classify(['avg_std_data/avg_std_data'], 'avg_ACC_N', 'DJump_Abs_I_z LapEnd', [])
-    # logger.info("------------std------------")
-    # gnb_classify(['std_data/std_data'], 'ACC_N', 'Gyro_z_Fil', [])
+        gnb_classify([ds], "", "", drops, False)
 
 
 if __name__ == '__main__':
-    run_gnb_auto()
+    folder = "Sprungdaten_processed/without_preprocessed/"
+    drops_raw = []
+    '''
+    (0) all preprocessed data 
+(1) first 9 columns (without S in name) 
+(2) starts with DJump_SIG_I_S - generally worsen
+(3) starts with DJump_ABS_I_S - generally worsen
+(4) starts with DJump_I_ABS_S
+5 all other than ["DJump_I_ABS_S", "DJump_ABS_I_S"]
+6 all other than ["DJump_I_ABS_S", "DJump_SIG_I_S"]
+7 all other than ["DJump_ABS_I_S", "DJump_SIG_I_S"]
+'''
+    logger.info("GNB Rerun")
+    #run_svc_auto(folder, drops_raw)
+    run_gnb_auto(folder, drops_raw)
