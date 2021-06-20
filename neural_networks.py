@@ -239,7 +239,7 @@ def run_multiple_times_oneliner(num_columns, num_classes, runs, act_func, loss, 
 
 def sample_x_test(x_test, y_test, num):
     df = x_test.copy()
-    df['Sprungtyp'] = y_test.idxmax(axis=1)
+    df['Sprungtyp'] = y_test.idxmax(axis=1)     # if not one-hot-encoded:   df['Sprungtyp'] = y_test
     counts = df['Sprungtyp'].value_counts()
     counts = counts.where(counts < num, other=num)
     x = pd.DataFrame(columns=df.columns)
@@ -327,8 +327,8 @@ def main():
     explainer = shap.KernelExplainer(model, shap_x_train)
     shap_values = explainer.shap_values(shap_x_test)
 
-    shap.summary_plot(shap_values, shap_x_test, plot_type='bar', plot_size=(15, 17), color=ListedColormap(cmap), class_names=y.unique(), max_display=20)
-    shap.summary_plot(shap_values, shap_x_test, plot_type='bar', plot_size=(15, 17), color=ListedColormap(cmap), class_names=y.unique(), max_display=68)
+    shap.summary_plot(shap_values, shap_x_test, plot_type='bar', plot_size=(15, 17), color=ListedColormap(cmap), class_names=shap_y_test.unique(), max_display=20)
+    shap.summary_plot(shap_values, shap_x_test, plot_type='bar', plot_size=(15, 17), color=ListedColormap(cmap), class_names=shap_y_test.unique(), max_display=68)
     saltoA = shap_y_test[shap_y_test == 'Salto A'].index[0]
     shap.summary_plot(shap_values[saltoA], shap_x_test, plot_size=(12, 12), title=shap_y_test[saltoA])
     saltoB = shap_y_test[shap_y_test == 'Salto B'].index[0]
