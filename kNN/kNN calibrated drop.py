@@ -6,6 +6,7 @@ from sklearn import neighbors
 from sklearn import preprocessing
 from sklearn.metrics import accuracy_score, f1_score
 from random_classifier import metrics as rc_metrics
+import matplotlib.pyplot as plt
 
 if __name__ == '__main__':
     # read individual data sets
@@ -91,6 +92,10 @@ if __name__ == '__main__':
     print(f"Accuracy f1 score: {str(mean_f.round(4))}")
     print("--------------------------------------------------------------")
 
-    explainer = shap.KernelExplainer(clf, X_test.sample(n=50), link='identity')
-    shap_values = explainer.shap_values(X_test.sample(n=10))
-    shap.summary_plot(shap_values[0], X_test.sample(n=10))
+    f = lambda x: clf.predict_proba(x)[:, 1]
+
+    med = X_train.mean().values.reshape((1, X_train.sample(n=200).shape[1]))
+    explainer = shap.KernelExplainer(f, med)
+    shap_values = explainer.shap_values(X_train.sample(n=100))
+    shap.summary_plot(shap_values, X_train.sample(n=100), show=False)
+    plt.savefig('SHAPSummary_KNN.png', bbox_inches="tight")
