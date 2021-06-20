@@ -29,6 +29,7 @@ if __name__ == '__main__':
                 start_column: str = '0_mean_Acc_N_Fil'
                 end_column: str = str(100 - i) + '_std_Gyro_z_Fil'
 
+            ''' don't need '''
             p = train_data.drop([col for col in train_data.columns if 'DJump_SIG_I_S' in col], axis=1)
             t = test_data.drop([col for col in test_data.columns if 'DJump_SIG_I_S' in col], axis=1)
 
