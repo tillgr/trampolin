@@ -237,11 +237,11 @@ def run_multiple_times_oneliner(num_columns, num_classes, runs, act_func, loss, 
     return best_model
 
 
-def sample_x_test(x_test, y_test):
+def sample_x_test(x_test, y_test, num):
     df = x_test.copy()
     df['Sprungtyp'] = y_test.idxmax(axis=1)
     counts = df['Sprungtyp'].value_counts()
-    counts = counts.where(counts < 3, other=3)
+    counts = counts.where(counts < num, other=num)
     x = pd.DataFrame(columns=df.columns)
 
     for jump in df['Sprungtyp'].unique():
@@ -318,18 +318,24 @@ def main():
     cmap_cm.insert(-1, '#000000')
     cmap_cm = ListedColormap(cmap_cm)
     # ListedColormap(process_cmap('winter'))
-    """
-    # DFF
-    shap_x_test, y = sample_x_test(x_test, y_test)
-    background = shap.sample(x_train, 400, random_state=1)
-    explainer = shap.KernelExplainer(model, background)
-    shap_values = explainer.shap_values(shap_x_test)
 
+    #"""
+    # DFF
+    shap_x_test, shap_y_test = sample_x_test(x_test, y_test, 3)
+    shap_x_train, shap_y_train = sample_x_test(x_train, y_train, 6)
+    #background = shap.sample(shap_x_train, 400, random_state=1)
+    explainer = shap.KernelExplainer(model, shap_x_train)
+    shap_values = explainer.shap_values(shap_x_test)
 
     shap.summary_plot(shap_values, shap_x_test, plot_type='bar', plot_size=(15, 17), color=ListedColormap(cmap), class_names=y.unique(), max_display=20)
     shap.summary_plot(shap_values, shap_x_test, plot_type='bar', plot_size=(15, 17), color=ListedColormap(cmap), class_names=y.unique(), max_display=68)
-    shap.summary_plot(shap_values[0], shap_x_test, plot_size=(12, 12), title=y[0])
-    """
+    saltoA = shap_y_test[shap_y_test == 'Salto A'].index[0]
+    shap.summary_plot(shap_values[saltoA], shap_x_test, plot_size=(12, 12), title=shap_y_test[saltoA])
+    saltoB = shap_y_test[shap_y_test == 'Salto B'].index[0]
+    shap.summary_plot(shap_values[saltoB], shap_x_test, plot_size=(12, 12), title=shap_y_test[saltoB])
+    saltoC = shap_y_test[shap_y_test == 'Salto C'].index[0]
+    shap.summary_plot(shap_values[saltoC], shap_x_test, plot_size=(12, 12), title=shap_y_test[saltoC])
+    #"""
 
     # CNN
     """
@@ -348,7 +354,7 @@ def main():
     shap.image_plot(shap_values, -x_test[i])  # , labels=list(y_test.columns))
     """
 
-    #"""
+    """
     # Confusion matrix to find mistakes in classification
     cm = sklearn.metrics.confusion_matrix(y_test.idxmax(axis=1), pd.DataFrame(model.predict(x_test), columns=y_test.columns).idxmax(axis=1))
     disp = sklearn.metrics.ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=y_test.columns)
@@ -358,6 +364,7 @@ def main():
     disp.figure_.autofmt_xdate()
     plt.show()
     #plt.savefig('CNN_confusion_matrix_flag.png')
+    """
 
 
     return
