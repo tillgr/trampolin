@@ -262,8 +262,8 @@ def main():
     neural_network = 'dff'  # 'dff'  'cnn'
     run_modus = ''     # 'multi' 'grid'
     run = 50                # for multi runs or how often random grid search runs
-    data_train = pd.read_csv("Sprungdaten_processed/without_preprocessed/percentage/20/vector_percentage_mean_std_20_train.csv")
-    data_test = pd.read_csv("Sprungdaten_processed/without_preprocessed/percentage/20/vector_percentage_mean_std_20_test.csv")
+    data_train = pd.read_csv("Sprungdaten_processed/with_preprocessed/percentage/25/vector_percentage_mean_std_25_train.csv")
+    data_test = pd.read_csv("Sprungdaten_processed/with_preprocessed/percentage/25/vector_percentage_mean_std_25_test.csv")
     pp_list = [3]
 
     if neural_network == 'cnn':
@@ -302,7 +302,7 @@ def main():
             print(grid_result.best_params_)
 
     #model.save("models/DFF_without_mean_std_20")
-    model = keras.models.load_model("models/DFF_without_mean_std_20")
+    model = keras.models.load_model("models/DFF_with_mean_std_25")
     model.summary()
     model.evaluate(x_test, y_test, verbose=1)
     shap.initjs()
@@ -329,12 +329,12 @@ def main():
 
     shap.summary_plot(shap_values, shap_x_test, plot_type='bar', plot_size=(15, 17), color=ListedColormap(cmap), class_names=shap_y_test.unique(), max_display=20)
     shap.summary_plot(shap_values, shap_x_test, plot_type='bar', plot_size=(15, 17), color=ListedColormap(cmap), class_names=shap_y_test.unique(), max_display=68)
-    saltoA = shap_y_test[shap_y_test == 'Salto A'].index[0]
-    shap.summary_plot(shap_values[saltoA], shap_x_test, plot_size=(12, 12), title=shap_y_test[saltoA])
-    saltoB = shap_y_test[shap_y_test == 'Salto B'].index[0]
-    shap.summary_plot(shap_values[saltoB], shap_x_test, plot_size=(12, 12), title=shap_y_test[saltoB])
-    saltoC = shap_y_test[shap_y_test == 'Salto C'].index[0]
-    shap.summary_plot(shap_values[saltoC], shap_x_test, plot_size=(12, 12), title=shap_y_test[saltoC])
+    saltoA = np.where(shap_y_test.unique() == 'Salto A')[0][0]
+    shap.summary_plot(shap_values[saltoA], shap_x_test, plot_size=(12, 12), title='Salto A')
+    saltoB = np.where(shap_y_test.unique() == 'Salto B')[0][0]
+    shap.summary_plot(shap_values[saltoB], shap_x_test, plot_size=(12, 12), title='Salto B')
+    saltoC = np.where(shap_y_test.unique() == 'Salto C')[0][0]
+    shap.summary_plot(shap_values[saltoC], shap_x_test, plot_size=(12, 12), title='Salto C')
     #"""
 
     # CNN
