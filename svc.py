@@ -3,7 +3,7 @@ from pandas import DataFrame
 import logging
 # import shap
 import matplotlib.pyplot as plt
-from sklearn.metrics import accuracy_score, f1_score
+from sklearn.metrics import accuracy_score, f1_score, ConfusionMatrixDisplay
 from sklearn.naive_bayes import GaussianNB
 from sklearn.svm import SVC
 import numpy as np
@@ -11,6 +11,10 @@ from sklearn.metrics import confusion_matrix, plot_confusion_matrix
 from os import listdir, walk
 from os.path import isfile, join
 from random_classifier import metrics
+from holoviews.plotting.util import process_cmap
+from matplotlib.colors import ListedColormap
+
+
 
 logging.basicConfig(filename='svc_gnb.log', format='%(asctime)s[%(name)s] - %(levelname)s - %(message)s',
                     level=logging.DEBUG)
@@ -164,18 +168,34 @@ def explain_model(datasets: list, feature_start: str, feature_end: str, drops_ke
     clf_linear = SVC(kernel='linear')
     clf_linear.fit(X, y)
     X_test = get_samples_features(test, feature_start, feature_end)
-
     y_pred = clf_linear.predict(X_test)
-    # cm = confusion_matrix(y_test, y_pred)
-    # title = 'Confusion matrix for SVC classifier'
+    cm = confusion_matrix(y_test, y_pred)
+    title = 'Confusion matrix for SVC classifier'
+    # cmap = ['#393b79','#5254a3','#6b6ecf','#9c9ede','#637939','#8ca252','#b5cf6b','#cedb9c','#8c6d31','#bd9e39','#e7ba52',
+    #  '#e7cb94','#843c39','#ad494a','#d6616b','#e7969c','#7b4173','#a55194','#ce6dbd','#de9ed6','#3182bd','#6baed6',
+    #  '#9ecae1','#c6dbef','#e6550d','#fd8d3c','#fdae6b','#fdd0a2','#31a354','#74c476','#a1d99b','#c7e9c0','#756bb1',
+    #  '#9e9ac8','#bcbddc','#dadaeb','#636363','#969696','#969696','#d9d9d9','#f0027f','#f781bf','#f7b6d2','#fccde5',
+    #  '#8dd3c7','#ffffb3','#bebada','#fb8072','#80b1d3','#fdb462','#b3de69','#fccde5','#d9d9d9','#bc80bd','#ccebc5','#ffed6f']
+    cmap_cm = process_cmap('summer')
+    cmap_cm.insert(0, '#ffffff')
+    cmap_cm.insert(-1, '#000000')
+    cmap_cm = ListedColormap(cmap_cm)
     # disp = plot_confusion_matrix(clf_linear,
     #                              X_test,
     #                              y_test,
     #                              display_labels=set(y),
-    #                              cmap=plt.cm.Blues,
-    #                              normalize=None,
+    #                              normalize=None
     #                              )
-    # plt.show()
+    cm = confusion_matrix(y_test, y_pred, labels=clf_linear.classes_)
+    disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=clf_linear.classes_)
+    disp.plot(cmap=cmap_cm)
+    disp.figure_.set_figwidth(35)
+    disp.figure_.set_figheight(25)
+    disp.figure_.autofmt_xdate()
+    plt.tick_params(axis='x', labelsize=10, labelrotation=45, grid_linewidth=5)
+    plt.title("SVC/without_preprocessed/vector_percentage_mean_std_25")
+    plt.tight_layout()
+    plt.savefig('SVC_with_vector_percentage_mean_std_25.png')
     '''
     index = y_test[y_test == 'Salto A'].index[0]
     explainer = shap.KernelExplainer(clf_linear.decision_function, X.sample(n=50), link='identity')
@@ -217,8 +237,8 @@ def run_gnb_auto(folder: str, drops: list):
 
 
 if __name__ == '__main__':
-    folder = "Sprungdaten_processed/without_preprocessed/"
-    drops_raw = []
+    # folder = "Sprungdaten_processed/without_preprocessed/"
+    # drops_raw = []
     '''
     (0) all preprocessed data 
 (1) first 9 columns (without S in name) 
@@ -229,6 +249,9 @@ if __name__ == '__main__':
 6 all other than ["DJump_I_ABS_S", "DJump_SIG_I_S"]
 7 all other than ["DJump_ABS_I_S", "DJump_SIG_I_S"]
 '''
-    logger.info("GNB Rerun")
-    #run_svc_auto(folder, drops_raw)
-    run_gnb_auto(folder, drops_raw)
+    # logger.info("GNB Rerun")
+    # #run_svc_auto(folder, drops_raw)
+    # run_gnb_auto(folder, drops_raw)
+    data_sets = ["Sprungdaten_processed/without_preprocessed/percentage/25/vector_percentage_mean_std_25"]
+    drops = []
+    explain_model(data_sets, "", "", drops, False)
