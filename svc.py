@@ -1,17 +1,16 @@
+import shap
 import pandas as pd
 from pandas import DataFrame
 import logging
-# import shap
 import matplotlib.pyplot as plt
 from sklearn.metrics import accuracy_score, f1_score, ConfusionMatrixDisplay
 from sklearn.naive_bayes import GaussianNB
 from sklearn.svm import SVC
 import numpy as np
 from sklearn.metrics import confusion_matrix, plot_confusion_matrix
-from os import listdir, walk
+from os import listdir
 from os.path import isfile, join
 from random_classifier import metrics
-from holoviews.plotting.util import process_cmap
 from matplotlib.colors import ListedColormap
 
 
@@ -143,8 +142,32 @@ def gnb_classify(datasets: list, feature_start: str, feature_end: str, drops_key
     prediction_and_evaludate(gnb, get_samples_features(test, feature_start, feature_end), test_actual)
 
 
+def sample_x_test(x_test, y_test, num, cnn=False):
+    df = x_test.copy()
+    df['Sprungtyp'] = y_test
+    counts = df['Sprungtyp'].value_counts()
+    counts = counts.where(counts < num, num)
+    x = pd.DataFrame(columns=df.columns)
+
+    for jump in df['Sprungtyp'].unique():
+        subframe = df[df['Sprungtyp'] == jump]
+        x = x.append(subframe.sample(counts[jump], random_state=1), ignore_index=True)
+
+    x = x.sample(frac=1, random_state=1)        # shuffle
+    y = x['Sprungtyp']
+    y = y.reset_index(drop=True)
+    x = x.drop(['Sprungtyp'], axis=1)
+    for column in x.columns:
+        x[column] = x[column].astype(float).round(3)
+    return x, y
+
+
 def explain_model(datasets: list, feature_start: str, feature_end: str, drops_keywords: list, reverse_drop: bool):
-    train, test = get_train_test_data(datasets)
+    # train, test = get_train_test_data(datasets)
+    # train = read_processed_data(datasets[0] + "_train.csv")
+    # test = read_processed_data(datasets[0] + "_test.csv")
+    train = pd.read_csv("Sprungdaten_processed/with_preprocessed/percentage/20/vector_percentage_mean_20_train.csv")
+    test = pd.read_csv("Sprungdaten_processed/with_preprocessed/percentage/20/vector_AJ_percentage_mean_20.csv")
 
     drops = [col for col in train.columns if any(keyword in col for keyword in drops_keywords)]
     if reverse_drop:
@@ -169,40 +192,43 @@ def explain_model(datasets: list, feature_start: str, feature_end: str, drops_ke
     clf_linear.fit(X, y)
     X_test = get_samples_features(test, feature_start, feature_end)
     y_pred = clf_linear.predict(X_test)
-    cm = confusion_matrix(y_test, y_pred)
-    title = 'Confusion matrix for SVC classifier'
-    # cmap = ['#393b79','#5254a3','#6b6ecf','#9c9ede','#637939','#8ca252','#b5cf6b','#cedb9c','#8c6d31','#bd9e39','#e7ba52',
-    #  '#e7cb94','#843c39','#ad494a','#d6616b','#e7969c','#7b4173','#a55194','#ce6dbd','#de9ed6','#3182bd','#6baed6',
-    #  '#9ecae1','#c6dbef','#e6550d','#fd8d3c','#fdae6b','#fdd0a2','#31a354','#74c476','#a1d99b','#c7e9c0','#756bb1',
-    #  '#9e9ac8','#bcbddc','#dadaeb','#636363','#969696','#969696','#d9d9d9','#f0027f','#f781bf','#f7b6d2','#fccde5',
-    #  '#8dd3c7','#ffffb3','#bebada','#fb8072','#80b1d3','#fdb462','#b3de69','#fccde5','#d9d9d9','#bc80bd','#ccebc5','#ffed6f']
+
+    shap.initjs()
+    cmap = ['#393b79','#5254a3','#6b6ecf','#9c9ede','#637939','#8ca252','#b5cf6b','#cedb9c','#8c6d31','#bd9e39','#e7ba52',
+     '#e7cb94','#843c39','#ad494a','#d6616b','#e7969c','#7b4173','#a55194','#ce6dbd','#de9ed6','#3182bd','#6baed6',
+     '#9ecae1','#c6dbef','#e6550d','#fd8d3c','#fdae6b','#fdd0a2','#31a354','#74c476','#a1d99b','#c7e9c0','#756bb1',
+     '#9e9ac8','#bcbddc','#dadaeb','#636363','#969696','#969696','#d9d9d9','#f0027f','#f781bf','#f7b6d2','#fccde5',
+     '#8dd3c7','#ffffb3','#bebada','#fb8072','#80b1d3','#fdb462','#b3de69','#fccde5','#d9d9d9','#bc80bd','#ccebc5','#ffed6f']
+    '''
     cmap_cm = process_cmap('summer')
     cmap_cm.insert(0, '#ffffff')
     cmap_cm.insert(-1, '#000000')
     cmap_cm = ListedColormap(cmap_cm)
-    # disp = plot_confusion_matrix(clf_linear,
-    #                              X_test,
-    #                              y_test,
-    #                              display_labels=set(y),
-    #                              normalize=None
-    #                              )
     cm = confusion_matrix(y_test, y_pred, labels=clf_linear.classes_)
     disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=clf_linear.classes_)
     disp.plot(cmap=cmap_cm)
     disp.figure_.set_figwidth(35)
     disp.figure_.set_figheight(25)
     disp.figure_.autofmt_xdate()
-    plt.tick_params(axis='x', labelsize=10, labelrotation=45, grid_linewidth=5)
     plt.title("SVC/without_preprocessed/vector_percentage_mean_std_25")
     plt.tight_layout()
     plt.savefig('SVC_with_vector_percentage_mean_std_25.png')
     '''
-    index = y_test[y_test == 'Salto A'].index[0]
-    explainer = shap.KernelExplainer(clf_linear.decision_function, X.sample(n=50), link='identity')
-    df = X_test.iloc[index].to_frame().transpose()
-    shap_values = explainer.shap_values(X_test.iloc[index].to_frame().transposei())
-    shap.summary_plot(shap_values[0], X_test.iloc[index].to_frame().transpose())
-    '''
+    shap_x_train, shap_y_train = sample_x_test(X, y, 3)
+    shap_x_test, shap_y_test = sample_x_test(X_test, y_test, 6)
+    explainer = shap.KernelExplainer(clf_linear.decision_function, shap_x_train) #, link='identity'
+    # df = X_test.iloc[index].to_frame().transpose()
+    # shap_values = explainer.shap_values(X_test.iloc[index].to_frame().transposei())
+    shap_values = explainer.shap_values(shap_x_test.loc[0:0, :])
+    # shap.summary_plot(shap_values, shap_x_test, plot_type='bar', plot_size=(25, 20), color=ListedColormap(cmap), class_names=shap_y_test.unique(), max_display=20)
+    # shap.summary_plot(shap_values, shap_x_test, plot_type='bar', plot_size=(25, 20), color=ListedColormap(cmap), class_names=shap_y_test.unique(), max_display=68)
+    # shap.summary_plot(shap_values[0], X_test.iloc[index].to_frame().transpose())
+    # saltoA = np.where(shap_y_test.unique() == 'Salto A')[0][0]
+    # shap.summary_plot(shap_values[saltoA], shap_x_test, plot_size=(25, 15), title='Salto A')
+    # saltoB = np.where(shap_y_test.unique() == 'Salto B')[0][0]
+    # shap.summary_plot(shap_values[saltoB], shap_x_test, plot_size=(25, 15), title='Salto B')
+    saltoC = np.where(shap_y_test.unique() == 'Salto C')[0][0]
+    shap.summary_plot(shap_values[0], shap_x_test.loc[0:0, :], plot_size=(12, 12), title='Salto C')
 
 
 def collect_all_data_sets(folder: str, data_sets: set):
