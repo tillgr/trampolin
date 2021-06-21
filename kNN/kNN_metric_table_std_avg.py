@@ -7,35 +7,38 @@ from sklearn.metrics import accuracy_score, f1_score
 from random_classifier import metrics as rc_metrics
 
 if __name__ == '__main__':
-            train_merged = pd.read_csv('../Sprungdaten_processed/with_preprocessed/std_data/std_data_train.csv')
-            test_merged = pd.read_csv('../Sprungdaten_processed/with_preprocessed/std_data/std_data_test.csv')
-            start_column: str = 'std_Acc_N_Fil'
-            end_column: str = 'std_Gyro_z_Fil'
 
             '''train_merged = pd.read_csv('../Sprungdaten_processed/without_preprocessed/averaged_data/averaged_data_train.csv')
             test_merged = pd.read_csv('../Sprungdaten_processed/without_preprocessed/averaged_data/averaged_data_test.csv')
             start_column: str = 'avg_Acc_N_Fil'
             end_column: str = 'avg_Gyro_z_Fil' '''
 
+            '''train_merged = pd.read_csv('../Sprungdaten_processed/with_preprocessed/averaged_data/averaged_data_train.csv')
+            test_merged = pd.read_csv('../Sprungdaten_processed/with_preprocessed/averaged_data/averaged_data_test.csv')
+            start_column: str = 'avg_Acc_N_Fil'
+            end_column: str = 'avg_DJump_ABS_I_S4_z LapEnd' '''
+
+
+            '''train_merged = pd.read_csv('../Sprungdaten_processed/without_preprocessed/std_data/std_data_train.csv')
+            test_merged = pd.read_csv('../Sprungdaten_processed/without_preprocessed/std_data/std_data_test.csv')
+            start_column: str = 'std_Acc_N_Fil'
+            end_column: str = 'std_Gyro_z_Fil' '''
+
+            '''train_merged = pd.read_csv('../Sprungdaten_processed/with_preprocessed/std_data/std_data_train.csv')
+            test_merged = pd.read_csv('../Sprungdaten_processed/with_preprocessed/std_data/std_data_test.csv')
+            start_column: str = 'std_Acc_N_Fil'
+            end_column: str = 'std_Gyro_z_Fil' '''
+
+
             '''train_merged = pd.read_csv('../Sprungdaten_processed/without_preprocessed/avg_std_data/avg_std_data_train.csv')
             test_merged = pd.read_csv('../Sprungdaten_processed/without_preprocessed/avg_std_data/avg_std_data_test.csv')
             start_column: str = 'avg_Acc_N_Fil'
             end_column: str = 'std_Gyro_z_Fil' '''
 
-            '''train_merged = pd.read_csv('../Sprungdaten_processed/with_preprocessed/avg_std_data/avg_std_data_train.csv')
+            train_merged = pd.read_csv('../Sprungdaten_processed/with_preprocessed/avg_std_data/avg_std_data_train.csv')
             test_merged = pd.read_csv('../Sprungdaten_processed/with_preprocessed/avg_std_data/avg_std_data_test.csv')
             start_column: str = 'avg_Acc_N_Fil'
-            end_column: str = 'avg_DJump_ABS_I_S4_z LapEnd' '''
-
-            '''train_merged = pd.read_csv('../Sprungdaten_processed/with_preprocessed/averaged_data/averaged_data_train.csv')
-            test_merged = pd.read_csv('../Sprungdaten_processed/with_preprocessed/averaged_data/averaged_data_test.csv')
-            start_column: str = 'avg_Acc_N_Fil'
-            end_column: str = 'avg_DJump_ABS_I_S4_z LapEnd'''''
-
-            '''train_merged = pd.read_csv('../Sprungdaten_processed/with_preprocessed/std_data/std_data_train.csv')
-                        test_merged = pd.read_csv('../Sprungdaten_processed/with_preprocessed/std_data/std_data_test.csv')
-                        start_column: str = 'std_Acc_N_Fil'
-                        end_column: str = 'std_Gyro_z_Fil' '''
+            end_column: str = 'avg_DJump_ABS_I_S4_z LapEnd'
 
             # get X_train
             X_train = train_merged.loc[:, start_column:end_column].to_numpy()
@@ -54,12 +57,10 @@ if __name__ == '__main__':
 
             # TODO: gleiche anzahl an allen sprüngen?
 
-            # neighbours
-            n_neighbors = 15
-
+            # params
+            n_neighbors = 3
             weights = 'distance'
-            dist_metric = 'manhattan'  # minkowski has better youden than manhattan and nearly the same accuracy (0.005
-            # difference)
+            dist_metric = 'manhattan'
 
             # we create an instance of Neighbours Classifier and fit the data.
             clf = neighbors.KNeighborsClassifier(n_neighbors=n_neighbors, weights=weights, metric=dist_metric, p=5)

@@ -48,26 +48,29 @@ if __name__ == '__main__':
             # TODO: gleiche anzahl an allen sprüngen?
 
             # neighbours
-            n_neighbors = 15
+            # n_neighbors = 15
 
             for weights in ['uniform', 'distance']:
                 for dist_metrics in ['manhattan', 'chebyshev', 'minkowski']:
-                    # we create an instance of Neighbours Classifier and fit the data.
-                    clf = neighbors.KNeighborsClassifier(n_neighbors=n_neighbors, weights=weights, metric=dist_metrics)
-                    if dist_metrics == 'minkowski':
+                    for n_neighbors in [3, 5, 7, 9, 11, 13, 15]:
+                        # we create an instance of Neighbours Classifier and fit the data.
                         clf = neighbors.KNeighborsClassifier(n_neighbors=n_neighbors, weights=weights,
-                                                             metric=dist_metrics, p=5)
+                                                             metric=dist_metrics)
+                        if dist_metrics == 'minkowski':
+                            clf = neighbors.KNeighborsClassifier(n_neighbors=n_neighbors, weights=weights,
+                                                                 metric=dist_metrics, p=5)
 
-                    clf.fit(X_train, y_train)
+                        clf.fit(X_train, y_train)
 
-                    # Predict the response for test dataset
-                    y_pred = clf.predict(X_test)
+                        # Predict the response for test dataset
+                        y_pred = clf.predict(X_test)
 
-                    # compare test and predicted targets
-                    print(f"PARAMETER:  weights: {weights} | metric: {dist_metrics}")
-                    print(f"Accuracy self: ", metrics.accuracy_score(y_test, y_pred))
-                    print(f"Accuracy f1 score weighted: {f1_score(y_test, y_pred, average='weighted')} ")
-                    mean_prec, mean_rec, mean_f, mean_youden = rc_metrics(y_test, y_pred)
-                    print(f"Accuracy f1 score: {str(mean_f.round(5))}")
-                    print(f"Accuracy youden score: {str(mean_youden.round(5))}")
-                    print("--------------------------------------------------------------")
+                        # compare test and predicted targets
+                        if metrics.accuracy_score(y_test, y_pred) >= 0.9:
+                            print(f"PARAMETER:  weights: {weights} | metric: {dist_metrics}  | neighbours: {n_neighbors}")
+                            print(f"Accuracy self: ", metrics.accuracy_score(y_test, y_pred))
+                            print(f"Accuracy f1 score weighted: {f1_score(y_test, y_pred, average='weighted')} ")
+                            mean_prec, mean_rec, mean_f, mean_youden = rc_metrics(y_test, y_pred)
+                            print(f"Accuracy f1 score: {str(mean_f.round(5))}")
+                            print(f"Accuracy youden score: {str(mean_youden.round(5))}")
+                            print("--------------------------------------------------------------")

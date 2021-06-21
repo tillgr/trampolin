@@ -1,0 +1,2372 @@
+Best config:
+
+[10 mean_std]
+PARAMETER:  weights: uniform | metric: manhattan  | neighbours: 3
+Accuracy self:  0.9541062801932367
+Accuracy f1 score weighted: 0.9485320421334029
+Accuracy f1 score: 0.87994
+Accuracy youden score: 0.89012
+
+
+
+"C:\Users\Till\OneDrive\UNI\KP DBAnw\Trampolin\venv\Scripts\python.exe" "C:/Users/Till/OneDrive/UNI/KP DBAnw/Trampolin/kNN/KNN_without_preprocessed.py"
+////////////////////////////////////////////
+Folder: 1
+> Type:
+PARAMETER:  weights: uniform | metric: manhattan  | neighbours: 3
+Accuracy self:  0.9516908212560387
+Accuracy f1 score weighted: 0.9465791628508681
+Accuracy f1 score: 0.87387
+Accuracy youden score: 0.88415
+--------------------------------------------------------------
+PARAMETER:  weights: uniform | metric: manhattan  | neighbours: 5
+Accuracy self:  0.9396135265700483
+Accuracy f1 score weighted: 0.9319846495150415
+Accuracy f1 score: 0.8226
+Accuracy youden score: 0.83672
+--------------------------------------------------------------
+PARAMETER:  weights: uniform | metric: manhattan  | neighbours: 7
+Accuracy self:  0.9251207729468599
+Accuracy f1 score weighted: 0.9145903288388633
+Accuracy f1 score: 0.73272
+Accuracy youden score: 0.75041
+--------------------------------------------------------------
+PARAMETER:  weights: uniform | metric: manhattan  | neighbours: 9
+Accuracy self:  0.9082125603864735
+Accuracy f1 score weighted: 0.8948478768020665
+Accuracy f1 score: 0.70726
+Accuracy youden score: 0.72643
+--------------------------------------------------------------
+PARAMETER:  weights: uniform | metric: minkowski  | neighbours: 3
+Accuracy self:  0.9154589371980676
+Accuracy f1 score weighted: 0.9097106026522169
+Accuracy f1 score: 0.79038
+Accuracy youden score: 0.80504
+--------------------------------------------------------------
+PARAMETER:  weights: uniform | metric: minkowski  | neighbours: 5
+Accuracy self:  0.9033816425120773
+Accuracy f1 score weighted: 0.8948271767531548
+Accuracy f1 score: 0.72372
+Accuracy youden score: 0.73234
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: manhattan  | neighbours: 3
+Accuracy self:  0.9541062801932367
+Accuracy f1 score weighted: 0.9490834662547217
+Accuracy f1 score: 0.87542
+Accuracy youden score: 0.88566
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: manhattan  | neighbours: 5
+Accuracy self:  0.9444444444444444
+Accuracy f1 score weighted: 0.9372567988330841
+Accuracy f1 score: 0.85146
+Accuracy youden score: 0.85972
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: manhattan  | neighbours: 7
+Accuracy self:  0.9444444444444444
+Accuracy f1 score weighted: 0.9371549423376632
+Accuracy f1 score: 0.8269
+Accuracy youden score: 0.83753
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: manhattan  | neighbours: 9
+Accuracy self:  0.927536231884058
+Accuracy f1 score weighted: 0.916584665065918
+Accuracy f1 score: 0.77407
+Accuracy youden score: 0.78292
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: manhattan  | neighbours: 11
+Accuracy self:  0.9251207729468599
+Accuracy f1 score weighted: 0.913900630007625
+Accuracy f1 score: 0.76655
+Accuracy youden score: 0.77171
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: manhattan  | neighbours: 13
+Accuracy self:  0.9082125603864735
+Accuracy f1 score weighted: 0.8947790245465768
+Accuracy f1 score: 0.74012
+Accuracy youden score: 0.7488
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: manhattan  | neighbours: 15
+Accuracy self:  0.9009661835748792
+Accuracy f1 score weighted: 0.8885235792552147
+Accuracy f1 score: 0.73046
+Accuracy youden score: 0.73327
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: minkowski  | neighbours: 3
+Accuracy self:  0.9299516908212561
+Accuracy f1 score weighted: 0.9247964723640723
+Accuracy f1 score: 0.83266
+Accuracy youden score: 0.83749
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: minkowski  | neighbours: 5
+Accuracy self:  0.9082125603864735
+Accuracy f1 score weighted: 0.8995010205932231
+Accuracy f1 score: 0.72498
+Accuracy youden score: 0.73364
+--------------------------------------------------------------
+////////////////////////////////////////////
+Folder: 1
+> Type: mean_
+PARAMETER:  weights: uniform | metric: manhattan  | neighbours: 3
+Accuracy self:  0.9492753623188406
+Accuracy f1 score weighted: 0.9429874804312084
+Accuracy f1 score: 0.85042
+Accuracy youden score: 0.86083
+--------------------------------------------------------------
+PARAMETER:  weights: uniform | metric: manhattan  | neighbours: 5
+Accuracy self:  0.9347826086956522
+Accuracy f1 score weighted: 0.9273390258543064
+Accuracy f1 score: 0.81586
+Accuracy youden score: 0.83368
+--------------------------------------------------------------
+PARAMETER:  weights: uniform | metric: manhattan  | neighbours: 7
+Accuracy self:  0.927536231884058
+Accuracy f1 score weighted: 0.918183900792443
+Accuracy f1 score: 0.75617
+Accuracy youden score: 0.77373
+--------------------------------------------------------------
+PARAMETER:  weights: uniform | metric: manhattan  | neighbours: 9
+Accuracy self:  0.9106280193236715
+Accuracy f1 score weighted: 0.8987126111015834
+Accuracy f1 score: 0.72431
+Accuracy youden score: 0.73811
+--------------------------------------------------------------
+PARAMETER:  weights: uniform | metric: chebyshev  | neighbours: 3
+Accuracy self:  0.9033816425120773
+Accuracy f1 score weighted: 0.8962253251662164
+Accuracy f1 score: 0.7693
+Accuracy youden score: 0.78826
+--------------------------------------------------------------
+PARAMETER:  weights: uniform | metric: minkowski  | neighbours: 3
+Accuracy self:  0.9371980676328503
+Accuracy f1 score weighted: 0.930898208298851
+Accuracy f1 score: 0.83414
+Accuracy youden score: 0.8588
+--------------------------------------------------------------
+PARAMETER:  weights: uniform | metric: minkowski  | neighbours: 5
+Accuracy self:  0.9227053140096618
+Accuracy f1 score weighted: 0.9148218203956906
+Accuracy f1 score: 0.77096
+Accuracy youden score: 0.78873
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: manhattan  | neighbours: 3
+Accuracy self:  0.9516908212560387
+Accuracy f1 score weighted: 0.9454917838350619
+Accuracy f1 score: 0.85197
+Accuracy youden score: 0.86234
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: manhattan  | neighbours: 5
+Accuracy self:  0.9396135265700483
+Accuracy f1 score weighted: 0.9329332363639755
+Accuracy f1 score: 0.84627
+Accuracy youden score: 0.85669
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: manhattan  | neighbours: 7
+Accuracy self:  0.9444444444444444
+Accuracy f1 score weighted: 0.9371549423376632
+Accuracy f1 score: 0.8269
+Accuracy youden score: 0.83753
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: manhattan  | neighbours: 9
+Accuracy self:  0.9299516908212561
+Accuracy f1 score weighted: 0.9201782370194976
+Accuracy f1 score: 0.79752
+Accuracy youden score: 0.80624
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: manhattan  | neighbours: 11
+Accuracy self:  0.9251207729468599
+Accuracy f1 score weighted: 0.913900630007625
+Accuracy f1 score: 0.76655
+Accuracy youden score: 0.77171
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: manhattan  | neighbours: 13
+Accuracy self:  0.9106280193236715
+Accuracy f1 score weighted: 0.8971640764475867
+Accuracy f1 score: 0.74106
+Accuracy youden score: 0.74925
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: manhattan  | neighbours: 15
+Accuracy self:  0.9033816425120773
+Accuracy f1 score weighted: 0.8908904522636385
+Accuracy f1 score: 0.73109
+Accuracy youden score: 0.73372
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: chebyshev  | neighbours: 3
+Accuracy self:  0.9106280193236715
+Accuracy f1 score weighted: 0.9039787115708793
+Accuracy f1 score: 0.79044
+Accuracy youden score: 0.80336
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: minkowski  | neighbours: 3
+Accuracy self:  0.9444444444444444
+Accuracy f1 score weighted: 0.9388338442748145
+Accuracy f1 score: 0.86619
+Accuracy youden score: 0.88303
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: minkowski  | neighbours: 5
+Accuracy self:  0.9299516908212561
+Accuracy f1 score weighted: 0.9218539776489062
+Accuracy f1 score: 0.77499
+Accuracy youden score: 0.79049
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: minkowski  | neighbours: 7
+Accuracy self:  0.9130434782608695
+Accuracy f1 score weighted: 0.9035100841680012
+Accuracy f1 score: 0.75759
+Accuracy youden score: 0.77345
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: minkowski  | neighbours: 9
+Accuracy self:  0.9057971014492754
+Accuracy f1 score weighted: 0.8949584626243111
+Accuracy f1 score: 0.75734
+Accuracy youden score: 0.76552
+--------------------------------------------------------------
+////////////////////////////////////////////
+Folder: 1
+> Type: mean_std_
+PARAMETER:  weights: uniform | metric: manhattan  | neighbours: 3
+Accuracy self:  0.9492753623188406
+Accuracy f1 score weighted: 0.9429874804312084
+Accuracy f1 score: 0.85042
+Accuracy youden score: 0.86083
+--------------------------------------------------------------
+PARAMETER:  weights: uniform | metric: manhattan  | neighbours: 5
+Accuracy self:  0.9420289855072463
+Accuracy f1 score weighted: 0.9344872384752196
+Accuracy f1 score: 0.82655
+Accuracy youden score: 0.83851
+--------------------------------------------------------------
+PARAMETER:  weights: uniform | metric: manhattan  | neighbours: 7
+Accuracy self:  0.927536231884058
+Accuracy f1 score weighted: 0.9164762698289417
+Accuracy f1 score: 0.73662
+Accuracy youden score: 0.75202
+--------------------------------------------------------------
+PARAMETER:  weights: uniform | metric: manhattan  | neighbours: 9
+Accuracy self:  0.9106280193236715
+Accuracy f1 score weighted: 0.8987126111015834
+Accuracy f1 score: 0.72431
+Accuracy youden score: 0.73811
+--------------------------------------------------------------
+PARAMETER:  weights: uniform | metric: minkowski  | neighbours: 3
+Accuracy self:  0.9371980676328503
+Accuracy f1 score weighted: 0.9320846225287435
+Accuracy f1 score: 0.82244
+Accuracy youden score: 0.83845
+--------------------------------------------------------------
+PARAMETER:  weights: uniform | metric: minkowski  | neighbours: 5
+Accuracy self:  0.9178743961352657
+Accuracy f1 score weighted: 0.9091377580372215
+Accuracy f1 score: 0.73892
+Accuracy youden score: 0.76459
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: manhattan  | neighbours: 3
+Accuracy self:  0.9516908212560387
+Accuracy f1 score weighted: 0.9454917838350619
+Accuracy f1 score: 0.85197
+Accuracy youden score: 0.86234
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: manhattan  | neighbours: 5
+Accuracy self:  0.9444444444444444
+Accuracy f1 score weighted: 0.937564725761325
+Accuracy f1 score: 0.85254
+Accuracy youden score: 0.86077
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: manhattan  | neighbours: 7
+Accuracy self:  0.9468599033816425
+Accuracy f1 score weighted: 0.939362944519368
+Accuracy f1 score: 0.83234
+Accuracy youden score: 0.83914
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: manhattan  | neighbours: 9
+Accuracy self:  0.927536231884058
+Accuracy f1 score weighted: 0.916584665065918
+Accuracy f1 score: 0.77407
+Accuracy youden score: 0.78292
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: manhattan  | neighbours: 11
+Accuracy self:  0.927536231884058
+Accuracy f1 score weighted: 0.9165402508537677
+Accuracy f1 score: 0.77497
+Accuracy youden score: 0.7834
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: manhattan  | neighbours: 13
+Accuracy self:  0.9106280193236715
+Accuracy f1 score weighted: 0.8971640764475867
+Accuracy f1 score: 0.74106
+Accuracy youden score: 0.74925
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: manhattan  | neighbours: 15
+Accuracy self:  0.9009661835748792
+Accuracy f1 score weighted: 0.8885517401036814
+Accuracy f1 score: 0.72781
+Accuracy youden score: 0.72784
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: chebyshev  | neighbours: 3
+Accuracy self:  0.9106280193236715
+Accuracy f1 score weighted: 0.9032228526428276
+Accuracy f1 score: 0.74116
+Accuracy youden score: 0.76423
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: minkowski  | neighbours: 3
+Accuracy self:  0.9444444444444444
+Accuracy f1 score weighted: 0.9400202585047069
+Accuracy f1 score: 0.85449
+Accuracy youden score: 0.86268
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: minkowski  | neighbours: 5
+Accuracy self:  0.9227053140096618
+Accuracy f1 score weighted: 0.914559609332305
+Accuracy f1 score: 0.72743
+Accuracy youden score: 0.74303
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: minkowski  | neighbours: 7
+Accuracy self:  0.9106280193236715
+Accuracy f1 score weighted: 0.9010911171418641
+Accuracy f1 score: 0.71232
+Accuracy youden score: 0.72805
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: minkowski  | neighbours: 9
+Accuracy self:  0.9033816425120773
+Accuracy f1 score weighted: 0.8913648906707312
+Accuracy f1 score: 0.7339
+Accuracy youden score: 0.74219
+--------------------------------------------------------------
+////////////////////////////////////////////
+Folder: 2
+> Type:
+PARAMETER:  weights: uniform | metric: manhattan  | neighbours: 3
+Accuracy self:  0.9444444444444444
+Accuracy f1 score weighted: 0.9381698640478677
+Accuracy f1 score: 0.84857
+Accuracy youden score: 0.85894
+--------------------------------------------------------------
+PARAMETER:  weights: uniform | metric: manhattan  | neighbours: 5
+Accuracy self:  0.9420289855072463
+Accuracy f1 score weighted: 0.9345111741829142
+Accuracy f1 score: 0.81828
+Accuracy youden score: 0.83603
+--------------------------------------------------------------
+PARAMETER:  weights: uniform | metric: manhattan  | neighbours: 7
+Accuracy self:  0.927536231884058
+Accuracy f1 score weighted: 0.9178885765009203
+Accuracy f1 score: 0.76568
+Accuracy youden score: 0.78496
+--------------------------------------------------------------
+PARAMETER:  weights: uniform | metric: manhattan  | neighbours: 9
+Accuracy self:  0.9130434782608695
+Accuracy f1 score weighted: 0.8995531978682673
+Accuracy f1 score: 0.71146
+Accuracy youden score: 0.7281
+--------------------------------------------------------------
+PARAMETER:  weights: uniform | metric: minkowski  | neighbours: 3
+Accuracy self:  0.9082125603864735
+Accuracy f1 score weighted: 0.8979705460257328
+Accuracy f1 score: 0.73381
+Accuracy youden score: 0.76645
+--------------------------------------------------------------
+PARAMETER:  weights: uniform | metric: minkowski  | neighbours: 5
+Accuracy self:  0.9033816425120773
+Accuracy f1 score weighted: 0.891735726192141
+Accuracy f1 score: 0.71775
+Accuracy youden score: 0.74288
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: manhattan  | neighbours: 3
+Accuracy self:  0.9468599033816425
+Accuracy f1 score weighted: 0.9406741674517214
+Accuracy f1 score: 0.85012
+Accuracy youden score: 0.86045
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: manhattan  | neighbours: 5
+Accuracy self:  0.9468599033816425
+Accuracy f1 score weighted: 0.9401344603621232
+Accuracy f1 score: 0.8487
+Accuracy youden score: 0.85904
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: manhattan  | neighbours: 7
+Accuracy self:  0.9420289855072463
+Accuracy f1 score weighted: 0.9347853603023618
+Accuracy f1 score: 0.82633
+Accuracy youden score: 0.83707
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: manhattan  | neighbours: 9
+Accuracy self:  0.9323671497584541
+Accuracy f1 score weighted: 0.9220740529627697
+Accuracy f1 score: 0.77812
+Accuracy youden score: 0.78634
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: manhattan  | neighbours: 11
+Accuracy self:  0.927536231884058
+Accuracy f1 score weighted: 0.9165402508537677
+Accuracy f1 score: 0.77497
+Accuracy youden score: 0.7834
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: manhattan  | neighbours: 13
+Accuracy self:  0.9057971014492754
+Accuracy f1 score weighted: 0.8924555830927006
+Accuracy f1 score: 0.73586
+Accuracy youden score: 0.74542
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: minkowski  | neighbours: 3
+Accuracy self:  0.9154589371980676
+Accuracy f1 score weighted: 0.9070098491163479
+Accuracy f1 score: 0.79136
+Accuracy youden score: 0.81382
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: minkowski  | neighbours: 5
+Accuracy self:  0.9130434782608695
+Accuracy f1 score weighted: 0.901210057335069
+Accuracy f1 score: 0.72571
+Accuracy youden score: 0.74643
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: minkowski  | neighbours: 7
+Accuracy self:  0.9033816425120773
+Accuracy f1 score weighted: 0.8913350663165373
+Accuracy f1 score: 0.71911
+Accuracy youden score: 0.72749
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: minkowski  | neighbours: 9
+Accuracy self:  0.9009661835748792
+Accuracy f1 score weighted: 0.887799436151806
+Accuracy f1 score: 0.68239
+Accuracy youden score: 0.7009
+--------------------------------------------------------------
+////////////////////////////////////////////
+Folder: 2
+> Type: mean_
+PARAMETER:  weights: uniform | metric: manhattan  | neighbours: 3
+Accuracy self:  0.9492753623188406
+Accuracy f1 score weighted: 0.9429874804312084
+Accuracy f1 score: 0.85042
+Accuracy youden score: 0.86083
+--------------------------------------------------------------
+PARAMETER:  weights: uniform | metric: manhattan  | neighbours: 5
+Accuracy self:  0.9371980676328503
+Accuracy f1 score weighted: 0.9297832880745494
+Accuracy f1 score: 0.81715
+Accuracy youden score: 0.83511
+--------------------------------------------------------------
+PARAMETER:  weights: uniform | metric: manhattan  | neighbours: 7
+Accuracy self:  0.9251207729468599
+Accuracy f1 score weighted: 0.9157951787553485
+Accuracy f1 score: 0.7556
+Accuracy youden score: 0.77327
+--------------------------------------------------------------
+PARAMETER:  weights: uniform | metric: manhattan  | neighbours: 9
+Accuracy self:  0.9106280193236715
+Accuracy f1 score weighted: 0.8987126111015834
+Accuracy f1 score: 0.72431
+Accuracy youden score: 0.73811
+--------------------------------------------------------------
+PARAMETER:  weights: uniform | metric: chebyshev  | neighbours: 3
+Accuracy self:  0.9009661835748792
+Accuracy f1 score weighted: 0.8938801770438534
+Accuracy f1 score: 0.79543
+Accuracy youden score: 0.81301
+--------------------------------------------------------------
+PARAMETER:  weights: uniform | metric: chebyshev  | neighbours: 5
+Accuracy self:  0.9033816425120773
+Accuracy f1 score weighted: 0.8939079752485284
+Accuracy f1 score: 0.7435
+Accuracy youden score: 0.76676
+--------------------------------------------------------------
+PARAMETER:  weights: uniform | metric: minkowski  | neighbours: 3
+Accuracy self:  0.9299516908212561
+Accuracy f1 score weighted: 0.9237307862130223
+Accuracy f1 score: 0.82716
+Accuracy youden score: 0.83962
+--------------------------------------------------------------
+PARAMETER:  weights: uniform | metric: minkowski  | neighbours: 5
+Accuracy self:  0.9130434782608695
+Accuracy f1 score weighted: 0.905392748931542
+Accuracy f1 score: 0.75842
+Accuracy youden score: 0.77868
+--------------------------------------------------------------
+PARAMETER:  weights: uniform | metric: minkowski  | neighbours: 7
+Accuracy self:  0.9009661835748792
+Accuracy f1 score weighted: 0.8915590404693104
+Accuracy f1 score: 0.72197
+Accuracy youden score: 0.73789
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: manhattan  | neighbours: 3
+Accuracy self:  0.9516908212560387
+Accuracy f1 score weighted: 0.9454917838350619
+Accuracy f1 score: 0.85197
+Accuracy youden score: 0.86234
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: manhattan  | neighbours: 5
+Accuracy self:  0.9420289855072463
+Accuracy f1 score weighted: 0.9353774985842187
+Accuracy f1 score: 0.84756
+Accuracy youden score: 0.85811
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: manhattan  | neighbours: 7
+Accuracy self:  0.9420289855072463
+Accuracy f1 score weighted: 0.9347853603023618
+Accuracy f1 score: 0.82633
+Accuracy youden score: 0.83707
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: manhattan  | neighbours: 9
+Accuracy self:  0.9299516908212561
+Accuracy f1 score weighted: 0.9201782370194976
+Accuracy f1 score: 0.79752
+Accuracy youden score: 0.80624
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: manhattan  | neighbours: 11
+Accuracy self:  0.9299516908212561
+Accuracy f1 score weighted: 0.919813607131815
+Accuracy f1 score: 0.79055
+Accuracy youden score: 0.7955
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: manhattan  | neighbours: 13
+Accuracy self:  0.9130434782608695
+Accuracy f1 score weighted: 0.9001371676507048
+Accuracy f1 score: 0.74568
+Accuracy youden score: 0.75513
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: manhattan  | neighbours: 15
+Accuracy self:  0.9033816425120773
+Accuracy f1 score weighted: 0.8899127575744623
+Accuracy f1 score: 0.72759
+Accuracy youden score: 0.73489
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: chebyshev  | neighbours: 3
+Accuracy self:  0.9057971014492754
+Accuracy f1 score weighted: 0.9000666968749761
+Accuracy f1 score: 0.79468
+Accuracy youden score: 0.81935
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: chebyshev  | neighbours: 5
+Accuracy self:  0.9154589371980676
+Accuracy f1 score weighted: 0.9066849391860996
+Accuracy f1 score: 0.78324
+Accuracy youden score: 0.80788
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: chebyshev  | neighbours: 7
+Accuracy self:  0.9033816425120773
+Accuracy f1 score weighted: 0.8949776486929004
+Accuracy f1 score: 0.78059
+Accuracy youden score: 0.79477
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: minkowski  | neighbours: 3
+Accuracy self:  0.9347826086956522
+Accuracy f1 score weighted: 0.929334390081578
+Accuracy f1 score: 0.85869
+Accuracy youden score: 0.86339
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: minkowski  | neighbours: 5
+Accuracy self:  0.927536231884058
+Accuracy f1 score weighted: 0.9214712786669373
+Accuracy f1 score: 0.82382
+Accuracy youden score: 0.83875
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: minkowski  | neighbours: 7
+Accuracy self:  0.9251207729468599
+Accuracy f1 score weighted: 0.9178924928039486
+Accuracy f1 score: 0.79756
+Accuracy youden score: 0.80497
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: minkowski  | neighbours: 9
+Accuracy self:  0.9082125603864735
+Accuracy f1 score weighted: 0.8985424774507316
+Accuracy f1 score: 0.78897
+Accuracy youden score: 0.80143
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: minkowski  | neighbours: 11
+Accuracy self:  0.9009661835748792
+Accuracy f1 score weighted: 0.8901900596342286
+Accuracy f1 score: 0.75651
+Accuracy youden score: 0.76385
+--------------------------------------------------------------
+////////////////////////////////////////////
+Folder: 2
+> Type: mean_std_
+PARAMETER:  weights: uniform | metric: manhattan  | neighbours: 3
+Accuracy self:  0.9492753623188406
+Accuracy f1 score weighted: 0.9429874804312084
+Accuracy f1 score: 0.85042
+Accuracy youden score: 0.86083
+--------------------------------------------------------------
+PARAMETER:  weights: uniform | metric: manhattan  | neighbours: 5
+Accuracy self:  0.9444444444444444
+Accuracy f1 score weighted: 0.9368333454197498
+Accuracy f1 score: 0.8271
+Accuracy youden score: 0.83897
+--------------------------------------------------------------
+PARAMETER:  weights: uniform | metric: manhattan  | neighbours: 7
+Accuracy self:  0.9227053140096618
+Accuracy f1 score weighted: 0.9116324847992601
+Accuracy f1 score: 0.72956
+Accuracy youden score: 0.74493
+--------------------------------------------------------------
+PARAMETER:  weights: uniform | metric: manhattan  | neighbours: 9
+Accuracy self:  0.9106280193236715
+Accuracy f1 score weighted: 0.8987162034801223
+Accuracy f1 score: 0.7234
+Accuracy youden score: 0.73696
+--------------------------------------------------------------
+PARAMETER:  weights: uniform | metric: chebyshev  | neighbours: 3
+Accuracy self:  0.9057971014492754
+Accuracy f1 score weighted: 0.9000447909641427
+Accuracy f1 score: 0.75533
+Accuracy youden score: 0.78666
+--------------------------------------------------------------
+PARAMETER:  weights: uniform | metric: chebyshev  | neighbours: 5
+Accuracy self:  0.9033816425120773
+Accuracy f1 score weighted: 0.8977011640777691
+Accuracy f1 score: 0.75963
+Accuracy youden score: 0.7806
+--------------------------------------------------------------
+PARAMETER:  weights: uniform | metric: minkowski  | neighbours: 3
+Accuracy self:  0.9323671497584541
+Accuracy f1 score weighted: 0.9274949523024573
+Accuracy f1 score: 0.81806
+Accuracy youden score: 0.84482
+--------------------------------------------------------------
+PARAMETER:  weights: uniform | metric: minkowski  | neighbours: 5
+Accuracy self:  0.9154589371980676
+Accuracy f1 score weighted: 0.9097451257346582
+Accuracy f1 score: 0.77455
+Accuracy youden score: 0.79055
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: manhattan  | neighbours: 3
+Accuracy self:  0.9516908212560387
+Accuracy f1 score weighted: 0.9454917838350619
+Accuracy f1 score: 0.85197
+Accuracy youden score: 0.86234
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: manhattan  | neighbours: 5
+Accuracy self:  0.9468599033816425
+Accuracy f1 score weighted: 0.9399219800912606
+Accuracy f1 score: 0.8531
+Accuracy youden score: 0.86123
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: manhattan  | neighbours: 7
+Accuracy self:  0.9468599033816425
+Accuracy f1 score weighted: 0.9394259291070395
+Accuracy f1 score: 0.82995
+Accuracy youden score: 0.83915
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: manhattan  | neighbours: 9
+Accuracy self:  0.927536231884058
+Accuracy f1 score weighted: 0.9165644555303837
+Accuracy f1 score: 0.77315
+Accuracy youden score: 0.78177
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: manhattan  | neighbours: 11
+Accuracy self:  0.9323671497584541
+Accuracy f1 score weighted: 0.9214494551249048
+Accuracy f1 score: 0.77553
+Accuracy youden score: 0.78434
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: manhattan  | neighbours: 13
+Accuracy self:  0.9106280193236715
+Accuracy f1 score weighted: 0.8971640764475867
+Accuracy f1 score: 0.74106
+Accuracy youden score: 0.74925
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: manhattan  | neighbours: 15
+Accuracy self:  0.9009661835748792
+Accuracy f1 score weighted: 0.8885517401036814
+Accuracy f1 score: 0.72781
+Accuracy youden score: 0.72784
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: chebyshev  | neighbours: 3
+Accuracy self:  0.9130434782608695
+Accuracy f1 score weighted: 0.909005906180133
+Accuracy f1 score: 0.76055
+Accuracy youden score: 0.79347
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: chebyshev  | neighbours: 5
+Accuracy self:  0.9082125603864735
+Accuracy f1 score weighted: 0.9024715258351013
+Accuracy f1 score: 0.74454
+Accuracy youden score: 0.77464
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: minkowski  | neighbours: 3
+Accuracy self:  0.9396135265700483
+Accuracy f1 score weighted: 0.9354919332673022
+Accuracy f1 score: 0.85012
+Accuracy youden score: 0.86906
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: minkowski  | neighbours: 5
+Accuracy self:  0.927536231884058
+Accuracy f1 score weighted: 0.9235504051802095
+Accuracy f1 score: 0.83939
+Accuracy youden score: 0.85016
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: minkowski  | neighbours: 7
+Accuracy self:  0.9227053140096618
+Accuracy f1 score weighted: 0.9166028017437539
+Accuracy f1 score: 0.78111
+Accuracy youden score: 0.79192
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: minkowski  | neighbours: 9
+Accuracy self:  0.9082125603864735
+Accuracy f1 score weighted: 0.8988891390932159
+Accuracy f1 score: 0.77364
+Accuracy youden score: 0.78261
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: minkowski  | neighbours: 11
+Accuracy self:  0.9082125603864735
+Accuracy f1 score weighted: 0.8976385452255639
+Accuracy f1 score: 0.74726
+Accuracy youden score: 0.7503
+--------------------------------------------------------------
+////////////////////////////////////////////
+Folder: 5
+> Type:
+PARAMETER:  weights: uniform | metric: manhattan  | neighbours: 3
+Accuracy self:  0.9396135265700483
+Accuracy f1 score weighted: 0.9333412438642807
+Accuracy f1 score: 0.84715
+Accuracy youden score: 0.85755
+--------------------------------------------------------------
+PARAMETER:  weights: uniform | metric: manhattan  | neighbours: 5
+Accuracy self:  0.9396135265700483
+Accuracy f1 score weighted: 0.9335048875474655
+Accuracy f1 score: 0.84533
+Accuracy youden score: 0.85823
+--------------------------------------------------------------
+PARAMETER:  weights: uniform | metric: manhattan  | neighbours: 7
+Accuracy self:  0.9227053140096618
+Accuracy f1 score weighted: 0.9158047704550388
+Accuracy f1 score: 0.76681
+Accuracy youden score: 0.78222
+--------------------------------------------------------------
+PARAMETER:  weights: uniform | metric: manhattan  | neighbours: 9
+Accuracy self:  0.9130434782608695
+Accuracy f1 score weighted: 0.9017466162811631
+Accuracy f1 score: 0.729
+Accuracy youden score: 0.74111
+--------------------------------------------------------------
+PARAMETER:  weights: uniform | metric: minkowski  | neighbours: 3
+Accuracy self:  0.9082125603864735
+Accuracy f1 score weighted: 0.9031649790800275
+Accuracy f1 score: 0.79964
+Accuracy youden score: 0.81324
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: manhattan  | neighbours: 3
+Accuracy self:  0.9420289855072463
+Accuracy f1 score weighted: 0.9358772262571088
+Accuracy f1 score: 0.84871
+Accuracy youden score: 0.85907
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: manhattan  | neighbours: 5
+Accuracy self:  0.9396135265700483
+Accuracy f1 score weighted: 0.9334682198551896
+Accuracy f1 score: 0.8475
+Accuracy youden score: 0.85794
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: manhattan  | neighbours: 7
+Accuracy self:  0.9347826086956522
+Accuracy f1 score weighted: 0.9286022741081669
+Accuracy f1 score: 0.81195
+Accuracy youden score: 0.82148
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: manhattan  | neighbours: 9
+Accuracy self:  0.9299516908212561
+Accuracy f1 score weighted: 0.9209057017490172
+Accuracy f1 score: 0.79763
+Accuracy youden score: 0.80801
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: manhattan  | neighbours: 11
+Accuracy self:  0.9227053140096618
+Accuracy f1 score weighted: 0.911662892664454
+Accuracy f1 score: 0.76412
+Accuracy youden score: 0.77013
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: manhattan  | neighbours: 13
+Accuracy self:  0.9082125603864735
+Accuracy f1 score weighted: 0.8963097396127472
+Accuracy f1 score: 0.73775
+Accuracy youden score: 0.743
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: manhattan  | neighbours: 15
+Accuracy self:  0.9033816425120773
+Accuracy f1 score weighted: 0.8909366853991133
+Accuracy f1 score: 0.73122
+Accuracy youden score: 0.73124
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: minkowski  | neighbours: 3
+Accuracy self:  0.9130434782608695
+Accuracy f1 score weighted: 0.9088715072163689
+Accuracy f1 score: 0.8322
+Accuracy youden score: 0.83816
+--------------------------------------------------------------
+////////////////////////////////////////////
+Folder: 5
+> Type: mean_
+PARAMETER:  weights: uniform | metric: manhattan  | neighbours: 3
+Accuracy self:  0.9468599033816425
+Accuracy f1 score weighted: 0.9405637215504263
+Accuracy f1 score: 0.85108
+Accuracy youden score: 0.86377
+--------------------------------------------------------------
+PARAMETER:  weights: uniform | metric: manhattan  | neighbours: 5
+Accuracy self:  0.9396135265700483
+Accuracy f1 score weighted: 0.932717535653892
+Accuracy f1 score: 0.81533
+Accuracy youden score: 0.83547
+--------------------------------------------------------------
+PARAMETER:  weights: uniform | metric: manhattan  | neighbours: 7
+Accuracy self:  0.9299516908212561
+Accuracy f1 score weighted: 0.9215275547182643
+Accuracy f1 score: 0.76934
+Accuracy youden score: 0.79094
+--------------------------------------------------------------
+PARAMETER:  weights: uniform | metric: manhattan  | neighbours: 9
+Accuracy self:  0.9106280193236715
+Accuracy f1 score weighted: 0.8995550397403795
+Accuracy f1 score: 0.72558
+Accuracy youden score: 0.74168
+--------------------------------------------------------------
+PARAMETER:  weights: uniform | metric: chebyshev  | neighbours: 3
+Accuracy self:  0.9227053140096618
+Accuracy f1 score weighted: 0.9176106984318482
+Accuracy f1 score: 0.80966
+Accuracy youden score: 0.84214
+--------------------------------------------------------------
+PARAMETER:  weights: uniform | metric: chebyshev  | neighbours: 5
+Accuracy self:  0.9154589371980676
+Accuracy f1 score weighted: 0.912022043550273
+Accuracy f1 score: 0.77877
+Accuracy youden score: 0.80649
+--------------------------------------------------------------
+PARAMETER:  weights: uniform | metric: minkowski  | neighbours: 3
+Accuracy self:  0.9323671497584541
+Accuracy f1 score weighted: 0.9284897470482261
+Accuracy f1 score: 0.85979
+Accuracy youden score: 0.87872
+--------------------------------------------------------------
+PARAMETER:  weights: uniform | metric: minkowski  | neighbours: 5
+Accuracy self:  0.9202898550724637
+Accuracy f1 score weighted: 0.9137400235289298
+Accuracy f1 score: 0.77382
+Accuracy youden score: 0.80002
+--------------------------------------------------------------
+PARAMETER:  weights: uniform | metric: minkowski  | neighbours: 7
+Accuracy self:  0.9033816425120773
+Accuracy f1 score weighted: 0.8969061512723063
+Accuracy f1 score: 0.75227
+Accuracy youden score: 0.77459
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: manhattan  | neighbours: 3
+Accuracy self:  0.9492753623188406
+Accuracy f1 score weighted: 0.9430997039432544
+Accuracy f1 score: 0.85265
+Accuracy youden score: 0.86528
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: manhattan  | neighbours: 5
+Accuracy self:  0.9468599033816425
+Accuracy f1 score weighted: 0.9406051123654736
+Accuracy f1 score: 0.84984
+Accuracy youden score: 0.85999
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: manhattan  | neighbours: 7
+Accuracy self:  0.9444444444444444
+Accuracy f1 score weighted: 0.9384225013177983
+Accuracy f1 score: 0.83007
+Accuracy youden score: 0.84305
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: manhattan  | neighbours: 9
+Accuracy self:  0.9323671497584541
+Accuracy f1 score weighted: 0.9245593020246841
+Accuracy f1 score: 0.80154
+Accuracy youden score: 0.80922
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: manhattan  | neighbours: 11
+Accuracy self:  0.9323671497584541
+Accuracy f1 score weighted: 0.9227376626527483
+Accuracy f1 score: 0.79911
+Accuracy youden score: 0.80796
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: manhattan  | neighbours: 13
+Accuracy self:  0.9178743961352657
+Accuracy f1 score weighted: 0.9060555061430705
+Accuracy f1 score: 0.77018
+Accuracy youden score: 0.78007
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: manhattan  | neighbours: 15
+Accuracy self:  0.9106280193236715
+Accuracy f1 score weighted: 0.8976359788423369
+Accuracy f1 score: 0.74281
+Accuracy youden score: 0.75176
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: chebyshev  | neighbours: 3
+Accuracy self:  0.9251207729468599
+Accuracy f1 score weighted: 0.9210869293028427
+Accuracy f1 score: 0.80599
+Accuracy youden score: 0.84375
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: chebyshev  | neighbours: 5
+Accuracy self:  0.927536231884058
+Accuracy f1 score weighted: 0.9236461121087859
+Accuracy f1 score: 0.81008
+Accuracy youden score: 0.84429
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: chebyshev  | neighbours: 7
+Accuracy self:  0.9178743961352657
+Accuracy f1 score weighted: 0.9111892239064951
+Accuracy f1 score: 0.81158
+Accuracy youden score: 0.83697
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: chebyshev  | neighbours: 9
+Accuracy self:  0.9082125603864735
+Accuracy f1 score weighted: 0.897564574421456
+Accuracy f1 score: 0.75961
+Accuracy youden score: 0.77327
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: minkowski  | neighbours: 3
+Accuracy self:  0.9371980676328503
+Accuracy f1 score weighted: 0.9342812416974423
+Accuracy f1 score: 0.89238
+Accuracy youden score: 0.90355
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: minkowski  | neighbours: 5
+Accuracy self:  0.9347826086956522
+Accuracy f1 score weighted: 0.9301561235231295
+Accuracy f1 score: 0.84041
+Accuracy youden score: 0.86114
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: minkowski  | neighbours: 7
+Accuracy self:  0.9251207729468599
+Accuracy f1 score weighted: 0.9203968646477029
+Accuracy f1 score: 0.82287
+Accuracy youden score: 0.83464
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: minkowski  | neighbours: 9
+Accuracy self:  0.927536231884058
+Accuracy f1 score weighted: 0.9204809095004205
+Accuracy f1 score: 0.8324
+Accuracy youden score: 0.84247
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: minkowski  | neighbours: 11
+Accuracy self:  0.9106280193236715
+Accuracy f1 score weighted: 0.9037248510290362
+Accuracy f1 score: 0.81855
+Accuracy youden score: 0.82421
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: minkowski  | neighbours: 13
+Accuracy self:  0.9033816425120773
+Accuracy f1 score weighted: 0.8923711408837856
+Accuracy f1 score: 0.75762
+Accuracy youden score: 0.7645
+--------------------------------------------------------------
+////////////////////////////////////////////
+Folder: 5
+> Type: mean_std_
+PARAMETER:  weights: uniform | metric: manhattan  | neighbours: 3
+Accuracy self:  0.9516908212560387
+Accuracy f1 score weighted: 0.9455439661634976
+Accuracy f1 score: 0.85394
+Accuracy youden score: 0.86671
+--------------------------------------------------------------
+PARAMETER:  weights: uniform | metric: manhattan  | neighbours: 5
+Accuracy self:  0.9396135265700483
+Accuracy f1 score weighted: 0.9321405424044851
+Accuracy f1 score: 0.81771
+Accuracy youden score: 0.83557
+--------------------------------------------------------------
+PARAMETER:  weights: uniform | metric: manhattan  | neighbours: 7
+Accuracy self:  0.9323671497584541
+Accuracy f1 score weighted: 0.9246504468793199
+Accuracy f1 score: 0.77966
+Accuracy youden score: 0.79712
+--------------------------------------------------------------
+PARAMETER:  weights: uniform | metric: manhattan  | neighbours: 9
+Accuracy self:  0.9178743961352657
+Accuracy f1 score weighted: 0.9078481344954406
+Accuracy f1 score: 0.74554
+Accuracy youden score: 0.75712
+--------------------------------------------------------------
+PARAMETER:  weights: uniform | metric: chebyshev  | neighbours: 3
+Accuracy self:  0.9251207729468599
+Accuracy f1 score weighted: 0.9191854628323305
+Accuracy f1 score: 0.77981
+Accuracy youden score: 0.82013
+--------------------------------------------------------------
+PARAMETER:  weights: uniform | metric: chebyshev  | neighbours: 5
+Accuracy self:  0.9130434782608695
+Accuracy f1 score weighted: 0.9095260078999905
+Accuracy f1 score: 0.77535
+Accuracy youden score: 0.80061
+--------------------------------------------------------------
+PARAMETER:  weights: uniform | metric: chebyshev  | neighbours: 7
+Accuracy self:  0.9057971014492754
+Accuracy f1 score weighted: 0.8975618115676534
+Accuracy f1 score: 0.75663
+Accuracy youden score: 0.77194
+--------------------------------------------------------------
+PARAMETER:  weights: uniform | metric: minkowski  | neighbours: 3
+Accuracy self:  0.9371980676328503
+Accuracy f1 score weighted: 0.9324726743148466
+Accuracy f1 score: 0.83156
+Accuracy youden score: 0.85754
+--------------------------------------------------------------
+PARAMETER:  weights: uniform | metric: minkowski  | neighbours: 5
+Accuracy self:  0.927536231884058
+Accuracy f1 score weighted: 0.9210357696346049
+Accuracy f1 score: 0.77687
+Accuracy youden score: 0.80244
+--------------------------------------------------------------
+PARAMETER:  weights: uniform | metric: minkowski  | neighbours: 7
+Accuracy self:  0.9202898550724637
+Accuracy f1 score weighted: 0.9144485293475978
+Accuracy f1 score: 0.77321
+Accuracy youden score: 0.79133
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: manhattan  | neighbours: 3
+Accuracy self:  0.9541062801932367
+Accuracy f1 score weighted: 0.9480482695673511
+Accuracy f1 score: 0.85549
+Accuracy youden score: 0.86822
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: manhattan  | neighbours: 5
+Accuracy self:  0.9468599033816425
+Accuracy f1 score weighted: 0.9400281191160667
+Accuracy f1 score: 0.85221
+Accuracy youden score: 0.86008
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: manhattan  | neighbours: 7
+Accuracy self:  0.9468599033816425
+Accuracy f1 score weighted: 0.9415607520621107
+Accuracy f1 score: 0.84032
+Accuracy youden score: 0.84923
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: manhattan  | neighbours: 9
+Accuracy self:  0.9347826086956522
+Accuracy f1 score weighted: 0.927002271060667
+Accuracy f1 score: 0.81397
+Accuracy youden score: 0.81829
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: manhattan  | neighbours: 11
+Accuracy self:  0.9323671497584541
+Accuracy f1 score weighted: 0.9233900368432371
+Accuracy f1 score: 0.79078
+Accuracy youden score: 0.79556
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: manhattan  | neighbours: 13
+Accuracy self:  0.9154589371980676
+Accuracy f1 score weighted: 0.9056422857125896
+Accuracy f1 score: 0.77298
+Accuracy youden score: 0.77262
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: manhattan  | neighbours: 15
+Accuracy self:  0.9082125603864735
+Accuracy f1 score weighted: 0.8956313349215529
+Accuracy f1 score: 0.73623
+Accuracy youden score: 0.73755
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: chebyshev  | neighbours: 3
+Accuracy self:  0.927536231884058
+Accuracy f1 score weighted: 0.9226616937033252
+Accuracy f1 score: 0.77614
+Accuracy youden score: 0.82174
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: chebyshev  | neighbours: 5
+Accuracy self:  0.9251207729468599
+Accuracy f1 score weighted: 0.921110630367255
+Accuracy f1 score: 0.80657
+Accuracy youden score: 0.83841
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: chebyshev  | neighbours: 7
+Accuracy self:  0.9299516908212561
+Accuracy f1 score weighted: 0.9235833160666042
+Accuracy f1 score: 0.81811
+Accuracy youden score: 0.83922
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: chebyshev  | neighbours: 9
+Accuracy self:  0.9057971014492754
+Accuracy f1 score weighted: 0.8937673848719968
+Accuracy f1 score: 0.7334
+Accuracy youden score: 0.74462
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: chebyshev  | neighbours: 11
+Accuracy self:  0.9033816425120773
+Accuracy f1 score weighted: 0.8916492940211755
+Accuracy f1 score: 0.72722
+Accuracy youden score: 0.74222
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: minkowski  | neighbours: 3
+Accuracy self:  0.9420289855072463
+Accuracy f1 score weighted: 0.938264168964063
+Accuracy f1 score: 0.86415
+Accuracy youden score: 0.88236
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: minkowski  | neighbours: 5
+Accuracy self:  0.9420289855072463
+Accuracy f1 score weighted: 0.9374361984071612
+Accuracy f1 score: 0.84345
+Accuracy youden score: 0.86356
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: minkowski  | neighbours: 7
+Accuracy self:  0.9396135265700483
+Accuracy f1 score weighted: 0.9356367976521891
+Accuracy f1 score: 0.84333
+Accuracy youden score: 0.85092
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: minkowski  | neighbours: 9
+Accuracy self:  0.9323671497584541
+Accuracy f1 score weighted: 0.925301417209013
+Accuracy f1 score: 0.83423
+Accuracy youden score: 0.84415
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: minkowski  | neighbours: 11
+Accuracy self:  0.9130434782608695
+Accuracy f1 score weighted: 0.9045367601215221
+Accuracy f1 score: 0.81242
+Accuracy youden score: 0.82107
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: minkowski  | neighbours: 13
+Accuracy self:  0.9082125603864735
+Accuracy f1 score weighted: 0.8961327374440167
+Accuracy f1 score: 0.74052
+Accuracy youden score: 0.75056
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: minkowski  | neighbours: 15
+Accuracy self:  0.9009661835748792
+Accuracy f1 score weighted: 0.8887222240812
+Accuracy f1 score: 0.73972
+Accuracy youden score: 0.74746
+--------------------------------------------------------------
+////////////////////////////////////////////
+Folder: 10
+> Type:
+PARAMETER:  weights: uniform | metric: manhattan  | neighbours: 3
+Accuracy self:  0.9396135265700483
+Accuracy f1 score weighted: 0.9357548945059564
+Accuracy f1 score: 0.87378
+Accuracy youden score: 0.88749
+--------------------------------------------------------------
+PARAMETER:  weights: uniform | metric: manhattan  | neighbours: 5
+Accuracy self:  0.9396135265700483
+Accuracy f1 score weighted: 0.9338368769983062
+Accuracy f1 score: 0.84405
+Accuracy youden score: 0.85864
+--------------------------------------------------------------
+PARAMETER:  weights: uniform | metric: manhattan  | neighbours: 7
+Accuracy self:  0.9130434782608695
+Accuracy f1 score weighted: 0.9038088339158569
+Accuracy f1 score: 0.75569
+Accuracy youden score: 0.77413
+--------------------------------------------------------------
+PARAMETER:  weights: uniform | metric: manhattan  | neighbours: 9
+Accuracy self:  0.9009661835748792
+Accuracy f1 score weighted: 0.8883385494028448
+Accuracy f1 score: 0.71179
+Accuracy youden score: 0.72598
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: manhattan  | neighbours: 3
+Accuracy self:  0.9468599033816425
+Accuracy f1 score weighted: 0.9441741871637749
+Accuracy f1 score: 0.92219
+Accuracy youden score: 0.93563
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: manhattan  | neighbours: 5
+Accuracy self:  0.9420289855072463
+Accuracy f1 score weighted: 0.9372048236427468
+Accuracy f1 score: 0.86798
+Accuracy youden score: 0.88204
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: manhattan  | neighbours: 7
+Accuracy self:  0.927536231884058
+Accuracy f1 score weighted: 0.9206688461433089
+Accuracy f1 score: 0.81644
+Accuracy youden score: 0.8309
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: manhattan  | neighbours: 9
+Accuracy self:  0.927536231884058
+Accuracy f1 score weighted: 0.9189874593027504
+Accuracy f1 score: 0.80159
+Accuracy youden score: 0.81035
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: manhattan  | neighbours: 11
+Accuracy self:  0.9227053140096618
+Accuracy f1 score weighted: 0.9124694432919895
+Accuracy f1 score: 0.77534
+Accuracy youden score: 0.78465
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: manhattan  | neighbours: 13
+Accuracy self:  0.9154589371980676
+Accuracy f1 score weighted: 0.9037453357464627
+Accuracy f1 score: 0.75847
+Accuracy youden score: 0.76402
+--------------------------------------------------------------
+////////////////////////////////////////////
+Folder: 10
+> Type: mean_
+PARAMETER:  weights: uniform | metric: manhattan  | neighbours: 3
+Accuracy self:  0.9541062801932367
+Accuracy f1 score weighted: 0.94910903538281
+Accuracy f1 score: 0.87756
+Accuracy youden score: 0.89003
+--------------------------------------------------------------
+PARAMETER:  weights: uniform | metric: manhattan  | neighbours: 5
+Accuracy self:  0.9323671497584541
+Accuracy f1 score weighted: 0.926566059865706
+Accuracy f1 score: 0.81285
+Accuracy youden score: 0.83276
+--------------------------------------------------------------
+PARAMETER:  weights: uniform | metric: manhattan  | neighbours: 7
+Accuracy self:  0.9202898550724637
+Accuracy f1 score weighted: 0.910630702696186
+Accuracy f1 score: 0.72966
+Accuracy youden score: 0.74922
+--------------------------------------------------------------
+PARAMETER:  weights: uniform | metric: manhattan  | neighbours: 9
+Accuracy self:  0.9154589371980676
+Accuracy f1 score weighted: 0.903235399349461
+Accuracy f1 score: 0.71587
+Accuracy youden score: 0.73465
+--------------------------------------------------------------
+PARAMETER:  weights: uniform | metric: chebyshev  | neighbours: 3
+Accuracy self:  0.927536231884058
+Accuracy f1 score weighted: 0.9204189654865217
+Accuracy f1 score: 0.78724
+Accuracy youden score: 0.82599
+--------------------------------------------------------------
+PARAMETER:  weights: uniform | metric: chebyshev  | neighbours: 5
+Accuracy self:  0.9130434782608695
+Accuracy f1 score weighted: 0.9058073276276664
+Accuracy f1 score: 0.76672
+Accuracy youden score: 0.78846
+--------------------------------------------------------------
+PARAMETER:  weights: uniform | metric: minkowski  | neighbours: 3
+Accuracy self:  0.9371980676328503
+Accuracy f1 score weighted: 0.9315713426595703
+Accuracy f1 score: 0.83608
+Accuracy youden score: 0.85735
+--------------------------------------------------------------
+PARAMETER:  weights: uniform | metric: minkowski  | neighbours: 5
+Accuracy self:  0.9227053140096618
+Accuracy f1 score weighted: 0.9148127623691473
+Accuracy f1 score: 0.76452
+Accuracy youden score: 0.79193
+--------------------------------------------------------------
+PARAMETER:  weights: uniform | metric: minkowski  | neighbours: 7
+Accuracy self:  0.9009661835748792
+Accuracy f1 score weighted: 0.8918162336236232
+Accuracy f1 score: 0.72836
+Accuracy youden score: 0.75096
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: manhattan  | neighbours: 3
+Accuracy self:  0.9565217391304348
+Accuracy f1 score weighted: 0.9516133387866635
+Accuracy f1 score: 0.87911
+Accuracy youden score: 0.89154
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: manhattan  | neighbours: 5
+Accuracy self:  0.9396135265700483
+Accuracy f1 score weighted: 0.9344757024827495
+Accuracy f1 score: 0.84736
+Accuracy youden score: 0.85728
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: manhattan  | neighbours: 7
+Accuracy self:  0.9396135265700483
+Accuracy f1 score weighted: 0.933589056081483
+Accuracy f1 score: 0.82358
+Accuracy youden score: 0.83634
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: manhattan  | neighbours: 9
+Accuracy self:  0.9347826086956522
+Accuracy f1 score weighted: 0.926275283147946
+Accuracy f1 score: 0.80226
+Accuracy youden score: 0.81297
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: manhattan  | neighbours: 11
+Accuracy self:  0.9299516908212561
+Accuracy f1 score weighted: 0.9203759586944241
+Accuracy f1 score: 0.79322
+Accuracy youden score: 0.80538
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: manhattan  | neighbours: 13
+Accuracy self:  0.9251207729468599
+Accuracy f1 score weighted: 0.914051074388914
+Accuracy f1 score: 0.77308
+Accuracy youden score: 0.78103
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: manhattan  | neighbours: 15
+Accuracy self:  0.9154589371980676
+Accuracy f1 score weighted: 0.9041249906524303
+Accuracy f1 score: 0.76349
+Accuracy youden score: 0.76682
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: chebyshev  | neighbours: 3
+Accuracy self:  0.9323671497584541
+Accuracy f1 score weighted: 0.9264073323912047
+Accuracy f1 score: 0.81998
+Accuracy youden score: 0.85091
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: chebyshev  | neighbours: 5
+Accuracy self:  0.9202898550724637
+Accuracy f1 score weighted: 0.9145218065134092
+Accuracy f1 score: 0.81624
+Accuracy youden score: 0.84563
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: chebyshev  | neighbours: 7
+Accuracy self:  0.9154589371980676
+Accuracy f1 score weighted: 0.9072680604855721
+Accuracy f1 score: 0.78638
+Accuracy youden score: 0.80918
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: chebyshev  | neighbours: 9
+Accuracy self:  0.9106280193236715
+Accuracy f1 score weighted: 0.9001275144781041
+Accuracy f1 score: 0.77949
+Accuracy youden score: 0.79617
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: chebyshev  | neighbours: 11
+Accuracy self:  0.9033816425120773
+Accuracy f1 score weighted: 0.8919489244154873
+Accuracy f1 score: 0.74824
+Accuracy youden score: 0.76092
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: minkowski  | neighbours: 3
+Accuracy self:  0.9420289855072463
+Accuracy f1 score weighted: 0.9372966546067711
+Accuracy f1 score: 0.86864
+Accuracy youden score: 0.88218
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: minkowski  | neighbours: 5
+Accuracy self:  0.927536231884058
+Accuracy f1 score weighted: 0.9212530765460822
+Accuracy f1 score: 0.80056
+Accuracy youden score: 0.83016
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: minkowski  | neighbours: 7
+Accuracy self:  0.9251207729468599
+Accuracy f1 score weighted: 0.9180479482912153
+Accuracy f1 score: 0.80763
+Accuracy youden score: 0.82851
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: minkowski  | neighbours: 9
+Accuracy self:  0.9130434782608695
+Accuracy f1 score weighted: 0.9055559359044723
+Accuracy f1 score: 0.81637
+Accuracy youden score: 0.82939
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: minkowski  | neighbours: 11
+Accuracy self:  0.9130434782608695
+Accuracy f1 score weighted: 0.90577722957114
+Accuracy f1 score: 0.82354
+Accuracy youden score: 0.83073
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: minkowski  | neighbours: 13
+Accuracy self:  0.9057971014492754
+Accuracy f1 score weighted: 0.8958537949317572
+Accuracy f1 score: 0.77375
+Accuracy youden score: 0.7819
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: minkowski  | neighbours: 15
+Accuracy self:  0.9009661835748792
+Accuracy f1 score weighted: 0.88979154525351
+Accuracy f1 score: 0.74978
+Accuracy youden score: 0.75811
+--------------------------------------------------------------
+////////////////////////////////////////////
+Folder: 10
+> Type: mean_std_
+PARAMETER:  weights: uniform | metric: manhattan  | neighbours: 3
+Accuracy self:  0.9541062801932367
+Accuracy f1 score weighted: 0.9485320421334029
+Accuracy f1 score: 0.87994
+Accuracy youden score: 0.89012
+--------------------------------------------------------------
+PARAMETER:  weights: uniform | metric: manhattan  | neighbours: 5
+Accuracy self:  0.9371980676328503
+Accuracy f1 score weighted: 0.9310472198237288
+Accuracy f1 score: 0.81738
+Accuracy youden score: 0.83949
+--------------------------------------------------------------
+PARAMETER:  weights: uniform | metric: manhattan  | neighbours: 7
+Accuracy self:  0.9227053140096618
+Accuracy f1 score weighted: 0.9124418168750588
+Accuracy f1 score: 0.73466
+Accuracy youden score: 0.75899
+--------------------------------------------------------------
+PARAMETER:  weights: uniform | metric: manhattan  | neighbours: 9
+Accuracy self:  0.927536231884058
+Accuracy f1 score weighted: 0.9175285075807689
+Accuracy f1 score: 0.7488
+Accuracy youden score: 0.75571
+--------------------------------------------------------------
+PARAMETER:  weights: uniform | metric: chebyshev  | neighbours: 3
+Accuracy self:  0.9323671497584541
+Accuracy f1 score weighted: 0.9257676622606904
+Accuracy f1 score: 0.76563
+Accuracy youden score: 0.81188
+--------------------------------------------------------------
+PARAMETER:  weights: uniform | metric: chebyshev  | neighbours: 5
+Accuracy self:  0.9130434782608695
+Accuracy f1 score weighted: 0.9058208301527502
+Accuracy f1 score: 0.76581
+Accuracy youden score: 0.78712
+--------------------------------------------------------------
+PARAMETER:  weights: uniform | metric: minkowski  | neighbours: 3
+Accuracy self:  0.9323671497584541
+Accuracy f1 score weighted: 0.9259482562932558
+Accuracy f1 score: 0.80449
+Accuracy youden score: 0.8332
+--------------------------------------------------------------
+PARAMETER:  weights: uniform | metric: minkowski  | neighbours: 5
+Accuracy self:  0.9299516908212561
+Accuracy f1 score weighted: 0.9230803026180161
+Accuracy f1 score: 0.79628
+Accuracy youden score: 0.82352
+--------------------------------------------------------------
+PARAMETER:  weights: uniform | metric: minkowski  | neighbours: 7
+Accuracy self:  0.9106280193236715
+Accuracy f1 score weighted: 0.9028896323251417
+Accuracy f1 score: 0.75741
+Accuracy youden score: 0.78214
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: manhattan  | neighbours: 3
+Accuracy self:  0.9565217391304348
+Accuracy f1 score weighted: 0.9510777642800101
+Accuracy f1 score: 0.88152
+Accuracy youden score: 0.89163
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: manhattan  | neighbours: 5
+Accuracy self:  0.9444444444444444
+Accuracy f1 score weighted: 0.9390617139991545
+Accuracy f1 score: 0.8513
+Accuracy youden score: 0.86371
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: manhattan  | neighbours: 7
+Accuracy self:  0.9420289855072463
+Accuracy f1 score weighted: 0.9352495949832799
+Accuracy f1 score: 0.8225
+Accuracy youden score: 0.8403
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: manhattan  | neighbours: 9
+Accuracy self:  0.9444444444444444
+Accuracy f1 score weighted: 0.9367143967512382
+Accuracy f1 score: 0.8208
+Accuracy youden score: 0.82746
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: manhattan  | neighbours: 11
+Accuracy self:  0.9299516908212561
+Accuracy f1 score weighted: 0.9194808756193843
+Accuracy f1 score: 0.7821
+Accuracy youden score: 0.79067
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: manhattan  | neighbours: 13
+Accuracy self:  0.9178743961352657
+Accuracy f1 score weighted: 0.9065326896820066
+Accuracy f1 score: 0.76465
+Accuracy youden score: 0.77313
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: manhattan  | neighbours: 15
+Accuracy self:  0.9106280193236715
+Accuracy f1 score weighted: 0.8990349482919184
+Accuracy f1 score: 0.75728
+Accuracy youden score: 0.76051
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: chebyshev  | neighbours: 3
+Accuracy self:  0.9371980676328503
+Accuracy f1 score weighted: 0.931585836123068
+Accuracy f1 score: 0.79827
+Accuracy youden score: 0.8368
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: chebyshev  | neighbours: 5
+Accuracy self:  0.9251207729468599
+Accuracy f1 score weighted: 0.9194135522807503
+Accuracy f1 score: 0.82028
+Accuracy youden score: 0.85139
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: chebyshev  | neighbours: 7
+Accuracy self:  0.9202898550724637
+Accuracy f1 score weighted: 0.9121762490140128
+Accuracy f1 score: 0.79111
+Accuracy youden score: 0.8159
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: chebyshev  | neighbours: 9
+Accuracy self:  0.9130434782608695
+Accuracy f1 score weighted: 0.903199951816576
+Accuracy f1 score: 0.7749
+Accuracy youden score: 0.79013
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: chebyshev  | neighbours: 11
+Accuracy self:  0.9154589371980676
+Accuracy f1 score weighted: 0.9060157152397571
+Accuracy f1 score: 0.77177
+Accuracy youden score: 0.78216
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: chebyshev  | neighbours: 13
+Accuracy self:  0.9082125603864735
+Accuracy f1 score weighted: 0.8988512599493647
+Accuracy f1 score: 0.76449
+Accuracy youden score: 0.77566
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: chebyshev  | neighbours: 15
+Accuracy self:  0.9009661835748792
+Accuracy f1 score weighted: 0.8884347440768103
+Accuracy f1 score: 0.72661
+Accuracy youden score: 0.74017
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: minkowski  | neighbours: 3
+Accuracy self:  0.9371980676328503
+Accuracy f1 score weighted: 0.9316735682404569
+Accuracy f1 score: 0.83704
+Accuracy youden score: 0.85802
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: minkowski  | neighbours: 5
+Accuracy self:  0.9371980676328503
+Accuracy f1 score weighted: 0.9312674492144533
+Accuracy f1 score: 0.83192
+Accuracy youden score: 0.85869
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: minkowski  | neighbours: 7
+Accuracy self:  0.9299516908212561
+Accuracy f1 score weighted: 0.9238850953573879
+Accuracy f1 score: 0.83737
+Accuracy youden score: 0.8578
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: minkowski  | neighbours: 9
+Accuracy self:  0.9251207729468599
+Accuracy f1 score weighted: 0.9181075059261633
+Accuracy f1 score: 0.82794
+Accuracy youden score: 0.84111
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: minkowski  | neighbours: 11
+Accuracy self:  0.9130434782608695
+Accuracy f1 score weighted: 0.904786572466142
+Accuracy f1 score: 0.79789
+Accuracy youden score: 0.8034
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: minkowski  | neighbours: 13
+Accuracy self:  0.9057971014492754
+Accuracy f1 score weighted: 0.8947594319785261
+Accuracy f1 score: 0.75455
+Accuracy youden score: 0.76253
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: minkowski  | neighbours: 15
+Accuracy self:  0.9033816425120773
+Accuracy f1 score weighted: 0.8924489939533177
+Accuracy f1 score: 0.75074
+Accuracy youden score: 0.75905
+--------------------------------------------------------------
+////////////////////////////////////////////
+Folder: 20
+> Type:
+PARAMETER:  weights: uniform | metric: manhattan  | neighbours: 3
+Accuracy self:  0.9130434782608695
+Accuracy f1 score weighted: 0.9083752256253396
+Accuracy f1 score: 0.85546
+Accuracy youden score: 0.87199
+--------------------------------------------------------------
+PARAMETER:  weights: uniform | metric: manhattan  | neighbours: 5
+Accuracy self:  0.9202898550724637
+Accuracy f1 score weighted: 0.9116854202325155
+Accuracy f1 score: 0.77348
+Accuracy youden score: 0.78771
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: manhattan  | neighbours: 3
+Accuracy self:  0.9202898550724637
+Accuracy f1 score weighted: 0.9176391743956775
+Accuracy f1 score: 0.91165
+Accuracy youden score: 0.92013
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: manhattan  | neighbours: 5
+Accuracy self:  0.9251207729468599
+Accuracy f1 score weighted: 0.918351436134036
+Accuracy f1 score: 0.83175
+Accuracy youden score: 0.83482
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: manhattan  | neighbours: 7
+Accuracy self:  0.9057971014492754
+Accuracy f1 score weighted: 0.8956376392153945
+Accuracy f1 score: 0.74936
+Accuracy youden score: 0.76068
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: manhattan  | neighbours: 9
+Accuracy self:  0.9057971014492754
+Accuracy f1 score weighted: 0.8953562386104231
+Accuracy f1 score: 0.75828
+Accuracy youden score: 0.76441
+--------------------------------------------------------------
+////////////////////////////////////////////
+Folder: 20
+> Type: mean_
+PARAMETER:  weights: uniform | metric: manhattan  | neighbours: 3
+Accuracy self:  0.9444444444444444
+Accuracy f1 score weighted: 0.9401164174823564
+Accuracy f1 score: 0.85052
+Accuracy youden score: 0.86468
+--------------------------------------------------------------
+PARAMETER:  weights: uniform | metric: manhattan  | neighbours: 5
+Accuracy self:  0.9323671497584541
+Accuracy f1 score weighted: 0.9270399114372158
+Accuracy f1 score: 0.84267
+Accuracy youden score: 0.8605
+--------------------------------------------------------------
+PARAMETER:  weights: uniform | metric: manhattan  | neighbours: 7
+Accuracy self:  0.9130434782608695
+Accuracy f1 score weighted: 0.9031179505975677
+Accuracy f1 score: 0.7274
+Accuracy youden score: 0.75167
+--------------------------------------------------------------
+PARAMETER:  weights: uniform | metric: manhattan  | neighbours: 9
+Accuracy self:  0.9130434782608695
+Accuracy f1 score weighted: 0.9015623657743234
+Accuracy f1 score: 0.73014
+Accuracy youden score: 0.75068
+--------------------------------------------------------------
+PARAMETER:  weights: uniform | metric: chebyshev  | neighbours: 3
+Accuracy self:  0.9371980676328503
+Accuracy f1 score weighted: 0.9333623288782076
+Accuracy f1 score: 0.84256
+Accuracy youden score: 0.86032
+--------------------------------------------------------------
+PARAMETER:  weights: uniform | metric: chebyshev  | neighbours: 5
+Accuracy self:  0.927536231884058
+Accuracy f1 score weighted: 0.9204568583146188
+Accuracy f1 score: 0.78454
+Accuracy youden score: 0.80744
+--------------------------------------------------------------
+PARAMETER:  weights: uniform | metric: chebyshev  | neighbours: 7
+Accuracy self:  0.9178743961352657
+Accuracy f1 score weighted: 0.9072109643704627
+Accuracy f1 score: 0.75059
+Accuracy youden score: 0.76689
+--------------------------------------------------------------
+PARAMETER:  weights: uniform | metric: minkowski  | neighbours: 3
+Accuracy self:  0.9396135265700483
+Accuracy f1 score weighted: 0.9345637385445297
+Accuracy f1 score: 0.84173
+Accuracy youden score: 0.8604
+--------------------------------------------------------------
+PARAMETER:  weights: uniform | metric: minkowski  | neighbours: 5
+Accuracy self:  0.9396135265700483
+Accuracy f1 score weighted: 0.9341745446075548
+Accuracy f1 score: 0.84246
+Accuracy youden score: 0.86221
+--------------------------------------------------------------
+PARAMETER:  weights: uniform | metric: minkowski  | neighbours: 7
+Accuracy self:  0.9178743961352657
+Accuracy f1 score weighted: 0.9080911482491376
+Accuracy f1 score: 0.7489
+Accuracy youden score: 0.77116
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: manhattan  | neighbours: 3
+Accuracy self:  0.9468599033816425
+Accuracy f1 score weighted: 0.9432804801927329
+Accuracy f1 score: 0.85012
+Accuracy youden score: 0.86514
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: manhattan  | neighbours: 5
+Accuracy self:  0.9371980676328503
+Accuracy f1 score weighted: 0.9321985295863993
+Accuracy f1 score: 0.84454
+Accuracy youden score: 0.86073
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: manhattan  | neighbours: 7
+Accuracy self:  0.9323671497584541
+Accuracy f1 score weighted: 0.9257953823932947
+Accuracy f1 score: 0.82188
+Accuracy youden score: 0.83879
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: manhattan  | neighbours: 9
+Accuracy self:  0.9323671497584541
+Accuracy f1 score weighted: 0.9253801326645623
+Accuracy f1 score: 0.81866
+Accuracy youden score: 0.83666
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: manhattan  | neighbours: 11
+Accuracy self:  0.9227053140096618
+Accuracy f1 score weighted: 0.914583778508252
+Accuracy f1 score: 0.78652
+Accuracy youden score: 0.80473
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: manhattan  | neighbours: 13
+Accuracy self:  0.9227053140096618
+Accuracy f1 score weighted: 0.913358304951201
+Accuracy f1 score: 0.79431
+Accuracy youden score: 0.80791
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: manhattan  | neighbours: 15
+Accuracy self:  0.9130434782608695
+Accuracy f1 score weighted: 0.9015310847038239
+Accuracy f1 score: 0.76881
+Accuracy youden score: 0.7817
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: chebyshev  | neighbours: 3
+Accuracy self:  0.9396135265700483
+Accuracy f1 score weighted: 0.9370707921069108
+Accuracy f1 score: 0.86951
+Accuracy youden score: 0.87346
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: chebyshev  | neighbours: 5
+Accuracy self:  0.9396135265700483
+Accuracy f1 score weighted: 0.9359300873387514
+Accuracy f1 score: 0.87486
+Accuracy youden score: 0.88372
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: chebyshev  | neighbours: 7
+Accuracy self:  0.9323671497584541
+Accuracy f1 score weighted: 0.9259700537656199
+Accuracy f1 score: 0.83777
+Accuracy youden score: 0.84052
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: chebyshev  | neighbours: 9
+Accuracy self:  0.9251207729468599
+Accuracy f1 score weighted: 0.916140546606811
+Accuracy f1 score: 0.78628
+Accuracy youden score: 0.794
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: chebyshev  | neighbours: 11
+Accuracy self:  0.9202898550724637
+Accuracy f1 score weighted: 0.9102482033441176
+Accuracy f1 score: 0.77772
+Accuracy youden score: 0.77887
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: chebyshev  | neighbours: 13
+Accuracy self:  0.9178743961352657
+Accuracy f1 score weighted: 0.9079134508037414
+Accuracy f1 score: 0.77697
+Accuracy youden score: 0.77844
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: chebyshev  | neighbours: 15
+Accuracy self:  0.9130434782608695
+Accuracy f1 score weighted: 0.9012507415181611
+Accuracy f1 score: 0.7602
+Accuracy youden score: 0.76531
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: minkowski  | neighbours: 3
+Accuracy self:  0.9444444444444444
+Accuracy f1 score weighted: 0.9409075683932737
+Accuracy f1 score: 0.8703
+Accuracy youden score: 0.87505
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: minkowski  | neighbours: 5
+Accuracy self:  0.9420289855072463
+Accuracy f1 score weighted: 0.9378829291764246
+Accuracy f1 score: 0.87368
+Accuracy youden score: 0.88447
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: minkowski  | neighbours: 7
+Accuracy self:  0.9396135265700483
+Accuracy f1 score weighted: 0.9348046037592685
+Accuracy f1 score: 0.86628
+Accuracy youden score: 0.87133
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: minkowski  | neighbours: 9
+Accuracy self:  0.927536231884058
+Accuracy f1 score weighted: 0.9197994039607658
+Accuracy f1 score: 0.78577
+Accuracy youden score: 0.79835
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: minkowski  | neighbours: 11
+Accuracy self:  0.9227053140096618
+Accuracy f1 score weighted: 0.9129272585617677
+Accuracy f1 score: 0.7827
+Accuracy youden score: 0.79124
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: minkowski  | neighbours: 13
+Accuracy self:  0.9178743961352657
+Accuracy f1 score weighted: 0.9060019293153185
+Accuracy f1 score: 0.76254
+Accuracy youden score: 0.76825
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: minkowski  | neighbours: 15
+Accuracy self:  0.9130434782608695
+Accuracy f1 score weighted: 0.901107543938858
+Accuracy f1 score: 0.75888
+Accuracy youden score: 0.76326
+--------------------------------------------------------------
+////////////////////////////////////////////
+Folder: 20
+> Type: mean_std_
+PARAMETER:  weights: uniform | metric: manhattan  | neighbours: 3
+Accuracy self:  0.9565217391304348
+Accuracy f1 score weighted: 0.9534755019859823
+Accuracy f1 score: 0.89338
+Accuracy youden score: 0.90134
+--------------------------------------------------------------
+PARAMETER:  weights: uniform | metric: manhattan  | neighbours: 5
+Accuracy self:  0.9444444444444444
+Accuracy f1 score weighted: 0.9382551895418814
+Accuracy f1 score: 0.84715
+Accuracy youden score: 0.86573
+--------------------------------------------------------------
+PARAMETER:  weights: uniform | metric: manhattan  | neighbours: 7
+Accuracy self:  0.927536231884058
+Accuracy f1 score weighted: 0.9170262253419721
+Accuracy f1 score: 0.74324
+Accuracy youden score: 0.76794
+--------------------------------------------------------------
+PARAMETER:  weights: uniform | metric: manhattan  | neighbours: 9
+Accuracy self:  0.9227053140096618
+Accuracy f1 score weighted: 0.9093098644660214
+Accuracy f1 score: 0.71684
+Accuracy youden score: 0.73808
+--------------------------------------------------------------
+PARAMETER:  weights: uniform | metric: chebyshev  | neighbours: 3
+Accuracy self:  0.9371980676328503
+Accuracy f1 score weighted: 0.9329925728599576
+Accuracy f1 score: 0.88149
+Accuracy youden score: 0.89774
+--------------------------------------------------------------
+PARAMETER:  weights: uniform | metric: chebyshev  | neighbours: 5
+Accuracy self:  0.927536231884058
+Accuracy f1 score weighted: 0.9199570094767822
+Accuracy f1 score: 0.77814
+Accuracy youden score: 0.80919
+--------------------------------------------------------------
+PARAMETER:  weights: uniform | metric: chebyshev  | neighbours: 7
+Accuracy self:  0.9082125603864735
+Accuracy f1 score weighted: 0.8976023951137042
+Accuracy f1 score: 0.7409
+Accuracy youden score: 0.75366
+--------------------------------------------------------------
+PARAMETER:  weights: uniform | metric: minkowski  | neighbours: 3
+Accuracy self:  0.9371980676328503
+Accuracy f1 score weighted: 0.9306695189255845
+Accuracy f1 score: 0.83935
+Accuracy youden score: 0.85791
+--------------------------------------------------------------
+PARAMETER:  weights: uniform | metric: minkowski  | neighbours: 5
+Accuracy self:  0.9323671497584541
+Accuracy f1 score weighted: 0.925681441665709
+Accuracy f1 score: 0.8118
+Accuracy youden score: 0.8377
+--------------------------------------------------------------
+PARAMETER:  weights: uniform | metric: minkowski  | neighbours: 7
+Accuracy self:  0.9106280193236715
+Accuracy f1 score weighted: 0.9008756092376983
+Accuracy f1 score: 0.74054
+Accuracy youden score: 0.75895
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: manhattan  | neighbours: 3
+Accuracy self:  0.9589371980676329
+Accuracy f1 score weighted: 0.9559798053898358
+Accuracy f1 score: 0.89493
+Accuracy youden score: 0.90285
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: manhattan  | neighbours: 5
+Accuracy self:  0.9516908212560387
+Accuracy f1 score weighted: 0.9462805286610559
+Accuracy f1 score: 0.87999
+Accuracy youden score: 0.89072
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: manhattan  | neighbours: 7
+Accuracy self:  0.9371980676328503
+Accuracy f1 score weighted: 0.9301594358974651
+Accuracy f1 score: 0.82013
+Accuracy youden score: 0.83757
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: manhattan  | neighbours: 9
+Accuracy self:  0.9444444444444444
+Accuracy f1 score weighted: 0.9369355018794144
+Accuracy f1 score: 0.82588
+Accuracy youden score: 0.84115
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: manhattan  | neighbours: 11
+Accuracy self:  0.9371980676328503
+Accuracy f1 score weighted: 0.9282508980324284
+Accuracy f1 score: 0.80416
+Accuracy youden score: 0.81655
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: manhattan  | neighbours: 13
+Accuracy self:  0.9178743961352657
+Accuracy f1 score weighted: 0.9072798692995471
+Accuracy f1 score: 0.76801
+Accuracy youden score: 0.77856
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: manhattan  | neighbours: 15
+Accuracy self:  0.9106280193236715
+Accuracy f1 score weighted: 0.8999057289659346
+Accuracy f1 score: 0.75883
+Accuracy youden score: 0.76594
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: chebyshev  | neighbours: 3
+Accuracy self:  0.9420289855072463
+Accuracy f1 score weighted: 0.9389927220308748
+Accuracy f1 score: 0.91516
+Accuracy youden score: 0.92343
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: chebyshev  | neighbours: 5
+Accuracy self:  0.9420289855072463
+Accuracy f1 score weighted: 0.93848784564131
+Accuracy f1 score: 0.89722
+Accuracy youden score: 0.90412
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: chebyshev  | neighbours: 7
+Accuracy self:  0.9251207729468599
+Accuracy f1 score weighted: 0.9197816687049364
+Accuracy f1 score: 0.86277
+Accuracy youden score: 0.87113
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: chebyshev  | neighbours: 9
+Accuracy self:  0.9130434782608695
+Accuracy f1 score weighted: 0.902363388792172
+Accuracy f1 score: 0.77096
+Accuracy youden score: 0.78297
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: chebyshev  | neighbours: 11
+Accuracy self:  0.9227053140096618
+Accuracy f1 score weighted: 0.9108320571346524
+Accuracy f1 score: 0.76463
+Accuracy youden score: 0.771
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: chebyshev  | neighbours: 13
+Accuracy self:  0.9178743961352657
+Accuracy f1 score weighted: 0.9046882330998749
+Accuracy f1 score: 0.75708
+Accuracy youden score: 0.76468
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: chebyshev  | neighbours: 15
+Accuracy self:  0.9154589371980676
+Accuracy f1 score weighted: 0.9022113759330505
+Accuracy f1 score: 0.75621
+Accuracy youden score: 0.76316
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: minkowski  | neighbours: 3
+Accuracy self:  0.9420289855072463
+Accuracy f1 score weighted: 0.9366014590800974
+Accuracy f1 score: 0.87202
+Accuracy youden score: 0.88273
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: minkowski  | neighbours: 5
+Accuracy self:  0.9420289855072463
+Accuracy f1 score weighted: 0.9383394847821003
+Accuracy f1 score: 0.89811
+Accuracy youden score: 0.90782
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: minkowski  | neighbours: 7
+Accuracy self:  0.9347826086956522
+Accuracy f1 score weighted: 0.9299340115287417
+Accuracy f1 score: 0.8705
+Accuracy youden score: 0.88127
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: minkowski  | neighbours: 9
+Accuracy self:  0.9227053140096618
+Accuracy f1 score weighted: 0.9128811968639627
+Accuracy f1 score: 0.77842
+Accuracy youden score: 0.79426
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: minkowski  | neighbours: 11
+Accuracy self:  0.9178743961352657
+Accuracy f1 score weighted: 0.906638942635827
+Accuracy f1 score: 0.77348
+Accuracy youden score: 0.7858
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: minkowski  | neighbours: 13
+Accuracy self:  0.9154589371980676
+Accuracy f1 score weighted: 0.902191166523883
+Accuracy f1 score: 0.75453
+Accuracy youden score: 0.76393
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: minkowski  | neighbours: 15
+Accuracy self:  0.9106280193236715
+Accuracy f1 score weighted: 0.8989697739313556
+Accuracy f1 score: 0.75829
+Accuracy youden score: 0.76281
+--------------------------------------------------------------
+////////////////////////////////////////////
+Folder: 25
+> Type:
+////////////////////////////////////////////
+Folder: 25
+> Type: mean_
+PARAMETER:  weights: uniform | metric: manhattan  | neighbours: 3
+Accuracy self:  0.9347826086956522
+Accuracy f1 score weighted: 0.9286182853323112
+Accuracy f1 score: 0.82399
+Accuracy youden score: 0.83427
+--------------------------------------------------------------
+PARAMETER:  weights: uniform | metric: manhattan  | neighbours: 5
+Accuracy self:  0.9299516908212561
+Accuracy f1 score weighted: 0.9221256707050648
+Accuracy f1 score: 0.80134
+Accuracy youden score: 0.8106
+--------------------------------------------------------------
+PARAMETER:  weights: uniform | metric: manhattan  | neighbours: 7
+Accuracy self:  0.9154589371980676
+Accuracy f1 score weighted: 0.9042209054679676
+Accuracy f1 score: 0.7267
+Accuracy youden score: 0.74687
+--------------------------------------------------------------
+PARAMETER:  weights: uniform | metric: manhattan  | neighbours: 9
+Accuracy self:  0.9082125603864735
+Accuracy f1 score weighted: 0.8968249118922943
+Accuracy f1 score: 0.72423
+Accuracy youden score: 0.74178
+--------------------------------------------------------------
+PARAMETER:  weights: uniform | metric: chebyshev  | neighbours: 3
+Accuracy self:  0.9371980676328503
+Accuracy f1 score weighted: 0.9290835345516508
+Accuracy f1 score: 0.82619
+Accuracy youden score: 0.83715
+--------------------------------------------------------------
+PARAMETER:  weights: uniform | metric: chebyshev  | neighbours: 5
+Accuracy self:  0.9202898550724637
+Accuracy f1 score weighted: 0.9120875835272227
+Accuracy f1 score: 0.75215
+Accuracy youden score: 0.78088
+--------------------------------------------------------------
+PARAMETER:  weights: uniform | metric: chebyshev  | neighbours: 7
+Accuracy self:  0.9082125603864735
+Accuracy f1 score weighted: 0.8948503594742094
+Accuracy f1 score: 0.6807
+Accuracy youden score: 0.70308
+--------------------------------------------------------------
+PARAMETER:  weights: uniform | metric: chebyshev  | neighbours: 9
+Accuracy self:  0.9033816425120773
+Accuracy f1 score weighted: 0.8862196869081403
+Accuracy f1 score: 0.64843
+Accuracy youden score: 0.66969
+--------------------------------------------------------------
+PARAMETER:  weights: uniform | metric: minkowski  | neighbours: 3
+Accuracy self:  0.9299516908212561
+Accuracy f1 score weighted: 0.9223431617015552
+Accuracy f1 score: 0.81689
+Accuracy youden score: 0.82959
+--------------------------------------------------------------
+PARAMETER:  weights: uniform | metric: minkowski  | neighbours: 5
+Accuracy self:  0.927536231884058
+Accuracy f1 score weighted: 0.9198029346898453
+Accuracy f1 score: 0.79327
+Accuracy youden score: 0.80841
+--------------------------------------------------------------
+PARAMETER:  weights: uniform | metric: minkowski  | neighbours: 7
+Accuracy self:  0.9178743961352657
+Accuracy f1 score weighted: 0.9082207528329354
+Accuracy f1 score: 0.72501
+Accuracy youden score: 0.74611
+--------------------------------------------------------------
+PARAMETER:  weights: uniform | metric: minkowski  | neighbours: 9
+Accuracy self:  0.9082125603864735
+Accuracy f1 score weighted: 0.8930376279509096
+Accuracy f1 score: 0.67332
+Accuracy youden score: 0.69285
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: manhattan  | neighbours: 3
+Accuracy self:  0.9347826086956522
+Accuracy f1 score weighted: 0.9303434458885262
+Accuracy f1 score: 0.82263
+Accuracy youden score: 0.8339
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: manhattan  | neighbours: 5
+Accuracy self:  0.9347826086956522
+Accuracy f1 score weighted: 0.9268176294182413
+Accuracy f1 score: 0.80348
+Accuracy youden score: 0.81151
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: manhattan  | neighbours: 7
+Accuracy self:  0.9299516908212561
+Accuracy f1 score weighted: 0.9206161130771487
+Accuracy f1 score: 0.77661
+Accuracy youden score: 0.7891
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: manhattan  | neighbours: 9
+Accuracy self:  0.9251207729468599
+Accuracy f1 score weighted: 0.9162390662891281
+Accuracy f1 score: 0.7714
+Accuracy youden score: 0.78627
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: manhattan  | neighbours: 11
+Accuracy self:  0.9178743961352657
+Accuracy f1 score weighted: 0.9082021976238249
+Accuracy f1 score: 0.76366
+Accuracy youden score: 0.78093
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: manhattan  | neighbours: 13
+Accuracy self:  0.9178743961352657
+Accuracy f1 score weighted: 0.9068388109073835
+Accuracy f1 score: 0.76505
+Accuracy youden score: 0.77259
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: manhattan  | neighbours: 15
+Accuracy self:  0.9130434782608695
+Accuracy f1 score weighted: 0.9017011659230082
+Accuracy f1 score: 0.75567
+Accuracy youden score: 0.75968
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: chebyshev  | neighbours: 3
+Accuracy self:  0.9371980676328503
+Accuracy f1 score weighted: 0.9301722241862083
+Accuracy f1 score: 0.82238
+Accuracy youden score: 0.83715
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: chebyshev  | neighbours: 5
+Accuracy self:  0.9251207729468599
+Accuracy f1 score weighted: 0.9181653761179585
+Accuracy f1 score: 0.78536
+Accuracy youden score: 0.80652
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: chebyshev  | neighbours: 7
+Accuracy self:  0.9251207729468599
+Accuracy f1 score weighted: 0.9143284907773864
+Accuracy f1 score: 0.73368
+Accuracy youden score: 0.75585
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: chebyshev  | neighbours: 9
+Accuracy self:  0.9251207729468599
+Accuracy f1 score weighted: 0.91400432222924
+Accuracy f1 score: 0.76766
+Accuracy youden score: 0.77594
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: chebyshev  | neighbours: 11
+Accuracy self:  0.9130434782608695
+Accuracy f1 score weighted: 0.9017854410653185
+Accuracy f1 score: 0.75894
+Accuracy youden score: 0.76794
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: chebyshev  | neighbours: 13
+Accuracy self:  0.9082125603864735
+Accuracy f1 score weighted: 0.8968116669610141
+Accuracy f1 score: 0.74909
+Accuracy youden score: 0.75265
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: minkowski  | neighbours: 3
+Accuracy self:  0.9299516908212561
+Accuracy f1 score weighted: 0.9229387209849549
+Accuracy f1 score: 0.81765
+Accuracy youden score: 0.82959
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: minkowski  | neighbours: 5
+Accuracy self:  0.9323671497584541
+Accuracy f1 score weighted: 0.925131760435617
+Accuracy f1 score: 0.7957
+Accuracy youden score: 0.8097
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: minkowski  | neighbours: 7
+Accuracy self:  0.9323671497584541
+Accuracy f1 score weighted: 0.9238808609182122
+Accuracy f1 score: 0.77169
+Accuracy youden score: 0.78791
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: minkowski  | neighbours: 9
+Accuracy self:  0.9347826086956522
+Accuracy f1 score weighted: 0.9249572516672725
+Accuracy f1 score: 0.77386
+Accuracy youden score: 0.78525
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: minkowski  | neighbours: 11
+Accuracy self:  0.9202898550724637
+Accuracy f1 score weighted: 0.9091784791736442
+Accuracy f1 score: 0.76634
+Accuracy youden score: 0.77434
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: minkowski  | neighbours: 13
+Accuracy self:  0.9130434782608695
+Accuracy f1 score weighted: 0.901731700734607
+Accuracy f1 score: 0.75239
+Accuracy youden score: 0.75606
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: minkowski  | neighbours: 15
+Accuracy self:  0.9057971014492754
+Accuracy f1 score weighted: 0.8942678027552812
+Accuracy f1 score: 0.74098
+Accuracy youden score: 0.74126
+--------------------------------------------------------------
+////////////////////////////////////////////
+Folder: 25
+> Type: mean_std_
+PARAMETER:  weights: uniform | metric: manhattan  | neighbours: 3
+Accuracy self:  0.9516908212560387
+Accuracy f1 score weighted: 0.9465581069508586
+Accuracy f1 score: 0.87684
+Accuracy youden score: 0.88956
+--------------------------------------------------------------
+PARAMETER:  weights: uniform | metric: manhattan  | neighbours: 5
+Accuracy self:  0.9396135265700483
+Accuracy f1 score weighted: 0.9339993214012069
+Accuracy f1 score: 0.84075
+Accuracy youden score: 0.86406
+--------------------------------------------------------------
+PARAMETER:  weights: uniform | metric: manhattan  | neighbours: 7
+Accuracy self:  0.9299516908212561
+Accuracy f1 score weighted: 0.9222467918532733
+Accuracy f1 score: 0.76189
+Accuracy youden score: 0.79272
+--------------------------------------------------------------
+PARAMETER:  weights: uniform | metric: manhattan  | neighbours: 9
+Accuracy self:  0.9130434782608695
+Accuracy f1 score weighted: 0.9044918842606926
+Accuracy f1 score: 0.71967
+Accuracy youden score: 0.73948
+--------------------------------------------------------------
+PARAMETER:  weights: uniform | metric: chebyshev  | neighbours: 3
+Accuracy self:  0.9396135265700483
+Accuracy f1 score weighted: 0.9375921383119684
+Accuracy f1 score: 0.90144
+Accuracy youden score: 0.91417
+--------------------------------------------------------------
+PARAMETER:  weights: uniform | metric: chebyshev  | neighbours: 5
+Accuracy self:  0.9371980676328503
+Accuracy f1 score weighted: 0.932474317269742
+Accuracy f1 score: 0.82161
+Accuracy youden score: 0.84885
+--------------------------------------------------------------
+PARAMETER:  weights: uniform | metric: chebyshev  | neighbours: 7
+Accuracy self:  0.9033816425120773
+Accuracy f1 score weighted: 0.8904747659260052
+Accuracy f1 score: 0.6975
+Accuracy youden score: 0.72962
+--------------------------------------------------------------
+PARAMETER:  weights: uniform | metric: chebyshev  | neighbours: 9
+Accuracy self:  0.9082125603864735
+Accuracy f1 score weighted: 0.8914889655153361
+Accuracy f1 score: 0.66863
+Accuracy youden score: 0.69758
+--------------------------------------------------------------
+PARAMETER:  weights: uniform | metric: minkowski  | neighbours: 3
+Accuracy self:  0.9420289855072463
+Accuracy f1 score weighted: 0.9403796404177793
+Accuracy f1 score: 0.89944
+Accuracy youden score: 0.91305
+--------------------------------------------------------------
+PARAMETER:  weights: uniform | metric: minkowski  | neighbours: 5
+Accuracy self:  0.927536231884058
+Accuracy f1 score weighted: 0.9228186254301549
+Accuracy f1 score: 0.82725
+Accuracy youden score: 0.84763
+--------------------------------------------------------------
+PARAMETER:  weights: uniform | metric: minkowski  | neighbours: 7
+Accuracy self:  0.9227053140096618
+Accuracy f1 score weighted: 0.9161267189709958
+Accuracy f1 score: 0.76727
+Accuracy youden score: 0.78826
+--------------------------------------------------------------
+PARAMETER:  weights: uniform | metric: minkowski  | neighbours: 9
+Accuracy self:  0.9154589371980676
+Accuracy f1 score weighted: 0.9006372122115516
+Accuracy f1 score: 0.69675
+Accuracy youden score: 0.72683
+--------------------------------------------------------------
+PARAMETER:  weights: uniform | metric: minkowski  | neighbours: 11
+Accuracy self:  0.9033816425120773
+Accuracy f1 score weighted: 0.8899418689331564
+Accuracy f1 score: 0.6997
+Accuracy youden score: 0.71907
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: manhattan  | neighbours: 3
+Accuracy self:  0.9541062801932367
+Accuracy f1 score weighted: 0.9490624103547123
+Accuracy f1 score: 0.87839
+Accuracy youden score: 0.89108
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: manhattan  | neighbours: 5
+Accuracy self:  0.9420289855072463
+Accuracy f1 score weighted: 0.9375926841159242
+Accuracy f1 score: 0.87142
+Accuracy youden score: 0.88632
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: manhattan  | neighbours: 7
+Accuracy self:  0.9444444444444444
+Accuracy f1 score weighted: 0.9383525499462156
+Accuracy f1 score: 0.8512
+Accuracy youden score: 0.86517
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: manhattan  | neighbours: 9
+Accuracy self:  0.9396135265700483
+Accuracy f1 score weighted: 0.9348945770170457
+Accuracy f1 score: 0.83832
+Accuracy youden score: 0.85176
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: manhattan  | neighbours: 11
+Accuracy self:  0.9251207729468599
+Accuracy f1 score weighted: 0.9165730215216245
+Accuracy f1 score: 0.78243
+Accuracy youden score: 0.79511
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: manhattan  | neighbours: 13
+Accuracy self:  0.9251207729468599
+Accuracy f1 score weighted: 0.9156264932115189
+Accuracy f1 score: 0.78963
+Accuracy youden score: 0.80432
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: manhattan  | neighbours: 15
+Accuracy self:  0.9154589371980676
+Accuracy f1 score weighted: 0.9043504364693861
+Accuracy f1 score: 0.75969
+Accuracy youden score: 0.76661
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: chebyshev  | neighbours: 3
+Accuracy self:  0.9420289855072463
+Accuracy f1 score weighted: 0.9408174557323389
+Accuracy f1 score: 0.902
+Accuracy youden score: 0.91569
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: chebyshev  | neighbours: 5
+Accuracy self:  0.9444444444444444
+Accuracy f1 score weighted: 0.9397334115089235
+Accuracy f1 score: 0.86005
+Accuracy youden score: 0.87571
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: chebyshev  | neighbours: 7
+Accuracy self:  0.9299516908212561
+Accuracy f1 score weighted: 0.9212054968576929
+Accuracy f1 score: 0.8037
+Accuracy youden score: 0.83087
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: chebyshev  | neighbours: 9
+Accuracy self:  0.9323671497584541
+Accuracy f1 score weighted: 0.9224577673210227
+Accuracy f1 score: 0.81309
+Accuracy youden score: 0.83064
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: chebyshev  | neighbours: 11
+Accuracy self:  0.9299516908212561
+Accuracy f1 score weighted: 0.921273087790308
+Accuracy f1 score: 0.81592
+Accuracy youden score: 0.83045
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: chebyshev  | neighbours: 13
+Accuracy self:  0.9178743961352657
+Accuracy f1 score weighted: 0.9092927222664682
+Accuracy f1 score: 0.80191
+Accuracy youden score: 0.80921
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: chebyshev  | neighbours: 15
+Accuracy self:  0.9033816425120773
+Accuracy f1 score weighted: 0.8893208490350871
+Accuracy f1 score: 0.71927
+Accuracy youden score: 0.72745
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: minkowski  | neighbours: 3
+Accuracy self:  0.9396135265700483
+Accuracy f1 score weighted: 0.9389027403270284
+Accuracy f1 score: 0.89272
+Accuracy youden score: 0.91231
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: minkowski  | neighbours: 5
+Accuracy self:  0.9420289855072463
+Accuracy f1 score weighted: 0.9389207405883765
+Accuracy f1 score: 0.88899
+Accuracy youden score: 0.89685
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: minkowski  | neighbours: 7
+Accuracy self:  0.9347826086956522
+Accuracy f1 score weighted: 0.9316797176398252
+Accuracy f1 score: 0.85569
+Accuracy youden score: 0.87111
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: minkowski  | neighbours: 9
+Accuracy self:  0.9323671497584541
+Accuracy f1 score weighted: 0.92267990861364
+Accuracy f1 score: 0.8092
+Accuracy youden score: 0.83103
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: minkowski  | neighbours: 11
+Accuracy self:  0.9371980676328503
+Accuracy f1 score weighted: 0.9285865933572262
+Accuracy f1 score: 0.82333
+Accuracy youden score: 0.83754
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: minkowski  | neighbours: 13
+Accuracy self:  0.9251207729468599
+Accuracy f1 score weighted: 0.9166123107588641
+Accuracy f1 score: 0.80829
+Accuracy youden score: 0.8186
+--------------------------------------------------------------
+PARAMETER:  weights: distance | metric: minkowski  | neighbours: 15
+Accuracy self:  0.9202898550724637
+Accuracy f1 score weighted: 0.9095151532126063
+Accuracy f1 score: 0.75891
+Accuracy youden score: 0.76539
+--------------------------------------------------------------
+
+Process finished with exit code 0

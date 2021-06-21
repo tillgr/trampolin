@@ -47,15 +47,10 @@ if __name__ == '__main__':
 
             # we create an instance of Neighbours Classifier and fit the data.
             for estimator in [100]:
-                for depth in [1, 2]:
-                    for learning_rate in [0.1, 0.01, 0.001, 0.0001]:
+                for depth in [1, 2, 3, 4, 5]:
+                    for learning_rate in [0.1, 0.01]:
                         clf = GradientBoostingClassifier(n_estimators=estimator, learning_rate=learning_rate,
                         max_depth=depth, random_state=2)
-
-                        print('///////////////////////////////////////////////////////////////')
-                        print(f"estimators: {estimator}")
-                        print(f"learning_rate: {learning_rate}")
-                        print(f"depth: {depth}")
 
                         # for i in range(0, 4):
                             # Train the model using the training sets
@@ -65,9 +60,9 @@ if __name__ == '__main__':
                         y_pred = clf.predict(X_test)
 
                         # compare test and predicted targets
-                        #print(f"PARAMETER:  weights: {weights} | metric: {dist_metrics}")
+                        print(f"PARAMETER:  estimators: {estimator} | learning_rate: {learning_rate} | depth: {depth}")
                         print(f"Accuracy self: ", metrics.accuracy_score(y_test, y_pred))
-                        print(f"Accuracy f1 score weighted: {f1_score(y_test, y_pred, average='weighted')} ")
+                        #print(f"Accuracy f1 score weighted: {f1_score(y_test, y_pred, average='weighted')} ")
                         mean_prec, mean_rec, mean_f, mean_youden = rc_metrics(y_test, y_pred)
                         print(f"Accuracy f1 score: {str(mean_f.round(5))}")
                         print(f"Accuracy youden score: {str(mean_youden.round(5))}")

@@ -1,0 +1,129 @@
+"C:\Users\Till\OneDrive\UNI\KP DBAnw\Trampolin\venv\Scripts\python.exe" "C:/Users/Till/OneDrive/UNI/KP DBAnw/Trampolin/kNN/kNN_metric_table.py"
+////////////////////////////////////////////
+Folder: 1
+> Type:
+Accuracy:  0.9541
+Accuracy youden score: 0.8857
+Accuracy f1 score: 0.8754
+--------------------------------------------------------------
+////////////////////////////////////////////
+Folder: 1
+> Type: mean_
+Accuracy:  0.9517
+Accuracy youden score: 0.8623
+Accuracy f1 score: 0.852
+--------------------------------------------------------------
+////////////////////////////////////////////
+Folder: 1
+> Type: mean_std_
+Accuracy:  0.9517
+Accuracy youden score: 0.8623
+Accuracy f1 score: 0.852
+--------------------------------------------------------------
+////////////////////////////////////////////
+Folder: 2
+> Type:
+Accuracy:  0.9469
+Accuracy youden score: 0.8605
+Accuracy f1 score: 0.8501
+--------------------------------------------------------------
+////////////////////////////////////////////
+Folder: 2
+> Type: mean_
+Accuracy:  0.9541
+Accuracy youden score: 0.8682
+Accuracy f1 score: 0.8555
+--------------------------------------------------------------
+////////////////////////////////////////////
+Folder: 2
+> Type: mean_std_
+Accuracy:  0.9517
+Accuracy youden score: 0.8623
+Accuracy f1 score: 0.852
+--------------------------------------------------------------
+////////////////////////////////////////////
+Folder: 5
+> Type:
+Accuracy:  0.9469
+Accuracy youden score: 0.86
+Accuracy f1 score: 0.8498
+--------------------------------------------------------------
+////////////////////////////////////////////
+Folder: 5
+> Type: mean_
+Accuracy:  0.9493
+Accuracy youden score: 0.8653
+Accuracy f1 score: 0.8527
+--------------------------------------------------------------
+////////////////////////////////////////////
+Folder: 5
+> Type: mean_std_
+Accuracy:  0.9541
+Accuracy youden score: 0.8682
+Accuracy f1 score: 0.8555
+--------------------------------------------------------------
+////////////////////////////////////////////
+Folder: 10
+> Type:
+Accuracy:  0.9541
+Accuracy youden score: 0.9365
+Accuracy f1 score: 0.9281
+--------------------------------------------------------------
+////////////////////////////////////////////
+Folder: 10
+> Type: mean_
+Accuracy:  0.9565
+Accuracy youden score: 0.8915
+Accuracy f1 score: 0.8791
+--------------------------------------------------------------
+////////////////////////////////////////////
+Folder: 10
+> Type: mean_std_
+Accuracy:  0.9541
+Accuracy youden score: 0.89
+Accuracy f1 score: 0.8776
+--------------------------------------------------------------
+////////////////////////////////////////////
+Folder: 20
+> Type:
+Accuracy:  0.9493
+Accuracy youden score: 0.912
+Accuracy f1 score: 0.8986
+--------------------------------------------------------------
+////////////////////////////////////////////
+Folder: 20
+> Type: mean_
+Accuracy:  0.9469
+Accuracy youden score: 0.8651
+Accuracy f1 score: 0.8515
+--------------------------------------------------------------
+////////////////////////////////////////////
+Folder: 20
+> Type: mean_std_
+Accuracy:  0.9517
+Accuracy youden score: 0.8899
+Accuracy f1 score: 0.878
+--------------------------------------------------------------
+////////////////////////////////////////////
+Folder: 25
+> Type:
+Accuracy:  0.93
+Accuracy youden score: 0.893
+Accuracy f1 score: 0.8864
+--------------------------------------------------------------
+////////////////////////////////////////////
+Folder: 25
+> Type: mean_
+Accuracy:  0.942
+Accuracy youden score: 0.8646
+Accuracy f1 score: 0.8531
+--------------------------------------------------------------
+////////////////////////////////////////////
+Folder: 25
+> Type: mean_std_
+Accuracy:  0.9517
+Accuracy youden score: 0.8902
+Accuracy f1 score: 0.8779
+--------------------------------------------------------------
+
+Process finished with exit code 0

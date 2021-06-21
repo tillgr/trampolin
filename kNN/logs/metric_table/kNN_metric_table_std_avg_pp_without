@@ -1,0 +1,17 @@
+[avg]
+Accuracy:  0.744
+Accuracy youden score: 0.7163
+Accuracy f1 score: 0.7081
+--------------------------------------------------------------
+
+[std]
+Accuracy:  0.7029
+Accuracy youden score: 0.6344
+Accuracy f1 score: 0.6239
+--------------------------------------------------------------
+
+[std_avg]
+Accuracy:  0.9179
+Accuracy youden score: 0.8607
+Accuracy f1 score: 0.8548
+--------------------------------------------------------------
