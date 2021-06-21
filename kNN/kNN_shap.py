@@ -8,6 +8,7 @@ from sklearn import metrics
 from sklearn import neighbors
 from sklearn.metrics import accuracy_score, plot_confusion_matrix, confusion_matrix
 from random_classifier import metrics as rc_metrics
+import time
 
 
 def sample_x_test(x_test, y_test, num):
@@ -96,9 +97,16 @@ if __name__ == '__main__':
     shap_x_test, shap_y_test = sample_x_test(X_test, y_test, 3)
     shap_x_train, shap_y_train = sample_x_test(X_train, y_train, 6)
 
-    f = lambda x: clf.predict_proba(x)[:, 1]
+    ''' f = lambda x: clf.predict_proba(x)[:, 1]
     explainer = shap.KernelExplainer(f, shap_x_train)
+    shap_values = explainer.shap_values(shap_x_test)'''
+
+    f = lambda x: clf.predict_proba(x)[:, 1]
+    # med = shap_x_test.median().values.reshape((1, shap_x_test.shape[1]))
+    explainer = shap.KernelExplainer(f, shap.kmeans(shap_x_train, 10))
     shap_values = explainer.shap_values(shap_x_test)
+
+    print(shap_values)
 
     shap.summary_plot(shap_values, shap_x_test, plot_type='bar', plot_size=(20, 17), color=ListedColormap(cmap),
                       class_names=shap_y_test.unique(), max_display=20)
@@ -111,6 +119,7 @@ if __name__ == '__main__':
     shap.summary_plot(shap_values[saltoB], shap_x_test, plot_size=(12, 12), title='Salto B')
     saltoC = np.where(shap_y_test.unique() == 'Salto C')[0][0]
     shap.summary_plot(shap_values[saltoC], shap_x_test, plot_size=(12, 12), title='Salto C')
+
     cm = confusion_matrix(y_test, y_pred)
     fig, ax = plt.subplots(figsize=(20, 20))
     plot_confusion_matrix(clf, shap_x_test, shap_y_test, xticks_rotation='vertical', display_labels=set(y_test), cmap=plt.cm.Blues, normalize=None, ax = ax)

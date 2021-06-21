@@ -1,11 +1,10 @@
 Best config:
 
-[10 mean_std]
+[20 mean_std]
 PARAMETER:  weights: uniform | metric: manhattan  | neighbours: 3
-Accuracy self:  0.9541062801932367
-Accuracy f1 score weighted: 0.9485320421334029
-Accuracy f1 score: 0.87994
-Accuracy youden score: 0.89012
+Accuracy self:  0.9589
+Accuracy f1 score: 0.8949
+Accuracy youden score: 0.9028
 
 
 
