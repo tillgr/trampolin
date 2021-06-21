@@ -375,10 +375,13 @@ def main():
     shap_x_test, shap_y_test = sample_x_test(x_test, y_test, 3, cnn=True)
     shap_x_train, shap_y_train = sample_x_test(x_train, y_train, 6, cnn=True)
 
-    e = shap.DeepExplainer(model, shap_x_train)
-    shap_values = e.shap_values(shap_x_test)
-    shap.image_plot(shap_values, -shap_x_test[[0, 1]])
-    shap.force_plot(e.expected_value[0], shap_values[0])
+    to_explain = shap_x_train[[0, 1, 2, 3]]
+
+    explainer = shap.DeepExplainer(model, shap_x_train)
+    shap_values, indexes = explainer.shap_values(to_explain, ranked_outputs=4, check_additivity=False)
+    index_names = np.vectorize(lambda i: shap_y_test.unique()[i])(indexes)
+
+    shap.image_plot(shap_values, to_explain, index_names)
 
     """
     # Shap for specific Class
