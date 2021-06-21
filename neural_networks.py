@@ -384,8 +384,20 @@ def main():
 
     # CNN
     #"""
+    class_names = {
+        27: '1 3/4 Salto vw B', 14: '1 3/4 Salto vw C', 32: '1/2 ein 1/2 aus C', 40: '3/4 Salto rw A', 33: '3/4 Salto vw A', 13: 'Baby- Fliffis C',
+        28: 'Barani A', 35: 'Barani B', 21: 'Barani C', 18: 'Cody C', 17: 'Rudi',
+        30: 'Bauchsprung', 20: 'Bücksprung', 10: 'Grätschwinkel', 34: 'Hocksprung', 38: 'Von Bauch in Stand', 4: 'Strecksprung',
+        1: 'Fliffis B', 39: 'Fliffis C', 29: 'Fliffis aus B', 23: 'Fliffis aus C', 11: 'Fliffis- Rudi B', 31: 'Fliffis- Rudi C',
+        8: 'Halb ein Triffis C', 22: 'Triffis B', 7: 'Triffis C',
+        24: 'Salto A', 36: 'Salto B', 37: 'Salto C', 0: 'Salto rw A', 6: 'Salto rw B', 16: 'Salto rw C',
+        9: 'Schraubensalto', 19: 'Schraubensalto A', 2: 'Schraubensalto C', 41: 'Doppelsalto B', 5: 'Doppelsalto C',
+        25: 'Voll- ein 1 3/4 Salto vw C', 26: 'Voll- ein- Rudi- aus B', 42: 'Voll- ein- halb- aus B', 15: 'Voll- ein- voll- aus A', 3: 'Voll- ein- voll- aus B', 12: 'Voll- ein- voll- aus C'
+    }
+
     shap_x_test, shap_y_test = sample_x_test(x_test, y_test, 3, cnn=True)
     shap_x_train, shap_y_train = sample_x_test(x_train, y_train, 6, cnn=True)
+
     parts = {1: ['1 3/4 Salto vw B', '1 3/4 Salto vw C', '1/2 ein 1/2 aus C', '3/4 Salto rw A', '3/4 Salto vw A', 'Baby- Fliffis C'],
              2: ['Barani A', 'Barani B', 'Barani C', 'Cody C', 'Rudi'],
              3: ['Bauchsprung', 'Bücksprung', 'Grätschwinkel', 'Hocksprung', 'Von Bauch in Stand', 'Strecksprung'],
@@ -394,25 +406,26 @@ def main():
              6: ['Salto A', 'Salto B', 'Salto C', 'Salto rw A', 'Salto rw B', 'Salto rw C'],
              7: ['Schraubensalto', 'Schraubensalto A', 'Schraubensalto C',  'Doppelsalto B', 'Doppelsalto C'],
              8: ['Voll- ein 1 3/4 Salto vw C', 'Voll- ein- Rudi- aus B', 'Voll- ein- halb- aus B', 'Voll- ein- voll- aus A', 'Voll- ein- voll- aus B', 'Voll- ein- voll- aus C']}
+
     for j in [1, 2, 3, 4, 5, 6, 7, 8]:
         index_list = get_index(parts[j], shap_y_test)
         to_explain = shap_x_test[index_list]
         explainer = shap.DeepExplainer(model, shap_x_train)
         shap_values, indexes = explainer.shap_values(to_explain, ranked_outputs=4, check_additivity=False)
-        index_names = np.vectorize(lambda i: shap_y_test.unique()[i])(indexes)
+        index_names = np.vectorize(lambda i: class_names[i])(indexes)
 
         shap.image_plot(shap_values, to_explain, index_names)
         # plt.savefig('plots/CNN/with_preprocessed/AJ/CNN_with_mean_std_20_AJ_part' + str(j) + '.png')
 
     """
-    1: '1 3/4 Salto vw B', '1 3/4 Salto vw C', '1/2 ein 1/2 aus C', '3/4 Salto rw A', '3/4 Salto vw A', 'Baby- Fliffis C',
-    2: 'Barani A', 'Barani B', 'Barani C', 'Cody C', 'Rudi', 
-    3: 'Bauchsprung', 'Bücksprung', 'Grätschwinkel', 'Hocksprung', 'Von Bauch in Stand', 'Strecksprung'
-    4: 'Fliffis B', 'Fliffis C', 'Fliffis aus B', 'Fliffis aus C', 'Fliffis- Rudi B', 'Fliffis- Rudi C', 
-    5: 'Halb ein Triffis C', 'Triffis B', 'Triffis C' 
-    6: 'Salto A', 'Salto B', 'Salto C', 'Salto rw A', 'Salto rw B', 'Salto rw C',
-    7: 'Schraubensalto', 'Schraubensalto A', 'Schraubensalto C',  'Doppelsalto B', 'Doppelsalto C', 
-    8: 'Voll- ein 1 3/4 Salto vw C', 'Voll- ein- Rudi- aus B', 'Voll- ein- halb- aus B', 'Voll- ein- voll- aus A', 'Voll- ein- voll- aus B', 'Voll- ein- voll- aus C', 
+    1: 27: '1 3/4 Salto vw B', 14: '1 3/4 Salto vw C', 32: '1/2 ein 1/2 aus C', 40: '3/4 Salto rw A', 33: '3/4 Salto vw A', 13: 'Baby- Fliffis C',
+    2: 28: 'Barani A', 35: 'Barani B', 21: 'Barani C', 18: 'Cody C', 17:'Rudi', 
+    3: 30: 'Bauchsprung', 20: 'Bücksprung', 10: 'Grätschwinkel', 34: 'Hocksprung', 38: 'Von Bauch in Stand', 4: 'Strecksprung'
+    4: 1: 'Fliffis B', 39: 'Fliffis C', 29: 'Fliffis aus B', 23: 'Fliffis aus C', 11: 'Fliffis- Rudi B', 31: 'Fliffis- Rudi C', 
+    5: 8: 'Halb ein Triffis C', 22: 'Triffis B', 7: 'Triffis C' 
+    6: 24: 'Salto A', 36: 'Salto B', 37: 'Salto C', 0: 'Salto rw A', 6: 'Salto rw B', 16: 'Salto rw C',
+    7: 9: 'Schraubensalto', 19: 'Schraubensalto A', 2: 'Schraubensalto C', 41: 'Doppelsalto B', 5: 'Doppelsalto C', 
+    8: 25: 'Voll- ein 1 3/4 Salto vw C', 26: 'Voll- ein- Rudi- aus B', 42: 'Voll- ein- halb- aus B', 15: 'Voll- ein- voll- aus A', 3: 'Voll- ein- voll- aus B', 12: 'Voll- ein- voll- aus C', 
     """
 
     #"""
