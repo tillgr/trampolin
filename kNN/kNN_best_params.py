@@ -24,12 +24,8 @@ if __name__ == '__main__':
                     i) + "_test.csv")
 
             # define columns cut
-            start_column: str = '0_Acc_N_Fil'
-            end_column: str = str(100 - i) + '_Gyro_z_Fil'
-
-            if calc_type == 'mean_std_':
-                start_column: str = '0_mean_Acc_N_Fil'
-                end_column: str = str(100 - i) + '_std_Gyro_z_Fil'
+            start_column: str = 'DJump_SIG_I_x LapEnd'
+            end_column: str = 'DJump_ABS_I_S4_z LapEnd'
 
             # p = train_merged.drop([col for col in train_merged.columns if 'DJump_ABS_I_S' in col], axis=1)
             # k = p.drop([col for col in p.columns if 'DJump_SIG_I_S' in col], axis=1)

@@ -6,7 +6,7 @@ from matplotlib import pyplot as plt
 from matplotlib.colors import ListedColormap
 from sklearn import metrics
 from sklearn import neighbors
-from sklearn.metrics import accuracy_score, plot_confusion_matrix, confusion_matrix
+from sklearn.metrics import accuracy_score, plot_confusion_matrix, confusion_matrix, ConfusionMatrixDisplay
 from random_classifier import metrics as rc_metrics
 import time
 
@@ -34,21 +34,28 @@ def sample_x_test(x_test, y_test, num):
 
 if __name__ == '__main__':
 
-    '''train_data = pd.read_csv(
-        '../Sprungdaten_processed/with_preprocessed/percentage/10/vector_percentage_mean_std_10_train.csv')
-    test_data = pd.read_csv(
-        '../Sprungdaten_processed/with_preprocessed/percentage/10/vector_percentage_mean_std_10_test.csv')'''
     train_data = pd.read_csv(
-        '../Sprungdaten_processed/without_preprocessed/percentage/10/vector_percentage_mean_std_10_train.csv')
+        '../Sprungdaten_processed/with_preprocessed/percentage/10/vector_percentage_mean_10_train.csv')
+    '''test_data = pd.read_csv(
+        '../Sprungdaten_processed/with_preprocessed/percentage/10/vector_percentage_mean_10_test.csv')
     test_data = pd.read_csv(
-        '../Sprungdaten_processed/without_preprocessed/percentage/10/vector_percentage_mean_std_10_test.csv')
+        '../Sprungdaten_processed/with_preprocessed/percentage/10/vector_AJ_percentage_mean_10.csv')'''
+
+
+    train_data = pd.read_csv(
+        '../Sprungdaten_processed/without_preprocessed/percentage/20/vector_percentage_mean_std_20_train.csv')
+        
+    '''test_data = pd.read_csv(
+        '../Sprungdaten_processed/without_preprocessed/percentage/20/vector_percentage_mean_std_20_test.csv')'''
+    test_data = pd.read_csv(
+        '../Sprungdaten_processed/without_preprocessed/percentage/20/vector_AJ_percentage_mean_std_20.csv')
 
     # get_features (X)
-    '''start_column: str = 'DJump_SIG_I_x LapEnd'
-    end_column: str = '90_std_Gyro_z_Fil' '''
+    '''start_column: str = '0_Acc_N_Fil'
+    end_column: str = '90_Gyro_z_Fil' '''
 
     start_column: str = '0_mean_Acc_N_Fil'
-    end_column: str = '90_std_Gyro_z_Fil'
+    end_column: str = '80_std_Gyro_z_Fil'
 
     ''' p = train_data.drop([col for col in train_data.columns if 'DJump_SIG_I_S' in col], axis=1)
     t = test_data.drop([col for col in test_data.columns if 'DJump_SIG_I_S' in col], axis=1)  '''
@@ -75,12 +82,6 @@ if __name__ == '__main__':
         print(f"Accuracy f1 score: {str(mean_f.round(4))}")
         print("--------------------------------------------------------------")
 
-    # print(y_train.to_frame())
-
-    '''explainer = shap.KernelExplainer(clf.decision_function, X_test.sample(n=50), link='identity')
-    shap_values = explainer.shap_values(X_test.sample(n=10))
-    shap.summary_plot(shap_values[0], X_test.sample(n=10))'''
-
     # colormap
     cmap = ['#393b79', '#5254a3', '#6b6ecf', '#9c9ede', '#637939', '#8ca252', '#b5cf6b', '#cedb9c', '#8c6d31',
             '#bd9e39', '#e7ba52', '#e7cb94', '#843c39', '#ad494a', '#d6616b', '#e7969c', '#7b4173', '#a55194', '#ce6dbd',
@@ -97,30 +98,31 @@ if __name__ == '__main__':
     shap_x_test, shap_y_test = sample_x_test(X_test, y_test, 3)
     shap_x_train, shap_y_train = sample_x_test(X_train, y_train, 6)
 
-    ''' f = lambda x: clf.predict_proba(x)[:, 1]
-    explainer = shap.KernelExplainer(f, shap_x_train)
-    shap_values = explainer.shap_values(shap_x_test)'''
 
-    f = lambda x: clf.predict_proba(x)[:, 1]
-    # med = shap_x_test.median().values.reshape((1, shap_x_test.shape[1]))
-    explainer = shap.KernelExplainer(f, shap.kmeans(shap_x_train, 10))
+    explainer = shap.KernelExplainer(clf.predict_proba, shap.kmeans(shap_x_train, 3))
     shap_values = explainer.shap_values(shap_x_test)
 
-    print(shap_values)
 
-    shap.summary_plot(shap_values, shap_x_test, plot_type='bar', plot_size=(20, 17), color=ListedColormap(cmap),
+    shap.summary_plot(shap_values, shap_x_test, plot_type='bar', plot_size=(22, 17), color=ListedColormap(cmap),
                       class_names=shap_y_test.unique(), max_display=20)
-    shap.summary_plot(shap_values, shap_x_test, plot_type='bar', plot_size=(15, 17), color=ListedColormap(cmap),
+    shap.summary_plot(shap_values, shap_x_test, plot_type='bar', plot_size=(20, 17), color=ListedColormap(cmap),
                       class_names=shap_y_test.unique(), max_display=68)
-   
-    saltoA = np.where(shap_y_test.unique() == 'Salto A')[0][0]
-    shap.summary_plot(shap_values[saltoA], shap_x_test, plot_size=(12, 12), title='Salto A')
-    saltoB = np.where(shap_y_test.unique() == 'Salto B')[0][0]
-    shap.summary_plot(shap_values[saltoB], shap_x_test, plot_size=(12, 12), title='Salto B')
-    saltoC = np.where(shap_y_test.unique() == 'Salto C')[0][0]
-    shap.summary_plot(shap_values[saltoC], shap_x_test, plot_size=(12, 12), title='Salto C')
 
-    cm = confusion_matrix(y_test, y_pred)
-    fig, ax = plt.subplots(figsize=(20, 20))
-    plot_confusion_matrix(clf, shap_x_test, shap_y_test, xticks_rotation='vertical', display_labels=set(y_test), cmap=plt.cm.Blues, normalize=None, ax = ax)
+    saltoA = np.where(shap_y_test.unique() == 'Salto A')[0][0]
+    shap.summary_plot(shap_values[saltoA], shap_x_test, plot_size=(20, 12), title='Salto A')
+    saltoB = np.where(shap_y_test.unique() == 'Salto B')[0][0]
+    shap.summary_plot(shap_values[saltoB], shap_x_test, plot_size=(20, 12), title='Salto B')
+    saltoC = np.where(shap_y_test.unique() == 'Salto C')[0][0]
+    shap.summary_plot(shap_values[saltoC], shap_x_test, plot_size=(20, 12), title='Salto C')
+
+    cm = confusion_matrix(y_test, y_pred, labels=clf.classes_)
+    disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=clf.classes_)
+    disp.plot(cmap=cmap_cm)
+    disp.figure_.set_figwidth(35)
+    disp.figure_.set_figheight(25)
+    disp.figure_.autofmt_xdate()
+    plt.tick_params(axis='x', labelsize=10, labelrotation=45, grid_linewidth=5)
+    plt.title("KNN/without_preprocessed/vector_AJ_percentage_mean_std_20")
+    plt.tight_layout()
     plt.show()
+
