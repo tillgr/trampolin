@@ -237,33 +237,66 @@ def run_multiple_times_oneliner(num_columns, num_classes, runs, act_func, loss, 
     return best_model
 
 
-def sample_x_test(x_test, y_test, num):
-    df = x_test.copy()
-    df['Sprungtyp'] = y_test.idxmax(axis=1)     # if not one-hot-encoded:   df['Sprungtyp'] = y_test
-    counts = df['Sprungtyp'].value_counts()
-    counts = counts.where(counts < num, other=num)
-    x = pd.DataFrame(columns=df.columns)
+def sample_x_test(x_test, y_test, num, cnn=False):
 
-    for jump in df['Sprungtyp'].unique():
-        subframe = df[df['Sprungtyp'] == jump]
-        x = x.append(subframe.sample(counts[jump], random_state=1), ignore_index=True)
+    if cnn:
+        y = y_test.idxmax(axis=1)
+        counts = y.value_counts()
+        counts = counts.where(counts < num, other=num)
+        x = pd.DataFrame()
 
-    x = x.sample(frac=1)        # shuffle
-    y = x['Sprungtyp']
-    y = y.reset_index(drop=True)
-    x = x.drop(['Sprungtyp'], axis=1)
-    for column in x.columns:
-        x[column] = x[column].astype(float).round(3)
+        for jump in y.unique():
+            indexes = y[y == jump].index
+            subframe = pd.DataFrame()
+            for index in indexes:
+                subframe = subframe.append({'Sprungtyp': jump, 'data': x_test[index]}, ignore_index=True)
+            subframe = subframe.sample(counts[jump], random_state=1)
+            x = x.append(subframe)
+
+        x = x.sample(frac=1, random_state=1)        # shuffle
+        y = x['Sprungtyp']
+        y = y.reset_index(drop=True)
+        x = x.drop(['Sprungtyp'], axis=1)
+        x = x.reset_index(drop=True)
+
+        shap_x = np.array
+        for i in range(len(x)):
+            if i == 0:
+                shap_x = x.loc[i][0]
+                shap_x = shap_x[np.newaxis, ...]
+                continue
+            row = x.loc[i][0]
+            shap_x = np.insert(shap_x, 1, row, axis=0)
+
+        return shap_x, y
+
+    else:
+        df = x_test.copy()
+        df['Sprungtyp'] = y_test.idxmax(axis=1)     # if not one-hot-encoded:   df['Sprungtyp'] = y_test
+        counts = df['Sprungtyp'].value_counts()
+        counts = counts.where(counts < num, other=num)
+        x = pd.DataFrame(columns=df.columns)
+
+        for jump in df['Sprungtyp'].unique():
+            subframe = df[df['Sprungtyp'] == jump]
+            x = x.append(subframe.sample(counts[jump], random_state=1), ignore_index=True)
+
+        x = x.sample(frac=1, random_state=1)        # shuffle
+        y = x['Sprungtyp']
+        y = y.reset_index(drop=True)
+        x = x.drop(['Sprungtyp'], axis=1)
+        for column in x.columns:
+            x[column] = x[column].astype(float).round(3)
 
     return x, y
 
 
 def main():
-    neural_network = 'dff'  # 'dff'  'cnn'
+    neural_network = 'cnn'  # 'dff'  'cnn'
     run_modus = ''     # 'multi' 'grid'
     run = 50                # for multi runs or how often random grid search runs
-    data_train = pd.read_csv("Sprungdaten_processed/with_preprocessed/percentage/25/vector_percentage_mean_std_25_train.csv")
-    data_test = pd.read_csv("Sprungdaten_processed/with_preprocessed/percentage/25/vector_percentage_mean_std_25_test.csv")
+    data_train = pd.read_csv("Sprungdaten_processed/without_preprocessed/percentage/5/percentage_mean_5_train.csv")
+    data_test = pd.read_csv("Sprungdaten_processed/without_preprocessed/percentage/5/percentage_mean_5_test.csv")
     pp_list = [3]
 
     if neural_network == 'cnn':
@@ -302,7 +335,7 @@ def main():
             print(grid_result.best_params_)
 
     #model.save("models/DFF_without_mean_std_20")
-    model = keras.models.load_model("models/DFF_with_mean_std_25")
+    model = keras.models.load_model("models/CNN_without_mean_5")
     model.summary()
     model.evaluate(x_test, y_test, verbose=1)
     shap.initjs()
@@ -319,7 +352,7 @@ def main():
     cmap_cm = ListedColormap(cmap_cm)
     # ListedColormap(process_cmap('winter'))
 
-    #"""
+    """
     # DFF
     shap_x_test, shap_y_test = sample_x_test(x_test, y_test, 3)
     shap_x_train, shap_y_train = sample_x_test(x_train, y_train, 6)
@@ -335,16 +368,19 @@ def main():
     shap.summary_plot(shap_values[saltoB], shap_x_test, plot_size=(12, 12), title='Salto B')
     saltoC = np.where(shap_y_test.unique() == 'Salto C')[0][0]
     shap.summary_plot(shap_values[saltoC], shap_x_test, plot_size=(12, 12), title='Salto C')
-    #"""
+    """
 
     # CNN
+    #"""
+    shap_x_test, shap_y_test = sample_x_test(x_test, y_test, 3, cnn=True)
+    shap_x_train, shap_y_train = sample_x_test(x_train, y_train, 6, cnn=True)
+
+    e = shap.DeepExplainer(model, shap_x_train)
+    shap_values = e.shap_values(shap_x_test)
+    shap.image_plot(shap_values, -shap_x_test[[0, 1]])
+    shap.force_plot(e.expected_value[0], shap_values[0])
+
     """
-    
-    background = x_train[np.random.choice(x_train.shape[0], 100, replace=False)]
-    e = shap.DeepExplainer(model, background)
-    shap_values = e.shap_values(x_test[0: 5])
-    shap.image_plot(shap_values, -x_test[0: 5]) #, labels=list(y_test.columns))
-    
     # Shap for specific Class
     i = y_test.index[y_test['Salto C'] == 1]
     pd.DataFrame(model.predict(x_test[i]), columns=y_test.columns).idxmax(axis=1)
