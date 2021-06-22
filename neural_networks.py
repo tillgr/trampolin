@@ -302,8 +302,8 @@ def main():
     neural_network = 'cnn'  # 'dff'  'cnn'
     run_modus = ''     # 'multi' 'grid'
     run = 50                # for multi runs or how often random grid search runs
-    data_train = pd.read_csv("Sprungdaten_processed/without_preprocessed/percentage/5/percentage_mean_5_train.csv")
-    data_test = pd.read_csv("Sprungdaten_processed/without_preprocessed/percentage/5/AJ_percentage_mean_5.csv")
+    data_train = pd.read_csv("Sprungdaten_processed/with_preprocessed/percentage/20/percentage_mean_std_20_train.csv")
+    data_test = pd.read_csv("Sprungdaten_processed/with_preprocessed/percentage/20/percentage_mean_std_20_test.csv")
     pp_list = [3]
 
     if neural_network == 'cnn':
@@ -342,7 +342,7 @@ def main():
             print(grid_result.best_params_)
 
     #model.save("models/DFF_without_mean_std_20")
-    model = keras.models.load_model("models/CNN_without_mean_5")
+    model = keras.models.load_model("models/CNN_with_mean_std_20")
     model.summary()
     model.evaluate(x_test, y_test, verbose=1)
     shap.initjs()
@@ -353,11 +353,11 @@ def main():
      '#9e9ac8','#bcbddc','#dadaeb','#636363','#969696','#969696','#d9d9d9','#f0027f','#f781bf','#f7b6d2','#fccde5',
      '#8dd3c7','#ffffb3','#bebada','#fb8072','#80b1d3','#fdb462','#b3de69','#fccde5','#d9d9d9','#bc80bd','#ccebc5','#ffed6f']
 
-    #cmap_cm = process_cmap('summer')
-    cmap_cm = ['#048166']
+    cmap_cm = process_cmap('summer')
     cmap_cm.insert(0, '#ffffff')
     cmap_cm.insert(-1, '#000000')
     cmap_cm = ListedColormap(cmap_cm)
+
 
     cmap_cm_AJ = ['#ffffff', '#048166']
     cmap_cm_AJ = ListedColormap(cmap_cm_AJ)
@@ -406,7 +406,7 @@ def main():
         index_names = np.vectorize(lambda i: d[i])(indexes)
 
         shap.image_plot(shap_values, to_explain, index_names, show=False)
-        plt.savefig('plots/CNN/without_preprocessed/AJ/CNN_without_mean_5_AJ_part' + str(j) + '.png')
+        plt.savefig('plots/CNN/with_preprocessed/CNN_with_mean_std_20_part' + str(j) + '.png')
 
 
     #"""
