@@ -116,7 +116,7 @@ def classify(datasets: list, feature_start: str, feature_end: str, drops_keyword
 
 
 def gnb_classify(datasets: list, feature_start: str, feature_end: str, drops_keywords: list, reverse_drop: bool):
-    train, test = get_train_test_data(datasets)
+    # train, test = get_train_test_data(datasets)
     # any(substring in string for substring in substring_list)
     drops = [col for col in train.columns if any(keyword in col for keyword in drops_keywords)]
     if reverse_drop:
@@ -166,8 +166,8 @@ def explain_model(datasets: list, feature_start: str, feature_end: str, drops_ke
     # train, test = get_train_test_data(datasets)
     # train = read_processed_data(datasets[0] + "_train.csv")
     # test = read_processed_data(datasets[0] + "_test.csv")
-    train = pd.read_csv("Sprungdaten_processed/with_preprocessed/percentage/20/vector_percentage_mean_20_train.csv")
-    test = pd.read_csv("Sprungdaten_processed/with_preprocessed/percentage/20/vector_AJ_percentage_mean_20.csv")
+    train = pd.read_csv("Sprungdaten_processed/without_preprocessed/percentage/25/vector_percentage_mean_std_25_train.csv")
+    test = pd.read_csv("Sprungdaten_processed/without_preprocessed/percentage/25/vector_AJ_percentage_mean_std_25.csv")
 
     drops = [col for col in train.columns if any(keyword in col for keyword in drops_keywords)]
     if reverse_drop:
@@ -180,10 +180,6 @@ def explain_model(datasets: list, feature_start: str, feature_end: str, drops_ke
         feature_start = train.columns.tolist()[2]
     if feature_end == "":
         feature_end = train.columns.tolist()[-1]
-
-    logger.info("Classify with data set: " + str(datasets) +
-                ". Feature start at column: " + feature_start + ", feature end: " + feature_end +
-                ". Drops :" + str(drops))
 
     X = get_samples_features(train, feature_start, feature_end)
     y = get_targets(train)
@@ -219,16 +215,16 @@ def explain_model(datasets: list, feature_start: str, feature_end: str, drops_ke
     explainer = shap.KernelExplainer(clf_linear.decision_function, shap_x_train) #, link='identity'
     # df = X_test.iloc[index].to_frame().transpose()
     # shap_values = explainer.shap_values(X_test.iloc[index].to_frame().transposei())
-    shap_values = explainer.shap_values(shap_x_test.loc[0:0, :])
-    # shap.summary_plot(shap_values, shap_x_test, plot_type='bar', plot_size=(25, 20), color=ListedColormap(cmap), class_names=shap_y_test.unique(), max_display=20)
-    # shap.summary_plot(shap_values, shap_x_test, plot_type='bar', plot_size=(25, 20), color=ListedColormap(cmap), class_names=shap_y_test.unique(), max_display=68)
+    shap_values = explainer.shap_values(shap_x_test)
+    shap.summary_plot(shap_values, shap_x_test, plot_type='bar', plot_size=(25, 20), color=ListedColormap(cmap), class_names=shap_y_test.unique(), max_display=20)
+    shap.summary_plot(shap_values, shap_x_test, plot_type='bar', plot_size=(25, 20), color=ListedColormap(cmap), class_names=shap_y_test.unique(), max_display=68)
     # shap.summary_plot(shap_values[0], X_test.iloc[index].to_frame().transpose())
-    # saltoA = np.where(shap_y_test.unique() == 'Salto A')[0][0]
-    # shap.summary_plot(shap_values[saltoA], shap_x_test, plot_size=(25, 15), title='Salto A')
-    # saltoB = np.where(shap_y_test.unique() == 'Salto B')[0][0]
-    # shap.summary_plot(shap_values[saltoB], shap_x_test, plot_size=(25, 15), title='Salto B')
+    saltoA = np.where(shap_y_test.unique() == 'Salto A')[0][0]
+    shap.summary_plot(shap_values[saltoA], shap_x_test, plot_size=(25, 15), title='Salto A')
+    saltoB = np.where(shap_y_test.unique() == 'Salto B')[0][0]
+    shap.summary_plot(shap_values[saltoB], shap_x_test, plot_size=(25, 15), title='Salto B')
     saltoC = np.where(shap_y_test.unique() == 'Salto C')[0][0]
-    shap.summary_plot(shap_values[0], shap_x_test.loc[0:0, :], plot_size=(12, 12), title='Salto C')
+    shap.summary_plot(shap_values[saltoC], shap_x_test, plot_size=(25, 15), title='Salto C')
 
 
 def collect_all_data_sets(folder: str, data_sets: set):
@@ -278,6 +274,6 @@ if __name__ == '__main__':
     # logger.info("GNB Rerun")
     # #run_svc_auto(folder, drops_raw)
     # run_gnb_auto(folder, drops_raw)
-    data_sets = ["Sprungdaten_processed/without_preprocessed/percentage/25/vector_percentage_mean_std_25"]
+    data_sets = []
     drops = []
     explain_model(data_sets, "", "", drops, False)
