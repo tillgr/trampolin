@@ -13,8 +13,8 @@ from sklearn.ensemble import GradientBoostingClassifier as GBC
 
 if __name__ == '__main__':
 
-    for i in [25]:  # [1, 2, 5, 10, 20, 25]
-        for calc_type in ['']:  # ['', 'mean_', 'mean_std_']
+    for i in [10]:  # [1, 2, 5, 10, 20, 25]
+        for calc_type in ['mean_']:  # ['', 'mean_', 'mean_std_']
             print('////////////////////////////////////////////')
             print(f"Folder: {i}")
             print(f"> Type: {calc_type}")
@@ -27,19 +27,26 @@ if __name__ == '__main__':
                 "../Sprungdaten_processed/with_preprocessed/percentage/" + str(
                     i) + "/vector_percentage_" + calc_type + str(
                     i) + "_test.csv")
+            # data = pd.read_csv(
+            #         "../Sprungdaten_processed/with_preprocessed/percentage/" + str(
+            #             i) + "/vector_percentage_" + calc_type + str(
+            #             i) + ".csv")
 
-            # define columns cut
-            start_column: str = 'DJump_SIG_I_x LapEnd'
-            end_column: str = str(100 - i) + '_Gyro_z_Fil'
 
-            if calc_type == 'mean_std_':
-                end_column: str = str(100 - i) + '_std_Gyro_z_Fil'
-
-            # get X_train
-            X_train = train_merged.loc[:, start_column:end_column].to_numpy()
-
-            # get X_test
-            X_test = test_merged.loc[:, start_column:end_column].to_numpy()
+            # # define columns cut
+            # start_column: str = 'DJump_SIG_I_x LapEnd'
+            # end_column: str = str(100 - i) + '_Gyro_z_Fil'
+            #
+            # if calc_type == 'mean_std_':
+            #     end_column: str = str(100 - i) + '_std_Gyro_z_Fil'
+            #
+            # # get X_train
+            # X_train = train_merged.loc[:, start_column:end_column]
+            #
+            # # get X_test
+            # X_test = test_merged.loc[:, start_column:end_column]
+            X_train = train_merged.drop(['SprungID', 'Sprungtyp'], axis=1)
+            X_test = test_merged.drop(['SprungID', 'Sprungtyp'], axis=1)
 
             # create labelEncoder
             le = preprocessing.LabelEncoder()
@@ -85,8 +92,9 @@ if __name__ == '__main__':
 
             param_dist = {'n_estimators': [10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 200],
                           'max_depth': [3, 4, 5, 6, 7]}
+            run=20
 
-            grid = RandomizedSearchCV(estimator=model, param_distributions=param_dist, n_jobs=7)
+            grid = RandomizedSearchCV(estimator=model, param_distributions=param_dist, verbose=1, n_iter=run,  n_jobs=7, cv = 2)
             grid_result = grid.fit(X_test, y_test)
             print(grid_result.best_params_)
 
