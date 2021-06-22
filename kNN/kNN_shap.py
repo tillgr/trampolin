@@ -36,26 +36,27 @@ if __name__ == '__main__':
 
     train_data = pd.read_csv(
         '../Sprungdaten_processed/with_preprocessed/percentage/10/vector_percentage_mean_10_train.csv')
+
     '''test_data = pd.read_csv(
-        '../Sprungdaten_processed/with_preprocessed/percentage/10/vector_percentage_mean_10_test.csv')
+        '../Sprungdaten_processed/with_preprocessed/percentage/10/vector_percentage_mean_10_test.csv')'''
     test_data = pd.read_csv(
-        '../Sprungdaten_processed/with_preprocessed/percentage/10/vector_AJ_percentage_mean_10.csv')'''
+        '../Sprungdaten_processed/with_preprocessed/percentage/10/vector_AJ_percentage_mean_10.csv')
 
 
-    train_data = pd.read_csv(
-        '../Sprungdaten_processed/without_preprocessed/percentage/20/vector_percentage_mean_std_20_train.csv')
+    '''train_data = pd.read_csv(
+        '../Sprungdaten_processed/without_preprocessed/percentage/20/vector_percentage_mean_std_20_train.csv')'''
         
     '''test_data = pd.read_csv(
         '../Sprungdaten_processed/without_preprocessed/percentage/20/vector_percentage_mean_std_20_test.csv')'''
-    test_data = pd.read_csv(
-        '../Sprungdaten_processed/without_preprocessed/percentage/20/vector_AJ_percentage_mean_std_20.csv')
+    '''test_data = pd.read_csv(
+        '../Sprungdaten_processed/without_preprocessed/percentage/20/vector_AJ_percentage_mean_std_20.csv')'''
 
     # get_features (X)
-    '''start_column: str = '0_Acc_N_Fil'
-    end_column: str = '90_Gyro_z_Fil' '''
+    start_column: str = '0_Acc_N_Fil'
+    end_column: str = '90_Gyro_z_Fil'
 
-    start_column: str = '0_mean_Acc_N_Fil'
-    end_column: str = '80_std_Gyro_z_Fil'
+    '''start_column: str = '0_mean_Acc_N_Fil'
+    end_column: str = '80_std_Gyro_z_Fil' '''
 
     ''' p = train_data.drop([col for col in train_data.columns if 'DJump_SIG_I_S' in col], axis=1)
     t = test_data.drop([col for col in test_data.columns if 'DJump_SIG_I_S' in col], axis=1)  '''
@@ -95,6 +96,9 @@ if __name__ == '__main__':
     cmap_cm.insert(-1, '#000000')
     cmap_cm = ListedColormap(cmap_cm)
 
+    cmap_cm_AJ = ['#ffffff', '#048166']
+    cmap_cm_AJ = ListedColormap(cmap_cm_AJ)
+
     shap_x_test, shap_y_test = sample_x_test(X_test, y_test, 3)
     shap_x_train, shap_y_train = sample_x_test(X_train, y_train, 6)
 
@@ -103,7 +107,7 @@ if __name__ == '__main__':
     shap_values = explainer.shap_values(shap_x_test)
 
 
-    shap.summary_plot(shap_values, shap_x_test, plot_type='bar', plot_size=(22, 17), color=ListedColormap(cmap),
+    shap.summary_plot(shap_values, shap_x_test, plot_type='bar', plot_size=(30, 17), color=ListedColormap(cmap),
                       class_names=shap_y_test.unique(), max_display=20)
     shap.summary_plot(shap_values, shap_x_test, plot_type='bar', plot_size=(20, 17), color=ListedColormap(cmap),
                       class_names=shap_y_test.unique(), max_display=68)
@@ -117,12 +121,12 @@ if __name__ == '__main__':
 
     cm = confusion_matrix(y_test, y_pred, labels=clf.classes_)
     disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=clf.classes_)
-    disp.plot(cmap=cmap_cm)
+    disp.plot(cmap=cmap_cm_AJ)
     disp.figure_.set_figwidth(35)
     disp.figure_.set_figheight(25)
     disp.figure_.autofmt_xdate()
     plt.tick_params(axis='x', labelsize=10, labelrotation=45, grid_linewidth=5)
-    plt.title("KNN/without_preprocessed/vector_AJ_percentage_mean_std_20")
+    plt.title("KNN/with_preprocessed/vector_AJ_percentage_mean_10_train")
     plt.tight_layout()
     plt.show()
 
