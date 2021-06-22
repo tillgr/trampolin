@@ -266,7 +266,7 @@ def sample_x_test(x_test, y_test, num, cnn=False):
                 shap_x = shap_x[np.newaxis, ...]
                 continue
             row = x.loc[i][0]
-            shap_x = np.insert(shap_x, 1, row, axis=0)
+            shap_x = np.insert(shap_x, i, row, axis=0)
 
         return shap_x, y
 
@@ -302,8 +302,8 @@ def main():
     neural_network = 'cnn'  # 'dff'  'cnn'
     run_modus = ''     # 'multi' 'grid'
     run = 50                # for multi runs or how often random grid search runs
-    data_train = pd.read_csv("Sprungdaten_processed/with_preprocessed/percentage/20/percentage_mean_std_20_train.csv")
-    data_test = pd.read_csv("Sprungdaten_processed/with_preprocessed/percentage/20/AJ_percentage_mean_std_20.csv")
+    data_train = pd.read_csv("Sprungdaten_processed/without_preprocessed/percentage/5/percentage_mean_5_train.csv")
+    data_test = pd.read_csv("Sprungdaten_processed/without_preprocessed/percentage/5/AJ_percentage_mean_5.csv")
     pp_list = [3]
 
     if neural_network == 'cnn':
@@ -342,7 +342,7 @@ def main():
             print(grid_result.best_params_)
 
     #model.save("models/DFF_without_mean_std_20")
-    model = keras.models.load_model("models/CNN_with_mean_std_20")
+    model = keras.models.load_model("models/CNN_without_mean_5")
     model.summary()
     model.evaluate(x_test, y_test, verbose=1)
     shap.initjs()
@@ -384,16 +384,6 @@ def main():
 
     # CNN
     #"""
-    class_names = {
-        27: '1 3/4 Salto vw B', 14: '1 3/4 Salto vw C', 32: '1/2 ein 1/2 aus C', 40: '3/4 Salto rw A', 33: '3/4 Salto vw A', 13: 'Baby- Fliffis C',
-        28: 'Barani A', 35: 'Barani B', 21: 'Barani C', 18: 'Cody C', 17: 'Rudi',
-        30: 'Bauchsprung', 20: 'Bücksprung', 10: 'Grätschwinkel', 34: 'Hocksprung', 38: 'Von Bauch in Stand', 4: 'Strecksprung',
-        1: 'Fliffis B', 39: 'Fliffis C', 29: 'Fliffis aus B', 23: 'Fliffis aus C', 11: 'Fliffis- Rudi B', 31: 'Fliffis- Rudi C',
-        8: 'Halb ein Triffis C', 22: 'Triffis B', 7: 'Triffis C',
-        24: 'Salto A', 36: 'Salto B', 37: 'Salto C', 0: 'Salto rw A', 6: 'Salto rw B', 16: 'Salto rw C',
-        9: 'Schraubensalto', 19: 'Schraubensalto A', 2: 'Schraubensalto C', 41: 'Doppelsalto B', 5: 'Doppelsalto C',
-        25: 'Voll- ein 1 3/4 Salto vw C', 26: 'Voll- ein- Rudi- aus B', 42: 'Voll- ein- halb- aus B', 15: 'Voll- ein- voll- aus A', 3: 'Voll- ein- voll- aus B', 12: 'Voll- ein- voll- aus C'
-    }
 
     shap_x_test, shap_y_test = sample_x_test(x_test, y_test, 3, cnn=True)
     shap_x_train, shap_y_train = sample_x_test(x_train, y_train, 6, cnn=True)
@@ -412,21 +402,12 @@ def main():
         to_explain = shap_x_test[index_list]
         explainer = shap.DeepExplainer(model, shap_x_train)
         shap_values, indexes = explainer.shap_values(to_explain, ranked_outputs=4, check_additivity=False)
-        index_names = np.vectorize(lambda i: class_names[i])(indexes)
+        d = dict(enumerate(np.array(y_test.columns).flatten(), 0))
+        index_names = np.vectorize(lambda i: d[i])(indexes)
 
-        shap.image_plot(shap_values, to_explain, index_names)
-        # plt.savefig('plots/CNN/with_preprocessed/AJ/CNN_with_mean_std_20_AJ_part' + str(j) + '.png')
+        shap.image_plot(shap_values, to_explain, index_names, show=False)
+        plt.savefig('plots/CNN/without_preprocessed/AJ/CNN_without_mean_5_AJ_part' + str(j) + '.png')
 
-    """
-    1: 27: '1 3/4 Salto vw B', 14: '1 3/4 Salto vw C', 32: '1/2 ein 1/2 aus C', 40: '3/4 Salto rw A', 33: '3/4 Salto vw A', 13: 'Baby- Fliffis C',
-    2: 28: 'Barani A', 35: 'Barani B', 21: 'Barani C', 18: 'Cody C', 17:'Rudi', 
-    3: 30: 'Bauchsprung', 20: 'Bücksprung', 10: 'Grätschwinkel', 34: 'Hocksprung', 38: 'Von Bauch in Stand', 4: 'Strecksprung'
-    4: 1: 'Fliffis B', 39: 'Fliffis C', 29: 'Fliffis aus B', 23: 'Fliffis aus C', 11: 'Fliffis- Rudi B', 31: 'Fliffis- Rudi C', 
-    5: 8: 'Halb ein Triffis C', 22: 'Triffis B', 7: 'Triffis C' 
-    6: 24: 'Salto A', 36: 'Salto B', 37: 'Salto C', 0: 'Salto rw A', 6: 'Salto rw B', 16: 'Salto rw C',
-    7: 9: 'Schraubensalto', 19: 'Schraubensalto A', 2: 'Schraubensalto C', 41: 'Doppelsalto B', 5: 'Doppelsalto C', 
-    8: 25: 'Voll- ein 1 3/4 Salto vw C', 26: 'Voll- ein- Rudi- aus B', 42: 'Voll- ein- halb- aus B', 15: 'Voll- ein- voll- aus A', 3: 'Voll- ein- voll- aus B', 12: 'Voll- ein- voll- aus C', 
-    """
 
     #"""
     """
@@ -439,17 +420,17 @@ def main():
     shap.image_plot(shap_values, -x_test[i])  # , labels=list(y_test.columns))
     """
 
-    """
+    #"""
     # Confusion matrix to find mistakes in classification
     cm = sklearn.metrics.confusion_matrix(y_test.idxmax(axis=1), pd.DataFrame(model.predict(x_test), columns=y_test.columns).idxmax(axis=1))
     disp = sklearn.metrics.ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=y_test.columns)
-    disp.plot(cmap=cmap_cm_AJ)
+    disp.plot(cmap=cmap_cm)
     disp.figure_.set_figwidth(35)
     disp.figure_.set_figheight(25)
     disp.figure_.autofmt_xdate()
     plt.show()
     #plt.savefig('CNN_confusion_matrix_flag.png')
-    """
+    #"""
 
 
     return
