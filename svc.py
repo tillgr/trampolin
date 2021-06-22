@@ -166,8 +166,8 @@ def explain_model(datasets: list, feature_start: str, feature_end: str, drops_ke
     # train, test = get_train_test_data(datasets)
     # train = read_processed_data(datasets[0] + "_train.csv")
     # test = read_processed_data(datasets[0] + "_test.csv")
-    train = pd.read_csv("Sprungdaten_processed/without_preprocessed/percentage/25/vector_percentage_mean_std_25_train.csv")
-    test = pd.read_csv("Sprungdaten_processed/without_preprocessed/percentage/25/vector_AJ_percentage_mean_std_25.csv")
+    train = pd.read_csv("Sprungdaten_processed/without_preprocessed/percentage/10/vector_percentage_mean_std_10_train.csv")
+    test = pd.read_csv("Sprungdaten_processed/without_preprocessed/percentage/10/vector_AJ_percentage_mean_std_10.csv")
 
     drops = [col for col in train.columns if any(keyword in col for keyword in drops_keywords)]
     if reverse_drop:
@@ -184,7 +184,7 @@ def explain_model(datasets: list, feature_start: str, feature_end: str, drops_ke
     X = get_samples_features(train, feature_start, feature_end)
     y = get_targets(train)
     y_test = get_targets(test)
-    clf_linear = SVC(kernel='linear')
+    clf_linear = GaussianNB()
     clf_linear.fit(X, y)
     X_test = get_samples_features(test, feature_start, feature_end)
     y_pred = clf_linear.predict(X_test)
@@ -212,7 +212,7 @@ def explain_model(datasets: list, feature_start: str, feature_end: str, drops_ke
     '''
     shap_x_train, shap_y_train = sample_x_test(X, y, 3)
     shap_x_test, shap_y_test = sample_x_test(X_test, y_test, 6)
-    explainer = shap.KernelExplainer(clf_linear.decision_function, shap_x_train) #, link='identity'
+    explainer = shap.KernelExplainer(clf_linear.predict_proba, shap_x_train) #, link='identity'
     # df = X_test.iloc[index].to_frame().transpose()
     # shap_values = explainer.shap_values(X_test.iloc[index].to_frame().transposei())
     shap_values = explainer.shap_values(shap_x_test)
@@ -274,6 +274,7 @@ if __name__ == '__main__':
     # logger.info("GNB Rerun")
     # #run_svc_auto(folder, drops_raw)
     # run_gnb_auto(folder, drops_raw)
-    data_sets = []
+    data_sets = ["Sprungdaten_processed/without_preprocessed/percentage/2/vector_percentage_mean_2"]
     drops = []
+    classify(data_sets, "20_Acc_N_Fil", "80_Gyro_z_Fil", drops, False)
     explain_model(data_sets, "", "", drops, False)
