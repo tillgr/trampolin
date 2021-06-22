@@ -96,6 +96,8 @@ def correct_space_errors(data):
     data['Sprungtyp'].replace("41/", "Barani A", inplace=True)
     data['Sprungtyp'].replace("43/", "Rudi", inplace=True)
     data['Sprungtyp'].replace("00V", "Grätschwinkel", inplace=True)
+    data['Sprungtyp'].replace("1 3/4 salto Vorwärts B", "1 3/4 Salto vw B", inplace=True)
+    data['Sprungtyp'].replace("Fliffis Rudi C", "Fliffis- Rudi C", inplace=True)
 
     return data
 
@@ -664,14 +666,21 @@ def main():
 
     # ___________________________________________________
     # with preprocessed data or without preprocessed data
-    # pp = 'with_preprocessed'
-    # data_only_jumps = pd.read_csv("Sprungdaten_processed/" + pp + "/data_only_jumps.csv")
+    pp = 'with_preprocessed'
+    data_only_jumps = pd.read_csv("Sprungdaten_processed/" + pp + "/data_only_jumps.csv")
 
     """
+    averaged_data, std_data = calc_avg(data_only_jumps)
+    save_as_csv(averaged_data, "averaged_data", folder=pp + "/averaged_data")
+    save_as_csv(std_data, "std_data", folder=pp + "/std_data")
+
+    avg_std_data = combine_avg_std(averaged_data, std_data)
+    save_as_csv(avg_std_data, "avg_std_data", folder=pp + "/avg_std_data")
+    
     averaged_data = pd.read_csv('Sprungdaten_processed/' + pp + '/averaged_data/averaged_data.csv')
     std_data = pd.read_csv('Sprungdaten_processed/' + pp + '/std_data/std_data.csv')
     avg_std_data = pd.read_csv('Sprungdaten_processed/' + pp + '/avg_std_data/avg_std_data.csv')
-
+    
     train_data, test_data = split_train_test(averaged_data)
     save_as_csv(train_data, 'averaged_data_train', folder=pp + '/averaged_data')
     save_as_csv(test_data, 'averaged_data_test', folder=pp + '/averaged_data')
@@ -686,9 +695,9 @@ def main():
     """
 
     # for percentage
-    """
-    param = 'mean_std'  # 'mean' or None
-    for percent in [0.25, 0.20, 0.10, 0.05, 0.02, 0.01]:
+    #"""
+    param = 'mean'  # 'mean' or None
+    for percent in [0.01]:
         if param is None:
             data = percentage_cutting(data_only_jumps, percent)
             save_as_csv(data, 'percentage_'+ str(int(percent * 100)), 
@@ -711,12 +720,12 @@ def main():
                         folder=pp + '/percentage/' + str(int(percent * 100)))
             save_as_csv(test_data, 'percentage_' + param + '_' + str(int(percent * 100)) + '_test',
                         folder=pp + '/percentage/' + str(int(percent * 100)))
-    """
+    #"""
 
     # for vectorisation
     """
-    name = 'percentage_mean_' # percentage_mean_std  / percentage_
-    for percent in ['25', '20', '10', '5', '2', '1']:
+    name = 'percentage_mean_std_'           # percentage_mean_std_ / percentage_mean_ / percentage_
+    for percent in ['5', '2', '1']:     # '25', '20', '10', '5', '2', '1'
         data = pd.read_csv('Sprungdaten_processed/' + pp + '/percentage/' + percent + '/' + name + percent + '.csv')
         train_data = pd.read_csv(
             'Sprungdaten_processed/' + pp + '/percentage/' + percent + '/' + name + percent + '_train' + '.csv')
