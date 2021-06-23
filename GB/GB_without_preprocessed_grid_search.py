@@ -20,11 +20,11 @@ if __name__ == '__main__':
             print(f"> Type: {calc_type}")
             # override merge phase
             train_merged = pd.read_csv(
-                "../Sprungdaten_processed/with_preprocessed/percentage/" + str(
+                "../Sprungdaten_processed/without_preprocessed/percentage/" + str(
                     i) + "/vector_percentage_" + calc_type + str(
                     i) + "_train.csv")
             test_merged = pd.read_csv(
-                "../Sprungdaten_processed/with_preprocessed/percentage/" + str(
+                "../Sprungdaten_processed/without_preprocessed/percentage/" + str(
                     i) + "/vector_percentage_" + calc_type + str(
                     i) + "_test.csv")
             # data = pd.read_csv(
