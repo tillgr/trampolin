@@ -298,12 +298,78 @@ def get_index(jump_list, y_test):
     return index_list
 
 
+def create_colormap(shap_y_test, shap_values=None):
+    """
+    takes values and creates unique colormap, so that each jump, have always the sam color
+    :param shap_values: output from explainer.shap_values(shap_x_test)
+    :param shap_y_test: sampled y_test or single string jump
+    :return: colormap or single color if shap_values=None
+    """
+    color_dict = {
+        '1 3/4 Salto vw B': '#843c39',
+        '1 3/4 Salto vw C': '#ad494a',
+        '3/4 Salto rw A': '#d6616b',
+        '3/4 Salto vw A': '#e7969c',
+        'Barani A': '#e6550d',
+        'Barani B': '#fd8d3c',
+        'Barani C': '#fdae6b',
+        'Bauchsprung': '#544000',
+        'Bücksprung': '#8c6d31',
+        'Grätschwinkel': '#bd9e39',
+        'Hocksprung': '#e7ba52',
+        'Von Bauch in Stand': '#ffe07d',
+        'Strecksprung': '#e7cb94',
+        'Fliffis B': '#7b4173',
+        'Fliffis C': '#a55194',
+        'Baby- Fliffis C': '#ce6dbd',
+        'Fliffis aus B': '#d9599c',
+        'Fliffis aus C': '#f781bf',
+        'Fliffis- Rudi B': '#ff8cdb',
+        'Fliffis- Rudi C': '#ffb3e7',
+        'Rudi': '#c91a93',
+        'Halb ein Triffis C': '#756bb1',
+        'Triffis B': '#9e9ac8',
+        'Triffis C': '#bcbddc',
+        'Schraubensalto A': '#057d59',
+        'Schraubensalto': '#099e72',
+        'Schraubensalto C': '#3fc49d',
+        'Voll- ein 1 3/4 Salto vw C': '#637939',
+        'Voll- ein- Rudi- aus B': '#8ca252',
+        'Voll- ein- halb- aus B': '#b5cf6b',
+        'Doppelsalto A': '#3182bd',
+        'Doppelsalto B': '#6baed6',
+        'Doppelsalto C': '#9ecae1',
+        'Salto rw A': '#393b79',
+        'Salto rw B': '#5254a3',
+        'Salto rw C': '#6b6ecf',
+        'Salto A': '#24b8bf',
+        'Salto B': '#64ded2',
+        'Salto C': '#a5e8e8',
+        'Voll- ein- voll- aus A': '#31a354',
+        'Voll- ein- voll- aus B': '#74c476',
+        'Voll- ein- voll- aus C': '#a1d99b',
+        '1/2 ein 1/2 aus C': '#636363',
+        'Cody C': '#d9d9d9'}
+
+    if shap_values is None:
+        cmap = color_dict[shap_y_test]
+    else:
+        class_sequence = np.argsort([-np.abs(shap_values[i]).mean() for i in range(len(shap_values))])
+        d = dict(enumerate(np.array(shap_y_test.unique()).flatten(), 0))
+        index_names = np.vectorize(lambda i: d[i])(class_sequence)
+
+        list_cmap = np.vectorize(lambda i: color_dict[i])(index_names)
+        cmap = ListedColormap(list_cmap)
+
+    return cmap
+
+
 def main():
-    neural_network = 'cnn'  # 'dff'  'cnn'
+    neural_network = 'dff'  # 'dff'  'cnn'
     run_modus = ''     # 'multi' 'grid'
     run = 50                # for multi runs or how often random grid search runs
-    data_train = pd.read_csv("Sprungdaten_processed/with_preprocessed/percentage/20/percentage_mean_std_20_train.csv")
-    data_test = pd.read_csv("Sprungdaten_processed/with_preprocessed/percentage/20/percentage_mean_std_20_test.csv")
+    data_train = pd.read_csv("Sprungdaten_processed/with_preprocessed/percentage/25/vector_percentage_mean_std_25_train.csv")
+    data_test = pd.read_csv("Sprungdaten_processed/with_preprocessed/percentage/25/vector_percentage_mean_std_25_test.csv")
     pp_list = [3]
 
     if neural_network == 'cnn':
@@ -342,7 +408,7 @@ def main():
             print(grid_result.best_params_)
 
     #model.save("models/DFF_without_mean_std_20")
-    model = keras.models.load_model("models/CNN_with_mean_std_20")
+    model = keras.models.load_model("models/DFF_with_mean_std_25")
     model.summary()
     model.evaluate(x_test, y_test, verbose=1)
     shap.initjs()
@@ -364,27 +430,41 @@ def main():
 
     # ListedColormap(process_cmap('winter'))
 
-    """
+    #"""
     # DFF
+    salto_i = y_test.index[y_test['Salto C'] == 1]
+
     shap_x_test, shap_y_test = sample_x_test(x_test, y_test, 3)
     shap_x_train, shap_y_train = sample_x_test(x_train, y_train, 6)
     #background = shap.sample(shap_x_train, 400, random_state=1)
     explainer = shap.KernelExplainer(model, shap_x_train)
     shap_values = explainer.shap_values(shap_x_test)
 
-    shap.summary_plot(shap_values, shap_x_test, plot_type='bar', plot_size=(25, 20), color=ListedColormap(cmap), class_names=shap_y_test.unique(), max_display=20)
-    shap.summary_plot(shap_values, shap_x_test, plot_type='bar', plot_size=(25, 20), color=ListedColormap(cmap), class_names=shap_y_test.unique(), max_display=68)
+    bar_cm = create_colormap(shap_y_test, shap_values)
+
+    shap.summary_plot(shap_values, shap_x_test, plot_type='bar', plot_size=(25, 20), color=bar_cm, class_names=shap_y_test.unique(), max_display=20)
+    shap.summary_plot(shap_values, shap_x_test, plot_type='bar', plot_size=(25, 20), color=bar_cm, class_names=shap_y_test.unique(), max_display=68)
+
     saltoA = np.where(shap_y_test.unique() == 'Salto A')[0][0]
     shap.summary_plot(shap_values[saltoA], shap_x_test, plot_size=(25, 15), title='Salto A')
+
     saltoB = np.where(shap_y_test.unique() == 'Salto B')[0][0]
     shap.summary_plot(shap_values[saltoB], shap_x_test, plot_size=(25, 15), title='Salto B')
     saltoC = np.where(shap_y_test.unique() == 'Salto C')[0][0]
-    shap.summary_plot(shap_values[saltoC], shap_x_test, plot_size=(12, 12), title='Salto C')
-    """
+    shap.summary_plot(shap_values[saltoC], shap_x_test, plot_size=(25, 15), title='Salto C')
 
-    # CNN
+    # creating vor each jump a bar chart
+    for jump in shap_y_test.unique():
+        color_string = create_colormap(jump)
+        shap.summary_plot(shap_values[np.where(shap_y_test.unique() == jump)[0][0]].__abs__(), shap_x_test, plot_type='bar', color=color_string, plot_size=(20,20), show=False)
+        plt.savefig('plots/DFF/with_preprocessed/jump_analysis/' + jump.replace('/', '-') + '.png')
+        plt.clf()
+
     #"""
 
+
+    # CNN
+    """
     shap_x_test, shap_y_test = sample_x_test(x_test, y_test, 3, cnn=True)
     shap_x_train, shap_y_train = sample_x_test(x_train, y_train, 6, cnn=True)
 
@@ -407,9 +487,7 @@ def main():
 
         shap.image_plot(shap_values, to_explain, index_names, show=False)
         plt.savefig('plots/CNN/with_preprocessed/CNN_with_mean_std_20_part' + str(j) + '.png')
-
-
-    #"""
+    """
     """
     # Shap for specific Class
     i = y_test.index[y_test['Salto C'] == 1]
