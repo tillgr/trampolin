@@ -298,6 +298,96 @@ def get_index(jump_list, y_test):
     return index_list
 
 
+def jump_core_detection(modeltype, data_train, data_test, pp_list, jump_length=0):
+
+    if modeltype == 'dff':
+        jump_length = int(len(list(data_test.drop([col for col in data_train.columns if 'DJump' in col], axis=1)
+                                   .drop(['SprungID', 'Sprungtyp'], axis=1).columns))\
+                      / len([c for c in list(data_test.drop([col for col in data_train.columns if 'DJump' in col], axis=1)
+                                             .drop(['SprungID', 'Sprungtyp'], axis=1).columns) if c.startswith('0_')]))
+
+    scores = {}
+    percentage = int(100 / jump_length)
+    full_list = [l for l in range(0, 100, percentage)]
+
+    variants = []
+    for i in range(jump_length - 1):
+        variants.append([l for l in range(i + 1)])
+    for i in range(1, jump_length):
+        variants.append(list(range(i, jump_length)))
+    for i in range(int((jump_length - 1) / 2)):
+        both_sides = list(set(list(range(jump_length))) - set(list(range(0, jump_length))[i + 1:-1 - i]))
+        both_sides.sort()
+        variants.append(both_sides)
+
+    for variant in variants:        # 0 = first data point    ->     jump_length = last data points
+
+        if modeltype == 'cnn':
+            indexes = []
+            for i in range(int(len(data_train) / jump_length)):
+                for to_delete in variant:
+                    indexes.append(i * jump_length + to_delete)
+            data_train_copy = data_train.drop(indexes)
+            indexes = []
+            for i in range(int(len(data_test) / jump_length)):
+                for to_delete in variant:
+                    indexes.append(i * jump_length + to_delete)
+            data_test_copy = data_test.drop(indexes)
+
+            x_train, y_train, x_test, y_test, jump_data_length, num_columns, num_classes = prepare_data(data_train_copy, data_test_copy, pp_list)
+
+            model = run_multiple_times(jump_data_length, num_columns, num_classes, runs=3, conv=3, kernel=3, pool=2,
+                                       dense=2, act_func='tanh', loss='categorical_crossentropy', optim='Nadam', epochs=40,
+                                       x_train=x_train, y_train=y_train, x_test=x_test, y_test=y_test)
+            score = model.evaluate(x_test, y_test, verbose=1)
+
+            variant_output = [v * percentage for v in variant]
+            variant_output = list(set(full_list) - set(variant_output))
+            variant_output.sort()
+
+            scores[str(variant_output[0]) + ' - ' + str(variant_output[-1])] = score[1]
+
+        elif modeltype == 'dff':
+            data_train_copy = data_train.copy()
+            data_test_copy = data_test.copy()
+            for to_delete in variant:
+                data_train_copy = data_train_copy.drop([c for c in data_train.columns if c.startswith(str(int(to_delete * percentage)) + '_')], axis=1)
+                data_test_copy = data_test_copy.drop([c for c in data_train.columns if c.startswith(str(int(to_delete * percentage)) + '_')], axis=1)
+
+            x_train, y_train, x_test, y_test, num_columns, num_classes = prepare_data_oneliner(data_train_copy, data_test_copy, pp_list)
+
+            model = run_multiple_times_oneliner(num_columns, num_classes, runs=5, act_func='relu',
+                                                loss='categorical_crossentropy', optim='Nadam', epochs=100,
+                                                x_train=x_train, y_train=y_train, x_test=x_test, y_test=y_test)
+            score = model.evaluate(x_test, y_test, verbose=1)
+
+            variant_output = [v * percentage for v in variant]
+            variant_output = list(set(full_list) - set(variant_output))
+            variant_output.sort()
+
+            scores[str(variant_output[0]) + ' - ' + str(variant_output[-1])] = score[1]
+
+    print(scores)
+
+    plt.figure(figsize=(13, 13))
+    plt.suptitle('DFF without pp: percentage_mean_std_20')
+    plt.xlabel('Data')
+    plt.ylabel('Accuracy')
+    plt.axis([0, full_list[-1], 0, 100])
+    plt.xticks(range(0, 100 + percentage, percentage))
+    plt.yticks(range(0, 105, 5))
+    plt.grid(True, axis='x')
+    cmap = process_cmap('brg', len(scores))
+
+    for i in range(len(scores)):
+        entry = list(scores.items())[i]
+        start, end = entry[0].split('-')
+        acc = entry[1] * 100
+        plt.axhline(acc, (int(start) / 100), (int(end) + percentage) / 100, color=cmap[i])
+
+    plt.show()
+
+
 def create_colormap(shap_y_test, shap_values=None):
     """
     takes values and creates unique colormap, so that each jump, have always the sam color
@@ -366,10 +456,10 @@ def create_colormap(shap_y_test, shap_values=None):
 
 def main():
     neural_network = 'dff'  # 'dff'  'cnn'
-    run_modus = ''     # 'multi' 'grid'
+    run_modus = 'core'     # 'multi' 'grid' 'core'
     run = 50                # for multi runs or how often random grid search runs
-    data_train = pd.read_csv("Sprungdaten_processed/with_preprocessed/percentage/25/vector_percentage_mean_std_25_train.csv")
-    data_test = pd.read_csv("Sprungdaten_processed/with_preprocessed/percentage/25/vector_percentage_mean_std_25_test.csv")
+    data_train = pd.read_csv("Sprungdaten_processed/without_preprocessed/percentage/20/vector_percentage_mean_std_20_train.csv")
+    data_test = pd.read_csv("Sprungdaten_processed/without_preprocessed/percentage/20/vector_percentage_mean_std_20_test.csv")
     pp_list = [3]
 
     if neural_network == 'cnn':
@@ -389,6 +479,8 @@ def main():
             grid = RandomizedSearchCV(estimator=model, param_distributions=param_grid, verbose=1, n_iter=run, n_jobs=1)
             grid_result = grid.fit(x_test, y_test)
             print(grid_result.best_params_)
+        if run_modus == 'core':
+            jump_core_detection('cnn', data_train, data_test,  pp_list, jump_data_length)
 
     if neural_network == 'dff':
         x_train, y_train, x_test, y_test, num_columns, num_classes = prepare_data_oneliner(data_train, data_test, pp_list)
@@ -406,11 +498,13 @@ def main():
             grid = RandomizedSearchCV(estimator=model, param_distributions=param_grid, verbose=1, n_iter=run, n_jobs=1)
             grid_result = grid.fit(x_test, y_test)
             print(grid_result.best_params_)
+        if run_modus == 'core':
+            jump_core_detection('dff', data_train, data_test, pp_list)
 
     #model.save("models/DFF_without_mean_std_20")
-    model = keras.models.load_model("models/DFF_with_mean_std_25")
-    model.summary()
-    model.evaluate(x_test, y_test, verbose=1)
+    #model = keras.models.load_model("models/CNN_without_mean_5")
+    #model.summary()
+    #model.evaluate(x_test, y_test, verbose=1)
     shap.initjs()
     # colormap
     cmap = ['#393b79','#5254a3','#6b6ecf','#9c9ede','#637939','#8ca252','#b5cf6b','#cedb9c','#8c6d31','#bd9e39','#e7ba52',
@@ -498,7 +592,7 @@ def main():
     shap.image_plot(shap_values, -x_test[i])  # , labels=list(y_test.columns))
     """
 
-    #"""
+    """
     # Confusion matrix to find mistakes in classification
     cm = sklearn.metrics.confusion_matrix(y_test.idxmax(axis=1), pd.DataFrame(model.predict(x_test), columns=y_test.columns).idxmax(axis=1))
     disp = sklearn.metrics.ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=y_test.columns)
@@ -508,7 +602,7 @@ def main():
     disp.figure_.autofmt_xdate()
     plt.show()
     #plt.savefig('CNN_confusion_matrix_flag.png')
-    #"""
+    """
 
 
     return
