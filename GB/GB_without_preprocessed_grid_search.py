@@ -27,18 +27,12 @@ if __name__ == '__main__':
                 "../Sprungdaten_processed/without_preprocessed/percentage/" + str(
                     i) + "/vector_percentage_" + calc_type + str(
                     i) + "_test.csv")
-            # data = pd.read_csv(
-            #         "../Sprungdaten_processed/with_preprocessed/percentage/" + str(
-            #             i) + "/vector_percentage_" + calc_type + str(
-            #             i) + ".csv")
 
 
             # # define columns cut
             # start_column: str = 'DJump_SIG_I_x LapEnd'
             # end_column: str = str(100 - i) + '_Gyro_z_Fil'
             #
-            # if calc_type == 'mean_std_':
-            #     end_column: str = str(100 - i) + '_std_Gyro_z_Fil'
             #
             # # get X_train
             # X_train = train_merged.loc[:, start_column:end_column]
@@ -57,52 +51,13 @@ if __name__ == '__main__':
             # get y_test
             y_test = le.fit_transform(test_merged['Sprungtyp'])
 
-            # we create an instance of Neighbours Classifier and fit the data.
-            # for estimator in [100]:
-            #     for depth in [1, 2, 3, 4, 5]:
-            #         for learning_rate in [0.1, 0.01]:
-            #             clf = GradientBoostingClassifier(n_estimators=estimator, learning_rate=learning_rate,
-            #             max_depth=depth, random_state=2)
-            #
-            #             # for i in range(0, 4):
-            #                 # Train the model using the training sets
-            #             clf.fit(X_train, y_train)
-            #
-            #             # Predict the response for test dataset
-            #             y_pred = clf.predict(X_test)
-            #
-            #             # compare test and predicted targets
-            #             print(f"PARAMETER:  estimators: {estimator} | learning_rate: {learning_rate} | depth: {depth}")
-            #             print(f"Accuracy self: ", metrics.accuracy_score(y_test, y_pred))
-            #             #print(f"Accuracy f1 score weighted: {f1_score(y_test, y_pred, average='weighted')} ")
-            #             mean_prec, mean_rec, mean_f, mean_youden = rc_metrics(y_test, y_pred)
-            #             print(f"Accuracy f1 score: {str(mean_f.round(5))}")
-            #             print(f"Accuracy youden score: {str(mean_youden.round(5))}")
-            #             print("--------------------------------------------------------------")
-
-
-            # for i in range(0, 4):
-            # Train the model using the training sets
-            # clf.fit(X_train, y_train)
-
-            # Predict the response for test dataset
-            # y_pred = clf.predict(X_test)
 
             model = GradientBoostingClassifier()
 
             param_dist = {'n_estimators': [10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 200],
                           'max_depth': [3, 4, 5, 6, 7]}
-            n_iter=5
+            n_iter=10
 
             grid = RandomizedSearchCV(estimator=model, param_distributions=param_dist, verbose=1, n_iter=n_iter,  n_jobs=7, cv = 2)
             grid_result = grid.fit(X_test, y_test)
-            print(grid_result.best_params_)
-
-
-            # compare test and predicted targets
-            # print(f"PARAMETER:  estimators: {estimator} | learning_rate: {learning_rate} | depth: {depth}")
-            # print(f"Accuracy self: ", metrics.accuracy_score(y_test, y_pred))
-            # mean_prec, mean_rec, mean_f, mean_youden = rc_metrics(y_test, y_pred)
-            # print(f"Accuracy f1 score: {str(mean_f.round(5))}")
-            # print(f"Accuracy youden score: {str(mean_youden.round(5))}")
-            # print("--------------------------------------------------------------")
+            print(grid_result)

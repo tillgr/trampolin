@@ -92,7 +92,7 @@ if __name__ == '__main__':
 
             param_dist = {'n_estimators': [10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 200],
                           'max_depth': [3, 4, 5, 6, 7]}
-            n_iter=5
+            n_iter=10
 
             grid = RandomizedSearchCV(estimator=model, param_distributions=param_dist, verbose=1, n_iter=n_iter,  n_jobs=7, cv = 2)
             grid_result = grid.fit(X_test, y_test)
