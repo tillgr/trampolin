@@ -5,7 +5,7 @@ from holoviews.plotting.util import process_cmap
 from matplotlib import pyplot as plt
 from matplotlib.colors import ListedColormap
 from sklearn.linear_model import SGDClassifier
-from sklearn.metrics import accuracy_score, f1_score, plot_confusion_matrix
+from sklearn.metrics import accuracy_score, f1_score, plot_confusion_matrix, ConfusionMatrixDisplay
 from random_classifier import metrics
 from sklearn.metrics import confusion_matrix
 from sklearn import preprocessing
@@ -34,30 +34,30 @@ def sample_x_test(x_test, y_test, num):
 
 if __name__ == '__main__':
 
-    '''train_data = pd.read_csv(
+    train_data = pd.read_csv(
         '../Sprungdaten_processed/with_preprocessed/percentage/10/vector_percentage_mean_std_10_train.csv')
     test_data = pd.read_csv(
-        '../Sprungdaten_processed/with_preprocessed/percentage/10/vector_percentage_mean_std_10_test.csv')'''
-    train_data = pd.read_csv(
+        '../Sprungdaten_processed/with_preprocessed/percentage/10/vector_percentage_mean_std_10_test.csv')
+    '''train_data = pd.read_csv(
         '../Sprungdaten_processed/without_preprocessed/percentage/10/vector_percentage_mean_std_10_train.csv')
     test_data = pd.read_csv(
-        '../Sprungdaten_processed/without_preprocessed/percentage/10/vector_percentage_mean_std_10_test.csv')
+        '../Sprungdaten_processed/without_preprocessed/percentage/10/vector_percentage_mean_std_10_test.csv')'''
 
     # get_features (X)
     '''start_column: str = 'DJump_SIG_I_x LapEnd'
     end_column: str = '90_std_Gyro_z_Fil' '''
 
-    start_column: str = '0_mean_Acc_N_Fil'
-    end_column: str = '90_std_Gyro_z_Fil'
+    start_column: str = list(test_data.columns)[2]
+    end_column: str = list(test_data.columns)[-1]
 
-    ''' p = train_data.drop([col for col in train_data.columns if 'DJump_SIG_I_S' in col], axis=1)
-    t = test_data.drop([col for col in test_data.columns if 'DJump_SIG_I_S' in col], axis=1)  '''
+    p = train_data.drop([col for col in train_data.columns if 'DJump_SIG_I_S' in col], axis=1)
+    t = test_data.drop([col for col in test_data.columns if 'DJump_SIG_I_S' in col], axis=1)
 
-    X_train = train_data.loc[:, start_column:end_column]
-    y_train = (train_data['Sprungtyp'])
+    X_train = p.loc[:, start_column:end_column]
+    y_train = (p['Sprungtyp']).to_numpy()
 
-    X_test = test_data.loc[:, start_column:end_column]
-    y_test = (test_data['Sprungtyp'])
+    X_test = t.loc[:, start_column:end_column]
+    y_test = (t['Sprungtyp']).to_numpy()
 
     clf = SGDClassifier(loss='log', penalty='l1', alpha=0.0001,
                         l1_ratio=0.15, fit_intercept=True, max_iter=10000,
@@ -75,9 +75,9 @@ if __name__ == '__main__':
 
     # print(y_train.to_frame())
 
-    '''explainer = shap.KernelExplainer(clf.decision_function, X_test.sample(n=50), link='identity')
+    explainer = shap.KernelExplainer(clf.decision_function, X_test.sample(n=50), link='identity')
     shap_values = explainer.shap_values(X_test.sample(n=10))
-    shap.summary_plot(shap_values[0], X_test.sample(n=10))'''
+    shap.summary_plot(shap_values[0], X_test.sample(n=10))
 
     # colormap
     cmap = ['#393b79', '#5254a3', '#6b6ecf', '#9c9ede', '#637939', '#8ca252', '#b5cf6b', '#cedb9c', '#8c6d31',
@@ -100,7 +100,7 @@ if __name__ == '__main__':
 
     shap.summary_plot(shap_values, shap_x_test, plot_type='bar', plot_size=(20, 17), color=ListedColormap(cmap),
                       class_names=shap_y_test.unique(), max_display=20)
-    '''shap.summary_plot(shap_values, shap_x_test, plot_type='bar', plot_size=(15, 17), color=ListedColormap(cmap),
+    shap.summary_plot(shap_values, shap_x_test, plot_type='bar', plot_size=(15, 17), color=ListedColormap(cmap),
                       class_names=shap_y_test.unique(), max_display=68)
    
     saltoA = np.where(shap_y_test.unique() == 'Salto A')[0][0]
@@ -109,7 +109,18 @@ if __name__ == '__main__':
     shap.summary_plot(shap_values[saltoB], shap_x_test, plot_size=(12, 12), title='Salto B')
     saltoC = np.where(shap_y_test.unique() == 'Salto C')[0][0]
     shap.summary_plot(shap_values[saltoC], shap_x_test, plot_size=(12, 12), title='Salto C')
-    cm = confusion_matrix(y_test, y_pred)
-    fig, ax = plt.subplots(figsize=(20, 20))
-    plot_confusion_matrix(clf, shap_x_test, shap_y_test, xticks_rotation='vertical', display_labels=set(y_test), cmap=plt.cm.Blues, normalize=None, ax = ax)
-    plt.show() '''
+    cm = confusion_matrix(y_test, y_pred, labels=clf.classes_)
+    disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=clf.classes_)
+    disp.plot(cmap=cmap_cm)
+    disp.figure_.set_figwidth(35)
+    disp.figure_.set_figheight(25)
+    disp.figure_.autofmt_xdate()
+    plt.tick_params(axis='x', labelsize=10, labelrotation=45, grid_linewidth=5)
+    plt.title("SGD/with_preprocessed/vector_percentage_mean_std_10")
+    plt.tight_layout()
+    #plt.savefig('SGD/with_preprocessed/vector_percentage_mean_std_10')
+    plt.show()
+    #fig, ax = plt.subplots(figsize=(20, 20))
+    #plot_confusion_matrix(clf, shap_x_test, shap_y_test, xticks_rotation='vertical', display_labels=set(y_test), cmap=plt.cm.Blues, normalize=None, ax = ax)
+    #plt.show()
+
