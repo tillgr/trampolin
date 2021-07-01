@@ -336,7 +336,7 @@ def jump_core_detection(modeltype, data_train, data_test, pp_list, jump_length=0
 
             x_train, y_train, x_test, y_test, jump_data_length, num_columns, num_classes = prepare_data(data_train_copy, data_test_copy, pp_list)
 
-            model = run_multiple_times(jump_data_length, num_columns, num_classes, runs=3, conv=3, kernel=3, pool=2,
+            model = run_multiple_times(jump_data_length, num_columns, num_classes, runs=2, conv=3, kernel=3, pool=2,
                                        dense=2, act_func='tanh', loss='categorical_crossentropy', optim='Nadam', epochs=40,
                                        x_train=x_train, y_train=y_train, x_test=x_test, y_test=y_test)
             score = model.evaluate(x_test, y_test, verbose=1)
@@ -356,7 +356,7 @@ def jump_core_detection(modeltype, data_train, data_test, pp_list, jump_length=0
 
             x_train, y_train, x_test, y_test, num_columns, num_classes = prepare_data_oneliner(data_train_copy, data_test_copy, pp_list)
 
-            model = run_multiple_times_oneliner(num_columns, num_classes, runs=5, act_func='relu',
+            model = run_multiple_times_oneliner(num_columns, num_classes, runs=3, act_func='relu',
                                                 loss='categorical_crossentropy', optim='Nadam', epochs=100,
                                                 x_train=x_train, y_train=y_train, x_test=x_test, y_test=y_test)
             score = model.evaluate(x_test, y_test, verbose=1)
@@ -369,21 +369,29 @@ def jump_core_detection(modeltype, data_train, data_test, pp_list, jump_length=0
 
     print(scores)
 
+    min_y_value = 70
     plt.figure(figsize=(13, 13))
-    plt.suptitle('DFF without pp: percentage_mean_std_20')
+    plt.suptitle('DFF with pp: percentage_mean_std_25')
     plt.xlabel('Data')
     plt.ylabel('Accuracy')
-    plt.axis([0, full_list[-1], 0, 100])
+    plt.axis([0, full_list[-1], min_y_value, 100])
     plt.xticks(range(0, 100 + percentage, percentage))
-    plt.yticks(range(0, 105, 5))
+    plt.yticks(range(min_y_value, 105, 5))
     plt.grid(True, axis='x')
-    cmap = process_cmap('brg', len(scores))
+    #cmap = process_cmap('brg', len(scores))
 
     for i in range(len(scores)):
         entry = list(scores.items())[i]
         start, end = entry[0].split('-')
         acc = entry[1] * 100
-        plt.axhline(acc, (int(start) / 100), (int(end) + percentage) / 100, color=cmap[i])
+        if int(acc) >= min_y_value:
+            if start.replace(' ', '') == '0':
+                plt.axhline(acc, (int(start) / 100), (int(end) + percentage) / 100, color='#0000ff', alpha=0.7)
+            elif end.replace(' ', '') == str(full_list[-1]):
+                plt.axhline(acc, (int(start) / 100), (int(end) + percentage) / 100, color='#ff0000', alpha=0.7)
+            else:
+                plt.axhline(acc, (int(start) / 100), (int(end) + percentage) / 100, color='#00ff00', alpha=0.7)
+
 
     plt.show()
 
@@ -458,8 +466,8 @@ def main():
     neural_network = 'dff'  # 'dff'  'cnn'
     run_modus = 'core'     # 'multi' 'grid' 'core'
     run = 50                # for multi runs or how often random grid search runs
-    data_train = pd.read_csv("Sprungdaten_processed/without_preprocessed/percentage/20/vector_percentage_mean_std_20_train.csv")
-    data_test = pd.read_csv("Sprungdaten_processed/without_preprocessed/percentage/20/vector_percentage_mean_std_20_test.csv")
+    data_train = pd.read_csv("Sprungdaten_processed/with_preprocessed/percentage/25/vector_percentage_mean_std_25_train.csv")
+    data_test = pd.read_csv("Sprungdaten_processed/with_preprocessed/percentage/25/vector_percentage_mean_std_25_test.csv")
     pp_list = [3]
 
     if neural_network == 'cnn':
