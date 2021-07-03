@@ -545,7 +545,7 @@ def devectorize(data):
         row = row[1]    # get the series
         row = row.to_frame().T.reset_index(drop=True)
         for p in percent_list:
-            n = row[[col for col in row.columns if col.startswith(str(int(p)))]]
+            n = row[[col for col in row.columns if col.startswith(str(int(p))+'_')]]
             n.columns = without_percent_name
             temp = temp.append(n, ignore_index=True)
         temp['Sprungtyp'] = row['Sprungtyp'][0]
@@ -739,7 +739,17 @@ def main():
         save_as_csv(vector_train_data, 'vector_' + name + percent + '_train', folder=pp + '/percentage/' + percent)
         save_as_csv(vector_test_data, 'vector_' + name + percent + '_test', folder=pp + '/percentage/' + percent)
         save_as_csv(vector_data, 'vector_' + name + percent, folder=pp + '/percentage/' + percent)
-    """
+    #"""
+    pp = 'with'
+    name = 'mean_'
+    for p in ['1']:  # ['25', '20', '10', '5', '2', '1']
+        print(p)
+        data = pd.read_csv(
+            'Sprungdaten_processed/' + pp + '_preprocessed/percentage/' + p + '/vector_percentage_' + name + p + '.csv')
+        df = mean_jump_generator(data)
+        save_as_csv(df, 'vector_AJ_percentage_' + name + p, folder=pp + '_preprocessed/percentage/' + p)
+        devec_df = devectorize(df)
+        save_as_csv(devec_df, 'AJ_percentage_' + name + p, folder=pp + '_preprocessed/percentage/' + p)
 
     # Generating Mean Data and devectoring it
     """
