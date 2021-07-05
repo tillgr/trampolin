@@ -93,6 +93,9 @@ def prepare_data_oneliner(data_train, data_test, pp_list):
     x_test = data_test.drop('Sprungtyp', axis=1)
     x_test = x_test.drop(['SprungID'], axis=1)
 
+    x_train = x_train.drop([col for col in x_train.columns if 'DJump' not in col], axis=1)
+    x_test = x_test.drop([col for col in x_test.columns if 'DJump' not in col], axis=1)
+
     num_columns = len(x_train.columns)
 
     y_train = data_train['Sprungtyp']
@@ -500,7 +503,7 @@ def bar_plots(shap_values, shap_x_test, shap_y_test, bar=None, jumps=None, folde
             shap.summary_plot(shap_values, shap_x_test, plot_type='bar', plot_size=(25, 20),
                               color=ListedColormap('#616161'), class_names=shap_y_test.unique(),
                               max_display=len(shap_x_test.columns), show=False)
-            plt.savefig(folder + 'summary_plot'+  name + '.png')
+            plt.savefig(folder + 'summary_plot' + name + '.png')
         plt.clf()
 
     elif bar == 'single':
@@ -531,13 +534,15 @@ def bar_plots(shap_values, shap_x_test, shap_y_test, bar=None, jumps=None, folde
         data = np.array(list(jump_dict.values()))
         data_cum = data.cumsum(axis=1)
         # rainbow or turbo cmap
-        category_colors = plt.get_cmap('rainbow')(
-            np.linspace(0.15, 0.85, len([item for item in feature_names if item.startswith('0')])))
-        # how often category_colors have to repeat itself
-        number_sub_cm = len([item for item in feature_names if not item.startswith('DJump')]) / \
-                        len([item for item in feature_names if item.startswith('0')])
-        category_colors = np.tile(category_colors, (int(number_sub_cm), 1))
-
+        if len([item for item in feature_names if item.startswith('0')]) > 0:
+            category_colors = plt.get_cmap('rainbow')(
+                np.linspace(0.15, 0.85, len([item for item in feature_names if item.startswith('0')])))
+            # how often category_colors have to repeat itself
+            number_sub_cm = len([item for item in feature_names if not item.startswith('DJump')]) / \
+                            len([item for item in feature_names if item.startswith('0')])
+            category_colors = np.tile(category_colors, (int(number_sub_cm), 1))
+        else:
+            category_colors = np.ndarray(shape=(1, 4))
         count_djumps = len([item for item in feature_names if item.startswith('DJump')])
         # if Djumps in features, than other colormap must be appended
         if count_djumps > 0:
@@ -579,7 +584,7 @@ def bar_plots(shap_values, shap_x_test, shap_y_test, bar=None, jumps=None, folde
                         np.tile(dj_12_colors, (int(count_djumps/12), 1))))
             # if djump contains nine pack
             else:
-                c = int(count_djumps - 9 / 12)
+                c = int((count_djumps - 9) / 12)
                 sub_cm = np.concatenate((dj_9_colors, np.tile(dj_12_colors, (c, 1))))
                 if feature_names[0].startswith('DJump'):
                     category_colors = np.concatenate((sub_cm, category_colors))
@@ -614,12 +619,12 @@ def bar_plots(shap_values, shap_x_test, shap_y_test, bar=None, jumps=None, folde
 def main():
     neural_network = 'dff'  # 'dff'  'cnn'
     run_modus = ''  # 'multi' 'grid' 'core'
-    run = 50  # for multi runs or how often random grid search runs
+    run = 100  # for multi runs or how often random grid search runs
     data_train = pd.read_csv(
         "Sprungdaten_processed/with_preprocessed/percentage/25/vector_percentage_mean_std_25_train.csv")
     data_test = pd.read_csv(
         "Sprungdaten_processed/with_preprocessed/percentage/25/vector_percentage_mean_std_25_test.csv")
-    pp_list = [3]
+    pp_list = [1, 2, 3, 4]
 
     if neural_network == 'cnn':
         x_train, y_train, x_test, y_test, jump_data_length, num_columns, num_classes = prepare_data(data_train,
@@ -649,7 +654,7 @@ def main():
         if run_modus == 'multi':
             model = run_multiple_times_oneliner(num_columns, num_classes, runs=run, act_func='relu',
                                                 loss='categorical_crossentropy',
-                                                optim='Nadam', epochs=100, x_train=x_train, y_train=y_train,
+                                                optim='adam', epochs=40, x_train=x_train, y_train=y_train,
                                                 x_test=x_test, y_test=y_test)
             model.evaluate(x_test, y_test, verbose=1)
         if run_modus == 'grid':
@@ -664,8 +669,8 @@ def main():
         if run_modus == 'core':
             jump_core_detection('dff', data_train, data_test, pp_list)
 
-    # model.save("models/DFF_without_mean_std_20")
-    model = keras.models.load_model("models/DFF_with_mean_std_25")
+    # model.save("models/DFF_only_pp_")
+    model = keras.models.load_model("models/DFF_only_pp_")
     # model.summary()
     # model.evaluate(x_test, y_test, verbose=1)
     shap.initjs()
@@ -722,10 +727,10 @@ def main():
         plt.clf()
     """
     bar_plots(shap_values, shap_x_test, shap_y_test, bar='percentual',
-              folder='plots/DFF/with_preprocessed/')
+              folder='plots/DFF/with_preprocessed/', name='only_preprocessed')
 
-    bar_plots(shap_values, shap_x_test, shap_y_test, bar='percentual', jumps=['Salto A', 'Salto B', 'Salto C', 'Salto rw A', 'Salto rw B', 'Salto rw C', 'Schraubensalto', 'Schraubensalto A', 'Schraubensalto C',  'Doppelsalto B', 'Doppelsalto C'], folder='plots/DFF/with_preprocessed/', name='Saltos')
-    # bar_plots(shap_values, shap_x_test, shap_y_test, folder='plots/DFF/without_preprocessed/')
+    bar_plots(shap_values, shap_x_test, shap_y_test, bar='percentual', jumps=['Salto A', 'Salto B', 'Salto C', 'Salto rw A', 'Salto rw B', 'Salto rw C', 'Schraubensalto', 'Schraubensalto A', 'Schraubensalto C',  'Doppelsalto B', 'Doppelsalto C'], folder='plots/DFF/with_preprocessed/', name='Saltos_only_preprocessed')
+    bar_plots(shap_values, shap_x_test, shap_y_test, folder='plots/DFF/with_preprocessed/', name='only_preprocessed')
     # """
 
     # CNN
