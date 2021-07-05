@@ -168,8 +168,8 @@ def explain_model(datasets: list, feature_start: str, feature_end: str, drops_ke
     # train, test = get_train_test_data(datasets)
     # train = read_processed_data(datasets[0] + "_train.csv")
     # test = read_processed_data(datasets[0] + "_test.csv")
-    train = pd.read_csv("Sprungdaten_processed/with_preprocessed/percentage/20/vector_percentage_mean_20_train.csv")
-    test = pd.read_csv("Sprungdaten_processed/with_preprocessed/percentage/20/vector_AJ_percentage_mean_20.csv")
+    train = pd.read_csv("Sprungdaten_processed/without_preprocessed/percentage/10/vector_percentage_mean_std_10_train.csv")
+    test = pd.read_csv("Sprungdaten_processed/without_preprocessed/percentage/10/vector_AJ_percentage_mean_std_10.csv")
 
     drops = [col for col in train.columns if any(keyword in col for keyword in drops_keywords)]
     if reverse_drop:
@@ -186,8 +186,8 @@ def explain_model(datasets: list, feature_start: str, feature_end: str, drops_ke
     X = get_samples_features(train, feature_start, feature_end)
     y = get_targets(train)
     y_test = get_targets(test)
-    # clf = GaussianNB()
-    clf = SVC(kernel='linear')
+    clf = GaussianNB()
+    # clf = SVC(kernel='linear')
     clf.fit(X, y)
     X_test = get_samples_features(test, feature_start, feature_end)
     y_pred = clf.predict(X_test)
@@ -215,8 +215,8 @@ def explain_model(datasets: list, feature_start: str, feature_end: str, drops_ke
     '''
     shap_x_train, shap_y_train = sample_x_test(X, y, 3)
     shap_x_test, shap_y_test = sample_x_test(X_test, y_test, 6)
-    # explainer = shap.KernelExplainer(clf.predict_proba, shap_x_train) #, link='identity'
-    explainer = shap.KernelExplainer(clf.decision_function, shap_x_train)
+    explainer = shap.KernelExplainer(clf.predict_proba, shap_x_train) #, link='identity'
+    # explainer = shap.KernelExplainer(clf.decision_function, shap_x_train)
     # df = X_test.iloc[index].to_frame().transpose()
     # shap_values = explainer.shap_values(X_test.iloc[index].to_frame().transposei())
     shap_values = explainer.shap_values(shap_x_test)
@@ -231,12 +231,12 @@ def explain_model(datasets: list, feature_start: str, feature_end: str, drops_ke
     shap.summary_plot(shap_values[saltoC], shap_x_test, plot_size=(25, 15), title='Salto C')
     '''
     bar_plots(shap_values, shap_x_test, shap_y_test, bar='percentual',
-              folder='plots/SVC/with_preprocessed/bar_plots')
+              folder='plots/GNB/without_preprocessed/')
     bar_plots(shap_values, shap_x_test, shap_y_test, bar='summary',
-              folder='plots/SVC/with_preprocessed/bar_plots')
+              folder='plots/GNB/without_preprocessed/')
     bar_plots(shap_values, shap_x_test, shap_y_test, bar='percentual',
               jumps=['Salto A', 'Salto B', 'Salto C', 'Salto rw A', 'Salto rw B', 'Salto rw C', 'Schraubensalto', 'Schraubensalto A',
-                     'Schraubensalto C',  'Doppelsalto B', 'Doppelsalto C'], folder='plots/SVC/with_preprocessed/bar_plots', name='Saltos')
+                     'Schraubensalto C',  'Doppelsalto B', 'Doppelsalto C'], folder='plots/GNB/without_preprocessed/', name='Saltos')
 
 
 def collect_all_data_sets(folder: str, data_sets: set):
