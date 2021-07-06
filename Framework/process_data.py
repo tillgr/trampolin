@@ -821,11 +821,3 @@ def make_AJ_jumps(preprocessed, name, percentages):
         save_as_csv(df, 'vector_AJ_' + name + p, folder=preprocessed + '/percentage/' + p)
         devec_df = devectorize(df)
         save_as_csv(devec_df, 'AJ_' + name + p, folder=preprocessed + '/percentage/' + p)
-
-
-def main():
-    make_AJ_jumps('without_preprocessed', 'percentage', ['25'])
-
-
-if __name__ == '__main__':
-    main()
