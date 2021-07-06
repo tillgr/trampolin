@@ -6,13 +6,13 @@ from matplotlib import pyplot as plt
 from matplotlib.colors import ListedColormap
 from sklearn.linear_model import SGDClassifier
 from sklearn.metrics import accuracy_score, f1_score, plot_confusion_matrix, ConfusionMatrixDisplay
-from neural_networks import create_colormap
+from neural_networks import create_colormap, bar_plots
 from random_classifier import metrics
 from sklearn.metrics import confusion_matrix
 from sklearn import preprocessing
 
 
-def bar_plots(shap_values, shap_x_test, shap_y_test, bar=None, jumps=None, folder=None, name=None):
+def barr_plots(shap_values, shap_x_test, shap_y_test, bar=None, jumps=None, folder=None, name=None):
     """
 
     :param shap_values:
@@ -176,7 +176,7 @@ if __name__ == '__main__':
     '''train_data = pd.read_csv(
         '../Sprungdaten_processed/with_preprocessed/percentage/10/vector_percentage_mean_std_10_train.csv')
     test_data = pd.read_csv(
-        '../Sprungdaten_processed/with_preprocessed/percentage/10/vector_AJ_percentage_mean_std_10.csv')'''
+        '../Sprungdaten_processed/with_preprocessed/percentage/10/vector_percentage_mean_std_10_test.csv')'''
     train_data = pd.read_csv(
         '../Sprungdaten_processed/without_preprocessed/percentage/10/vector_percentage_mean_std_10_train.csv')
     test_data = pd.read_csv(
@@ -188,8 +188,11 @@ if __name__ == '__main__':
     start_column: str = list(train_data.columns)[2]
     end_column: str = list(train_data.columns)[-1]
 
-    # p = train_data.drop([col for col in train_data.columns if 'DJump_SIG_I_S' in col], axis=1)
-    # t = test_data.drop([col for col in test_data.columns if 'DJump_SIG_I_S' in col], axis=1)
+    '''start_aj: str = list(test_data.columns)[0]
+    end_aj: str = list(test_data.columns)[-3]'''
+
+    #p = train_data.drop([col for col in train_data.columns if 'DJump_SIG_I_S' in col], axis=1)
+    #t = test_data.drop([col for col in test_data.columns if 'DJump_SIG_I_S' in col], axis=1)
 
     X_train = train_data.loc[:, start_column:end_column]
     y_train = (train_data['Sprungtyp']).to_numpy()
@@ -216,8 +219,8 @@ if __name__ == '__main__':
     cmap_cm.insert(-1, '#000000')
     cmap_cm = ListedColormap(cmap_cm)
 
-    # cmap_cm_AJ = ['#ffffff', '#048166']
-    # cmap_cm_AJ = ListedColormap(cmap_cm_AJ)
+    #cmap_cm_AJ = ['#ffffff', '#048166']
+    #cmap_cm_AJ = ListedColormap(cmap_cm_AJ)
 
     shap_x_test, shap_y_test = sample_x_test(X_test, y_test, 3)
     shap_x_train, shap_y_train = sample_x_test(X_train, y_train, 6)
@@ -225,14 +228,16 @@ if __name__ == '__main__':
     explainer = shap.KernelExplainer(clf.decision_function, shap_x_train)
     shap_values = explainer.shap_values(shap_x_test)
 
-    bar_plots(shap_values, shap_x_test, shap_y_test, bar='percentual',
+    bar_plots(shap_values, shap_x_test, shap_y_test, bar='percentual', size=(50, 30),
               folder='../plots/SGD/without_preprocessed/', name='without_preprocessed')
 
-    bar_plots(shap_values, shap_x_test, shap_y_test, bar='percentual',
+    bar_plots(shap_values, shap_x_test, shap_y_test, bar='percentual', size=(50, 30),
               jumps=['Salto A', 'Salto B', 'Salto C', 'Salto rw A', 'Salto rw B', 'Salto rw C', 'Schraubensalto',
                      'Schraubensalto A', 'Schraubensalto C', 'Doppelsalto B', 'Doppelsalto C'],
               folder='../plots/SGD/without_preprocessed/', name='Saltos_without_preprocessed')
-    bar_plots(shap_values, shap_x_test, shap_y_test, folder='../plots/SGD/without_preprocessed/',
+
+    bar_plots(shap_values, shap_x_test, shap_y_test, size=(30, 45), bar='summary',
+              folder='../plots/SGD/without_preprocessed/',
               name='without_preprocessed')
 
     '''shap.summary_plot(shap_values, shap_x_test, plot_type='bar', plot_size=(20, 17), color=ListedColormap(cmap),
@@ -240,24 +245,24 @@ if __name__ == '__main__':
         shap.summary_plot(shap_values, shap_x_test, plot_type='bar', plot_size=(15, 17), color=ListedColormap(cmap),
                       class_names=shap_y_test.unique(), max_display=68)'''
 
-    '''saltoA = np.where(shap_y_test.unique() == 'Salto A')[0][0]
-    shap.summary_plot(shap_values[saltoA], shap_x_test, plot_size=(12, 12), title='Salto A')
+    saltoA = np.where(shap_y_test.unique() == 'Salto A')[0][0]
+    shap.summary_plot(shap_values[saltoA], shap_x_test, plot_size=(20, 12), title='Salto A')
     saltoB = np.where(shap_y_test.unique() == 'Salto B')[0][0]
-    shap.summary_plot(shap_values[saltoB], shap_x_test, plot_size=(12, 12), title='Salto B')
+    shap.summary_plot(shap_values[saltoB], shap_x_test, plot_size=(20, 12), title='Salto B')
     saltoC = np.where(shap_y_test.unique() == 'Salto C')[0][0]
-    shap.summary_plot(shap_values[saltoC], shap_x_test, plot_size=(12, 12), title='Salto C')'''
+    shap.summary_plot(shap_values[saltoC], shap_x_test, plot_size=(20, 12), title='Salto C')
 
-    '''cm = confusion_matrix(y_test, y_pred, labels=clf.classes_)
+    cm = confusion_matrix(y_test, y_pred, labels=clf.classes_)
     disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=clf.classes_)
-    disp.plot(cmap=cmap_cm_AJ)
+    disp.plot(cmap=cmap_cm)
     disp.figure_.set_figwidth(35)
     disp.figure_.set_figheight(25)
     disp.figure_.autofmt_xdate()
     plt.tick_params(axis='x', labelsize=10, labelrotation=45, grid_linewidth=5)
-    plt.title("SGD_without_mean_std_10_ConfusionMatrix_AJ")
+    plt.title("SGD_without_mean_std_10_ConfusionMatrix")
     plt.tight_layout()
-    plt.savefig('../plots/SGD/without_preprocessed/AJ')
-    plt.show()'''
+    plt.savefig('../plots/SGD/without_preprocessed/')
+    plt.show()
     # fig, ax = plt.subplots(figsize=(20, 20))
     # plot_confusion_matrix(clf, shap_x_test, shap_y_test, xticks_rotation='vertical', display_labels=set(y_test), cmap=plt.cm.Blues, normalize=None, ax = ax)
     # plt.show()
