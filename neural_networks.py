@@ -93,8 +93,9 @@ def prepare_data_oneliner(data_train, data_test, pp_list):
     x_test = data_test.drop('Sprungtyp', axis=1)
     x_test = x_test.drop(['SprungID'], axis=1)
 
-    x_train = x_train.drop([col for col in x_train.columns if 'DJump' not in col], axis=1)
-    x_test = x_test.drop([col for col in x_test.columns if 'DJump' not in col], axis=1)
+    # for Djump only
+    #x_train = x_train.drop([col for col in x_train.columns if 'DJump' not in col], axis=1)
+    #x_test = x_test.drop([col for col in x_test.columns if 'DJump' not in col], axis=1)
 
     num_columns = len(x_train.columns)
 
@@ -476,43 +477,65 @@ def create_colormap(shap_y_test, shap_values=None):
     return cmap
 
 
-def bar_plots(shap_values, shap_x_test, shap_y_test, bar=None, jumps=None, folder=None, name=None):
+def bar_plots(shap_values, shap_x_test, shap_y_test, bar='summary', size=None, jumps=None, folder=None, name=None, max_display=None):
     """
-
     :param shap_values:
     :param shap_x_test:
     :param shap_y_test:
     :param bar: different bar plots, can be 'summary', 'single' or 'percentual'
+    :param size: tuple -> for individual plot size
     :param jumps: for 'single' and 'percentual' you can imput a list with the jump names, for that bar plots should be created
     :param folder: path, where the plots should be saved, whens its empty, than plots will be shown and not be saved
     :param name: for saving the plot you can choose an other name
+    :param max_display: int -> for summary plot, if its none, than all features will be display
     :return:
     """
+    if size is None:
+        plot_size = {
+            'summary': (25, 20),
+            'summary_color': (25, 20),
+            'single': (20, 20),
+            'percentual': (30, 18)
+        }
+        size = plot_size[bar]
     if name is None:
         name = ''
     else:
         name = '-' + name
     if jumps is None:
         jumps = []
-    if bar is None or bar == 'summary':
+    if max_display is None:
+        max_display = len(shap_x_test.columns)
+
+    if bar == 'summary':
         if folder is None:
-            shap.summary_plot(shap_values, shap_x_test, plot_type='bar', plot_size=(25, 20),
+            shap.summary_plot(shap_values, shap_x_test, plot_type='bar', plot_size=size,
                               color=ListedColormap('#616161'), class_names=shap_y_test.unique(),
-                              max_display=len(shap_x_test.columns))
+                              max_display=max_display)
         else:
-            shap.summary_plot(shap_values, shap_x_test, plot_type='bar', plot_size=(25, 20),
+            shap.summary_plot(shap_values, shap_x_test, plot_type='bar', plot_size=size,
                               color=ListedColormap('#616161'), class_names=shap_y_test.unique(),
-                              max_display=len(shap_x_test.columns), show=False)
+                              max_display=max_display, show=False)
             plt.savefig(folder + 'summary_plot' + name + '.png')
         plt.clf()
-
+    elif bar == 'summary_color':
+        if folder is None:
+            shap.summary_plot(shap_values, shap_x_test, plot_type='bar', plot_size=size,
+                              color=create_colormap(shap_y_test, shap_values), class_names=shap_y_test.unique(),
+                              max_display=max_display)
+        else:
+            shap.summary_plot(shap_values, shap_x_test, plot_type='bar', plot_size=size,
+                              color=create_colormap(shap_y_test, shap_values), class_names=shap_y_test.unique(),
+                              max_display=max_display, show=False)
+            plt.savefig(folder + 'summary_plot_color' + name + '.png')
+        plt.clf()
     elif bar == 'single':
         if len(jumps) == 0:
             jumps = shap_y_test.unique()
         for jump in jumps:
             color_string = create_colormap(jump)
             shap.summary_plot(shap_values[np.where(shap_y_test.unique() == jump)[0][0]].__abs__(), shap_x_test,
-                              plot_type='bar', color=color_string, plot_size=(20, 20), show=False)
+                              plot_type='bar', color=color_string, plot_size=size, show=False)
             if folder is None:
                 plt.show()
             else:
@@ -591,11 +614,10 @@ def bar_plots(shap_values, shap_x_test, shap_y_test, bar=None, jumps=None, folde
                 else:
                     category_colors = np.concatenate((category_colors, sub_cm))
 
-        fig, ax = plt.subplots(figsize=(30, 18))
+        fig, ax = plt.subplots(figsize=size)
         ax.invert_yaxis()
         ax.xaxis.set_visible(False)
         ax.set_xlim(0, np.sum(data, axis=1).max())
-
         for i, (colname, color) in enumerate(zip(feature_names.tolist(), category_colors)):
             widths = data[:, i]
             starts = data_cum[:, i] - widths
@@ -605,7 +627,10 @@ def bar_plots(shap_values, shap_x_test, shap_y_test, bar=None, jumps=None, folde
             r, g, b, _ = color
             # text_color = 'white' if r * g * b < 0.5 else 'darkgrey'
             # ax.bar_label(rects, label_type='center', color=text_color)
-            ax.legend(ncol=1, bbox_to_anchor=(1.005, 1), loc='upper left', borderaxespad=0.)
+            if len(feature_names) < 70:
+                ax.legend(ncol=1, bbox_to_anchor=(1.005, 1), loc='upper left', borderaxespad=0.)
+            else:
+                ax.legend(ncol=2, bbox_to_anchor=(1.005, 1), loc='upper left', borderaxespad=0.)
         plt.suptitle('Percentual impact bar plot of the individual features')
 
         if folder is None:
@@ -624,7 +649,7 @@ def main():
         "Sprungdaten_processed/with_preprocessed/percentage/25/vector_percentage_mean_std_25_train.csv")
     data_test = pd.read_csv(
         "Sprungdaten_processed/with_preprocessed/percentage/25/vector_percentage_mean_std_25_test.csv")
-    pp_list = [1, 2, 3, 4]
+    pp_list = [3]
 
     if neural_network == 'cnn':
         x_train, y_train, x_test, y_test, jump_data_length, num_columns, num_classes = prepare_data(data_train,
@@ -670,7 +695,7 @@ def main():
             jump_core_detection('dff', data_train, data_test, pp_list)
 
     # model.save("models/DFF_only_pp_")
-    model = keras.models.load_model("models/DFF_only_pp_")
+    model = keras.models.load_model("models/DFF_with_mean_std_25")
     # model.summary()
     # model.evaluate(x_test, y_test, verbose=1)
     shap.initjs()
@@ -726,11 +751,10 @@ def main():
         # plt.savefig('plots/DFF/with_preprocessed/jump_analysis/' + jump.replace('/', '-') + '.png')
         plt.clf()
     """
-    bar_plots(shap_values, shap_x_test, shap_y_test, bar='percentual',
-              folder='plots/DFF/with_preprocessed/', name='only_preprocessed')
+    bar_plots(shap_values, shap_x_test, shap_y_test, bar='percentual')
 
-    bar_plots(shap_values, shap_x_test, shap_y_test, bar='percentual', jumps=['Salto A', 'Salto B', 'Salto C', 'Salto rw A', 'Salto rw B', 'Salto rw C', 'Schraubensalto', 'Schraubensalto A', 'Schraubensalto C',  'Doppelsalto B', 'Doppelsalto C'], folder='plots/DFF/with_preprocessed/', name='Saltos_only_preprocessed')
-    bar_plots(shap_values, shap_x_test, shap_y_test, folder='plots/DFF/with_preprocessed/', name='only_preprocessed')
+    bar_plots(shap_values, shap_x_test, shap_y_test, bar='percentual', jumps=['Salto A', 'Salto B', 'Salto C', 'Salto rw A', 'Salto rw B', 'Salto rw C', 'Schraubensalto', 'Schraubensalto A', 'Schraubensalto C',  'Doppelsalto B', 'Doppelsalto C'])
+    bar_plots(shap_values, shap_x_test, shap_y_test)
     # """
 
     # CNN
