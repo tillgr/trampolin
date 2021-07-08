@@ -5,6 +5,7 @@ from keras.models import Model, Sequential
 from keras.layers import Dense, Conv2D, MaxPooling2D, Input, Flatten
 from sklearn.model_selection import RandomizedSearchCV
 from keras.wrappers.scikit_learn import KerasClassifier
+import shap
 
 
 """
@@ -70,6 +71,160 @@ def grid_search(modeltype, param_grid, run, x_test, y_test):
     print(grid_result.best_params_)
 
 
+def sample_x_test(x_test, y_test, num, cnn=False):
+    """
+    Samples data by retrieving only a certain number of each jump.
+
+    :param x_test: can be x_test and x_train
+    :param y_test: can be y_test and y_train
+    :param num: number of each jump to retrieve
+    :param cnn: check True for CNN
+    :return: sampled data
+    """
+
+    if cnn:
+        y = y_test.idxmax(axis=1)
+        counts = y.value_counts()
+        counts = counts.where(counts < num, other=num)
+        x = pd.DataFrame()
+
+        for jump in y.unique():
+            indexes = y[y == jump].index
+            subframe = pd.DataFrame()
+            for index in indexes:
+                subframe = subframe.append({'Sprungtyp': jump, 'data': x_test[index]}, ignore_index=True)
+            subframe = subframe.sample(counts[jump], random_state=1)
+            x = x.append(subframe)
+
+        x = x.sample(frac=1, random_state=1)  # shuffle
+        y = x['Sprungtyp']
+        y = y.reset_index(drop=True)
+        x = x.drop(['Sprungtyp'], axis=1)
+        x = x.reset_index(drop=True)
+
+        shap_x = np.array
+        for i in range(len(x)):
+            if i == 0:
+                shap_x = x.loc[i][0]
+                shap_x = shap_x[np.newaxis, ...]
+                continue
+            row = x.loc[i][0]
+            shap_x = np.insert(shap_x, i, row, axis=0)
+
+        return shap_x, y
+
+    else:
+        df = x_test.copy()
+        df['Sprungtyp'] = y_test.idxmax(axis=1)  # if not one-hot-encoded:   df['Sprungtyp'] = y_test
+        counts = df['Sprungtyp'].value_counts()
+        counts = counts.where(counts < num, other=num)
+        x = pd.DataFrame(columns=df.columns)
+
+        for jump in df['Sprungtyp'].unique():
+            subframe = df[df['Sprungtyp'] == jump]
+            x = x.append(subframe.sample(counts[jump], random_state=1), ignore_index=True)
+
+        x = x.sample(frac=1, random_state=1)  # shuffle
+        y = x['Sprungtyp']
+        y = y.reset_index(drop=True)
+        x = x.drop(['Sprungtyp'], axis=1)
+        for column in x.columns:
+            x[column] = x[column].astype(float).round(3)
+
+    return x, y
+
+
+def jump_core_detection(modeltype, data_train, data_test, pp_list, runs, params):
+    """
+    Trains many different models with differently cut data. We cut from back to front, front to back, and from both sides
+
+    :param modeltype: 'CNN' or 'DFF'
+    :param data_train: dataframe read from .csv file
+    :param data_test: dataframe read from .csv file
+    :param pp_list: pp_list: a list with values from 1 to 4: [1, 2, 3, 4]. Corresponds to the blocks of preprocessed data. 1: first 9 columns, 2, 3, 4: 12 columns each
+    :param runs: how many models should be trained for each dataset
+    :param params: a list with all parameters for the model. e.g. CNN: [3, 3, 2, 2, 'tanh', 'categorical_crossentropy', 'Nadam', 40], e.g. DFF: ['relu', 'categorical_crossentropy', 'Nadam', 100]
+    :return: dictionary with scores of all trained models
+    """
+
+    if modeltype == 'DFF':
+        jump_length = int(len(list(data_test.drop([col for col in data_train.columns if 'DJump' in col], axis=1)
+                                   .drop(['SprungID', 'Sprungtyp'], axis=1).columns))
+                          / len([c for c in list(data_test.drop([col for col in data_train.columns if 'DJump' in col], axis=1)
+                                   .drop(['SprungID', 'Sprungtyp'], axis=1).columns) if c.startswith('0_')]))
+    elif modeltype == 'CNN':
+        x_train, y_train, x_test, y_test, jump_length, num_columns, num_classes = prepare_data_CNN(data_train, data_test, pp_list)
+    else:
+        raise AttributeError("modeltype is not 'CNN' or 'DFF'")
+
+    scores = {}
+    percentage = int(100 / jump_length)
+    full_list = [l for l in range(0, 100, percentage)]
+
+    variants = []
+    for i in range(jump_length - 1):
+        variants.append([l for l in range(i + 1)])
+    for i in range(1, jump_length):
+        variants.append(list(range(i, jump_length)))
+    for i in range(int((jump_length - 1) / 2)):
+        both_sides = list(set(list(range(jump_length))) - set(list(range(0, jump_length))[i + 1:-1 - i]))
+        both_sides.sort()
+        variants.append(both_sides)
+
+    for variant in variants:  # 0 = first data point    ->     jump_length = last data points
+
+        if modeltype == 'CNN':
+            indexes = []
+            for i in range(int(len(data_train) / jump_length)):
+                for to_delete in variant:
+                    indexes.append(i * jump_length + to_delete)
+            data_train_copy = data_train.drop(indexes)
+            indexes = []
+            for i in range(int(len(data_test) / jump_length)):
+                for to_delete in variant:
+                    indexes.append(i * jump_length + to_delete)
+            data_test_copy = data_test.drop(indexes)
+
+            x_train, y_train, x_test, y_test, jump_data_length, num_columns, num_classes = prepare_data_CNN(data_train_copy, data_test_copy, pp_list)
+
+            model = run_multiple_times_CNN(jump_data_length, num_columns, num_classes, runs=runs, conv=params[0], kernel=params[1], pool=params[2],
+                                       dense=params[3], act_func=params[4], loss=params[5], optim=params[6], epochs=params[7],
+                                       x_train=x_train, y_train=y_train, x_test=x_test, y_test=y_test)
+            score = model.evaluate(x_test, y_test, verbose=1)
+
+            variant_output = [v * percentage for v in variant]
+            variant_output = list(set(full_list) - set(variant_output))
+            variant_output.sort()
+
+            scores[str(variant_output[0]) + ' - ' + str(variant_output[-1])] = score[1]
+
+        elif modeltype == 'DFF':
+            data_train_copy = data_train.copy()
+            data_test_copy = data_test.copy()
+            for to_delete in variant:
+                data_train_copy = data_train_copy.drop(
+                    [c for c in data_train.columns if c.startswith(str(int(to_delete * percentage)) + '_')], axis=1)
+                data_test_copy = data_test_copy.drop(
+                    [c for c in data_train.columns if c.startswith(str(int(to_delete * percentage)) + '_')], axis=1)
+
+            x_train, y_train, x_test, y_test, num_columns, num_classes = prepare_data_DFF(data_train_copy, data_test_copy, pp_list)
+
+            model = run_multiple_times_DFF(num_columns, num_classes, runs=runs, act_func=params[0],
+                                                loss=params[1], optim=params[2], epochs=params[3],
+                                                x_train=x_train, y_train=y_train, x_test=x_test, y_test=y_test)
+            score = model.evaluate(x_test, y_test, verbose=1)
+
+            variant_output = [v * percentage for v in variant]
+            variant_output = list(set(full_list) - set(variant_output))
+            variant_output.sort()
+
+            scores[str(variant_output[0]) + ' - ' + str(variant_output[-1])] = score[1]
+
+    print(scores)
+
+    return scores
+
+
 """
 #                                       #
 #                                       #
@@ -116,7 +271,7 @@ def prepare_data_CNN(data_train, data_test, pp_list, only_pp=None):
         subframe = data_train[data_train['SprungID'] == id]
         y_train.append(subframe['Sprungtyp'].unique()[0])
         subframe = subframe.drop(['SprungID', 'Sprungtyp'], axis=1)
-        if only_pp is not None:
+        if only_pp is None:
             subframe = subframe.drop([col for col in subframe.columns if 'DJump' not in col], axis=1)
         x_train.append(subframe)
         print("Preparing train data: " + str(len(x_train)))
@@ -125,14 +280,13 @@ def prepare_data_CNN(data_train, data_test, pp_list, only_pp=None):
         subframe = data_test[data_test['SprungID'] == id]
         y_test.append(subframe['Sprungtyp'].unique()[0])
         subframe = subframe.drop(['SprungID', 'Sprungtyp'], axis=1)
-        if only_pp is not None:
+        if only_pp is None:
             subframe = subframe.drop([col for col in subframe.columns if 'DJump' not in col], axis=1)
         x_test.append(subframe)
         print("Preparing test data: " + str(len(x_test)))
 
     num_columns = len(data_train.columns) - 2       # without Sprungtyp and SprungID
     jump_data_length = len(data_train[data_train['SprungID'] == data_train['SprungID'].unique()[0]])
-
 
 
     x_train = np.array(x_train)
@@ -262,6 +416,100 @@ def run_multiple_times_CNN(jump_data_length, num_columns, num_classes, runs, con
     return best_model
 
 
+def get_index(jump_list, y_test):
+    """
+    Get the indexes for all jumps in the jump_list
+
+    :param jump_list: list with jump names
+    :param y_test: y_test
+    :return: a list with indexes of all jumps in the jump_list
+    """
+
+    index_list = []
+    for jump in jump_list:
+        index_list.extend(y_test.where(y_test == jump).dropna().index.tolist())
+    return index_list
+
+
+def gen_shap_CNN(model, part, sample_train, sample_test, x_train, y_train, x_test, y_test):
+    """
+    generates the shap values for the CNN. We do this in predefined parts to lower the amount of images in the image plot
+
+    :param model: CNN model
+    :param part: 1 - 8. related jumps. see code
+    :param sample_train: integer number. how often each jump should be sampled into the train data. We used 6
+    :param sample_test: integer number. how often each jump should be sampled into the test data. We used 3
+    :param x_train: return value of prepare_data_CNN
+    :param y_train: return value of prepare_data_CNN
+    :param x_test: return value of prepare_data_CNN
+    :param y_test: return value of prepare_data_CNN
+    :return: shap_values, to_explain and index_names for image plot
+    """
+
+    shap_x_train, shap_y_train = sample_x_test(x_train, y_train, sample_train, cnn=True)
+    shap_x_test, shap_y_test = sample_x_test(x_test, y_test, sample_test, cnn=True)
+
+    parts = {1: ['1 3/4 Salto vw B', '1 3/4 Salto vw C', '1/2 ein 1/2 aus C', '3/4 Salto rw A', '3/4 Salto vw A', 'Baby- Fliffis C'],
+             2: ['Barani A', 'Barani B', 'Barani C', 'Cody C', 'Rudi'],
+             3: ['Bauchsprung', 'Bücksprung', 'Grätschwinkel', 'Hocksprung', 'Von Bauch in Stand', 'Strecksprung'],
+             4: ['Fliffis B', 'Fliffis C', 'Fliffis aus B', 'Fliffis aus C', 'Fliffis- Rudi B', 'Fliffis- Rudi C'],
+             5: ['Halb ein Triffis C', 'Triffis B', 'Triffis C'],
+             6: ['Salto A', 'Salto B', 'Salto C', 'Salto rw A', 'Salto rw B', 'Salto rw C'],
+             7: ['Schraubensalto', 'Schraubensalto A', 'Schraubensalto C', 'Doppelsalto B', 'Doppelsalto C'],
+             8: ['Voll- ein 1 3/4 Salto vw C', 'Voll- ein- Rudi- aus B', 'Voll- ein- halb- aus B', 'Voll- ein- voll- aus A', 'Voll- ein- voll- aus B', 'Voll- ein- voll- aus C']}
+
+    index_list = get_index(parts[part], shap_y_test)
+    to_explain = shap_x_test[index_list]
+
+    explainer = shap.DeepExplainer(model, shap_x_train)
+    shap_values, indexes = explainer.shap_values(to_explain, ranked_outputs=4, check_additivity=False)
+
+    d = dict(enumerate(np.array(y_test.columns).flatten(), 0))
+    index_names = np.vectorize(lambda i: d[i])(indexes)
+
+    return shap_values, to_explain, index_names
+
+
+def predict_CNN(model, data):
+    """
+    Predicts the classes of given x data
+
+    :param model: a CNN model
+    :param data: path to a csv file
+    :return: prediction
+    """
+
+    data = pd.read_csv(data)
+
+    data = data.drop(['Sprungtyp'], axis=1)     # TODO: remove
+
+    x = []
+
+    for id in data['SprungID'].unique():
+        subframe = data[data['SprungID'] == id]    # TODO: create an ID
+        subframe = subframe.drop(['SprungID'], axis=1)
+        num_columns = len(subframe.columns)
+        jump_data_length = len(subframe)
+        x.append(subframe)
+        print("Preparing data for prediction: " + str(len(x)))
+
+    x = np.array(x)
+    x = x.reshape(x.shape[0], jump_data_length, num_columns, 1)
+
+    pred = model.predict(x)
+
+    pred = pd.DataFrame(pred, columns=['1 3/4 Salto vw B', '1 3/4 Salto vw C', '1/2 ein 1/2 aus C', '3/4 Salto rw A', '3/4 Salto vw A',
+                    'Baby- Fliffis C', 'Barani A', 'Barani B', 'Barani C', 'Bauchsprung', 'Bücksprung', 'Cody C',
+                    'Doppelsalto B', 'Doppelsalto C', 'Fliffis B', 'Fliffis C', 'Fliffis aus B', 'Fliffis aus C',
+                    'Fliffis- Rudi B', 'Fliffis- Rudi C', 'Grätschwinkel', 'Halb ein Triffis C', 'Hocksprung', 'Rudi',
+                    'Salto A', 'Salto B', 'Salto C', 'Salto rw A', 'Salto rw B', 'Salto rw C', 'Schraubensalto',
+                    'Schraubensalto A', 'Schraubensalto C', 'Strecksprung', 'Triffis B', 'Triffis C', 'Voll- ein 1 3/4 Salto vw C',
+                    'Voll- ein- Rudi- aus B', 'Voll- ein- halb- aus B', 'Voll- ein- voll- aus A', 'Voll- ein- voll- aus B',
+                    'Voll- ein- voll- aus C', 'Von Bauch in Stand'])
+    pred = np.array(pred.idxmax(axis=1))
+
+    return pred
+
 
 """
 #                                       #
@@ -305,7 +553,7 @@ def prepare_data_DFF(data_train, data_test, pp_list, only_pp=None):
     x_test = data_test.drop('Sprungtyp', axis=1)
     x_test = x_test.drop(['SprungID'], axis=1)
 
-    if only_pp is not None:
+    if only_pp is None:
         x_train = x_train.drop([col for col in x_train.columns if 'DJump' not in col], axis=1)
         x_test = x_test.drop([col for col in x_test.columns if 'DJump' not in col], axis=1)
 
@@ -391,3 +639,65 @@ def run_multiple_times_DFF(num_columns, num_classes, runs, act_func, loss, optim
     calc_scores(best_scores)
 
     return best_model
+
+
+def gen_shap_DFF(model, sample_train, sample_test, x_train, y_train, x_test, y_test):
+    """
+    generates the shap values for DFF
+
+    :param model: DFF model
+    :param sample_train: integer number. how often each jump should be sampled into the train data. We used 6
+    :param sample_test: integer number. how often each jump should be sampled into the test data. We used 3
+    :param x_train: return value of prepare_data_DFF
+    :param y_train: return value of prepare_data_DFF
+    :param x_test: return value of prepare_data_DFF
+    :param y_test: return value of prepare_data_DFF
+    :return: shap_values
+    """
+
+    shap_x_train, shap_y_train = sample_x_test(x_train, y_train, sample_train)
+    shap_x_test, shap_y_test = sample_x_test(x_test, y_test, sample_test)
+
+    explainer = shap.KernelExplainer(model, shap_x_train)
+    shap_values = explainer.shap_values(shap_x_test)
+
+    return shap_values
+
+
+def predict_DFF(model, data):
+    """
+        Predicts the classes of given x data
+
+        :param model: a DFF model
+        :param data: path to a csv file
+        :return: prediction
+        """
+
+    data = pd.read_csv(data)
+
+    data = data.drop(['Sprungtyp'], axis=1)  # TODO: remove
+
+    data = data.drop(['SprungID'], axis=1)   # TODO: create an ID
+
+    x = np.array(data)
+
+    pred = model.predict(x)
+
+    pred = pd.DataFrame(pred, columns=['1 3/4 Salto vw B', '1 3/4 Salto vw C', '1/2 ein 1/2 aus C', '3/4 Salto rw A',
+                                       '3/4 Salto vw A',
+                                       'Baby- Fliffis C', 'Barani A', 'Barani B', 'Barani C', 'Bauchsprung',
+                                       'Bücksprung', 'Cody C',
+                                       'Doppelsalto B', 'Doppelsalto C', 'Fliffis B', 'Fliffis C', 'Fliffis aus B',
+                                       'Fliffis aus C',
+                                       'Fliffis- Rudi B', 'Fliffis- Rudi C', 'Grätschwinkel', 'Halb ein Triffis C',
+                                       'Hocksprung', 'Rudi',
+                                       'Salto A', 'Salto B', 'Salto C', 'Salto rw A', 'Salto rw B', 'Salto rw C',
+                                       'Schraubensalto',
+                                       'Schraubensalto A', 'Schraubensalto C', 'Strecksprung', 'Triffis B', 'Triffis C',
+                                       'Voll- ein 1 3/4 Salto vw C',
+                                       'Voll- ein- Rudi- aus B', 'Voll- ein- halb- aus B', 'Voll- ein- voll- aus A',
+                                       'Voll- ein- voll- aus B',
+                                       'Voll- ein- voll- aus C', 'Von Bauch in Stand'])
+    pred = np.array(pred.idxmax(axis=1))
+
+    return pred
