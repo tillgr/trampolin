@@ -36,7 +36,7 @@ def sample_x_test(x_test, y_test, num):
 
 if __name__ == '__main__':
 
-    for dataType in ['with', 'without']:
+    for dataType in ['without']: #['with', 'without']:
         for aj in ['', 'AJ']:
             print("---")
             print(dataType)
