@@ -45,8 +45,8 @@ if __name__ == '__main__':
         '../Sprungdaten_processed/without_preprocessed/percentage/10/vector_percentage_mean_std_10_test.csv')'''
 
     # get_features (X)
-    start_column: str = '0_mean_Acc_N_Fil'
-    end_column: str = '90_std_Gyro_z_Fil'
+    start_column: str = 'DJump_SIG_I_x LapEnd'
+    end_column: str = 'DJump_ABS_I_S4_z LapEnd'
 
     '''start_column: str = list(train_data.columns)[2]
     end_column: str = list(train_data.columns)[-1]'''
@@ -104,11 +104,11 @@ if __name__ == '__main__':
               name='only_with_preprocessed')'''
 
     saltoA = np.where(shap_y_test.unique() == 'Salto A')[0][0]
-    shap.summary_plot(shap_values[saltoA], shap_x_test, plot_size=(20, 12), title='Salto A')
+    shap.summary_plot(shap_values[saltoA], shap_x_test, plot_size=(30, 12), title='Salto A')
     saltoB = np.where(shap_y_test.unique() == 'Salto B')[0][0]
     shap.summary_plot(shap_values[saltoB], shap_x_test, plot_size=(30, 12), title='Salto B')
     saltoC = np.where(shap_y_test.unique() == 'Salto C')[0][0]
-    shap.summary_plot(shap_values[saltoC], shap_x_test, plot_size=(20, 12), title='Salto C')
+    shap.summary_plot(shap_values[saltoC], shap_x_test, plot_size=(30, 12), title='Salto C')
 
     '''cm = confusion_matrix(y_test, y_pred, labels=clf.classes_)
     disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=clf.classes_)
