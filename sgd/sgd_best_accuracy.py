@@ -10,28 +10,7 @@ from neural_networks import create_colormap, bar_plots
 from random_classifier import metrics
 from sklearn.metrics import confusion_matrix
 from sklearn import preprocessing
-
-
-def sample_x_test(x_test, y_test, num):
-    df = x_test.copy()
-    df['Sprungtyp'] = y_test
-    counts = df['Sprungtyp'].value_counts()
-    counts = counts.where(counts < num, other=num)
-    x = pd.DataFrame(columns=df.columns)
-
-    for jump in df['Sprungtyp'].unique():
-        subframe = df[df['Sprungtyp'] == jump]
-        x = x.append(subframe.sample(counts[jump], random_state=1), ignore_index=True)
-
-    x = x.sample(frac=1)  # shuffle
-    y = x['Sprungtyp']
-    y = y.reset_index(drop=True)
-    x = x.drop(['Sprungtyp'], axis=1)
-    for column in x.columns:
-        x[column] = x[column].astype(float).round(3)
-
-    return x, y
-
+from sgd import sample_x_test
 
 if __name__ == '__main__':
 
@@ -57,11 +36,13 @@ if __name__ == '__main__':
     # p = train_data.drop([col for col in train_data.columns if 'DJump_SIG_I_S' in col], axis=1)
     # t = test_data.drop([col for col in test_data.columns if 'DJump_SIG_I_S' in col], axis=1)
 
+    # features
     X_train = train_data.loc[:, start_column:end_column]
-    y_train = (train_data['Sprungtyp']).to_numpy()
+    # targets
+    y_train = train_data['Sprungtyp']
 
     X_test = test_data.loc[:, start_column:end_column]
-    y_test = (test_data['Sprungtyp']).to_numpy()
+    y_test = test_data['Sprungtyp']
 
     clf = SGDClassifier(loss='log', penalty='l1', alpha=0.0001,
                         l1_ratio=0.15, fit_intercept=True, max_iter=10000,
@@ -91,7 +72,7 @@ if __name__ == '__main__':
     explainer = shap.KernelExplainer(clf.decision_function, shap_x_train)
     shap_values = explainer.shap_values(shap_x_test)
 
-    '''bar_plots(shap_values, shap_x_test, shap_y_test, bar='percentual', size=(50, 30),
+    bar_plots(shap_values, shap_x_test, shap_y_test, bar='percentual', size=(50, 30),
               folder='../plots/SGD/with_preprocessed/only_preprocessed', name='only_with_preprocessed')
 
     bar_plots(shap_values, shap_x_test, shap_y_test, bar='percentual', size=(50, 30),
@@ -101,7 +82,7 @@ if __name__ == '__main__':
 
     bar_plots(shap_values, shap_x_test, shap_y_test, size=(30, 45), bar='summary',
               folder='../plots/SGD/with_preprocessed/only_preprocessed',
-              name='only_with_preprocessed')'''
+              name='only_with_preprocessed')
 
     saltoA = np.where(shap_y_test.unique() == 'Salto A')[0][0]
     shap.summary_plot(shap_values[saltoA], shap_x_test, plot_size=(30, 12), title='Salto A')
@@ -110,7 +91,7 @@ if __name__ == '__main__':
     saltoC = np.where(shap_y_test.unique() == 'Salto C')[0][0]
     shap.summary_plot(shap_values[saltoC], shap_x_test, plot_size=(30, 12), title='Salto C')
 
-    '''cm = confusion_matrix(y_test, y_pred, labels=clf.classes_)
+    cm = confusion_matrix(y_test, y_pred, labels=clf.classes_)
     disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=clf.classes_)
     disp.plot(cmap=cmap_cm)
     disp.figure_.set_figwidth(35)
@@ -120,7 +101,7 @@ if __name__ == '__main__':
     plt.title("SGD_with_mean_std_10_ConfusionMatrix")
     plt.tight_layout()
     plt.savefig('../plots/SGD/with_preprocessed/only_preprocessed')
-    plt.show()'''
+    plt.show()
     # fig, ax = plt.subplots(figsize=(20, 20))
     # plot_confusion_matrix(clf, shap_x_test, shap_y_test, xticks_rotation='vertical', display_labels=set(y_test), cmap=plt.cm.Blues, normalize=None, ax = ax)
     # plt.show()

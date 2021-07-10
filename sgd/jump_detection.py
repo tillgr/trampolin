@@ -3,43 +3,58 @@ import numpy as np
 import pandas as pd
 
 
+def number_of_jumps(data):
+    jump_list = []
+    for i in range(100000):
+        jump_list.append(data[i])
+    jumps = list(dict.fromkeys(jump_list))
+    return print(len(jumps))
+
+
+def data_size(data):
+    jump_list = []
+    for i in range(100000):
+        jump_list.append(data[i])
+    print(len(jump_list))
+
+
 def cost(threshold: int):
     count = 0
-    for i in range(2700):
+    for i in range(100000):
         if y[i] > y[i + 1] and y[i] > y[i - 1] and y[i] > threshold:
             count += 1
-            if count > 10:
+            if count > jumps_amount:
                 break
     return count
 
 
-if __name__ == '__main__':
-    numberOfJumps = 2
-    threshold = 0
-    data = pd.read_csv("../sgd/all_data_new.csv")
-    x = np.array((data['Time']))
-    y = np.array((data['Acc_N_Fil']))
-    z = np.array((data['Acc_N_Fil']))
-    plt.plot(x[0:2700], y[0:2700])
-    plt.show()
-
-    '''for i in range(len(y[0:10000])):
-        if y[i - 1] < 5 and y[i] >= 5 and y[i + 1] > 5:
-            print(f" index: {i + 2}:, {y[i]}, {y[i - 1]}, {y[i + 1]} ")
-            for n in reversed(range(len(y[0:i]))):
-                if y[n] < y[n+1] and y[n] < y[n-1]:
-                    print(f" Time: {x[n]}, Jump beginning: {y[n]}")
-                    break'''
-
-    while cost(threshold) != numberOfJumps:
-        if cost(threshold) > numberOfJumps:
+def estimate_threshhold(threshold: int):
+    while cost(threshold) != jumps_amount:
+        if cost(threshold) > jumps_amount:
             threshold += 1
             cost(threshold)
         else:
             threshold -= 1
             cost(threshold)
+    return threshold
 
-    for i in range(2700):
+
+if __name__ == '__main__':
+    # jumps_amount = 5927 / 5463628 # jumps amount = 101 / 100000
+    # jumps_amount = 3 / 2715 # jumps_amount = 1072 / 1000000 # all = 5463628
+    threshold = 0
+    jumps_amount = 101
+    data = pd.read_csv("../sgd/all_data_new.csv")
+    x = np.array((data['Time']))
+    y = np.array((data['Acc_N_Fil']))
+    z = np.array((data['SprungID']))
+    # plt.plot(x[0:2700], y[0:2700])
+    # plt.show()
+
+    # number_of_jumps(z);
+    estimate_threshhold(threshold)
+
+    for i in range(100000):
         if y[i] > y[i + 1] and y[i] > y[i - 1] and y[i] > threshold:
-            print(f" index: {i + 2}:, time: {x[i]}, {y[i]}")
+            print(f" index: {i + 2}:, time: {x[i]}, acceleration: {y[i]}, id: {z[i]}")
     print(threshold)
