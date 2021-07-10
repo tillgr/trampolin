@@ -193,3 +193,97 @@ def shap_plots(data_train, data_test, pp_list, loss, penalty, max_iter, aj=None)
     shap.summary_plot(shap_values[saltoC], shap_x_test, plot_size=(30, 12), title='Salto C')
 
 
+def jump_core_detection(data_train, data_test, pp_list, jump_length=0):
+    scores = {}
+    percentage = int(100 / jump_length)
+    full_list = [l for l in range(0, 100, percentage)]
+
+    variants = []
+    for i in range(jump_length - 1):
+        variants.append([l for l in range(i + 1)])
+    for i in range(1, jump_length):
+        variants.append(list(range(i, jump_length)))
+    for i in range(int((jump_length - 1) / 2)):
+        both_sides = list(set(list(range(jump_length))) - set(list(range(0, jump_length))[i + 1:-1 - i]))
+        both_sides.sort()
+        variants.append(both_sides)
+    print(variants)
+
+    for variant in variants:
+        indexes = []
+        for i in range(int(len(data_train) / jump_length)):
+            for to_delete in variant:
+                indexes.append(i * jump_length + to_delete)
+        data_train_copy = data_train.drop(indexes)
+        print(data_train_copy)
+        indexes = []
+        for i in range(int(len(data_test) / jump_length)):
+            for to_delete in variant:
+                indexes.append(i * jump_length + to_delete)
+        data_test_copy = data_test.drop(indexes)
+        X_train, y_train, X_test, y_test = prepare_data(data_train_copy, data_test_copy, pp_list)
+        clf = SGDClassifier(loss='log', penalty='l1', alpha=0.0001,
+                            l1_ratio=0.15, fit_intercept=True, max_iter=10000,
+                            tol=0.001, shuffle=True, verbose=0, epsilon=0.1,
+                            n_jobs=None, random_state=10, learning_rate='optimal',
+                            eta0=0.0, power_t=0.5, early_stopping=False, validation_fraction=0.1,
+                            n_iter_no_change=5, class_weight=None,
+                            warm_start=False, average=False).fit(X_train, y_train)
+        y_pred = clf.predict(X_test)
+        print(f"Accuracy score:  {str(accuracy_score(y_test, y_pred).__round__(4))}")
+        score = accuracy_score(y_test, y_pred).__round__(4)
+        print(score)
+
+        variant_output = [v * percentage for v in variant]
+        variant_output = list(set(full_list) - set(variant_output))
+        variant_output.sort()
+
+        scores[str(variant_output[0]) + ' - ' + str(variant_output[-1])] = score
+
+    print(f"scores:  {scores}")
+
+    min_y_value = 70
+    plt.figure(figsize=(13, 13))
+    plt.suptitle('SGD without pp: percentage_mean_std_10')
+    plt.xlabel('Data')
+    plt.ylabel('Accuracy')
+    plt.axis([0, full_list[-1], min_y_value, 100])
+    plt.xticks(range(0, 100 + percentage, percentage))
+    plt.yticks(range(min_y_value, 105, 5))
+    plt.grid(True, axis='x')
+    # cmap = process_cmap('brg', len(scores))
+
+    for i in range(len(scores)):
+        entry = list(scores.items())[i]
+        start, end = entry[0].split('-')
+        acc = entry[1] * 100
+        print(acc)
+        print(min_y_value)
+        if int(acc) >= min_y_value:
+            if start.replace(' ', '') == '0':
+                plt.axhline(acc, (int(start) / 100), (int(end) + percentage) / 100, color='#0000ff', alpha=0.7)
+            elif end.replace(' ', '') == str(full_list[-1]):
+                plt.axhline(acc, (int(start) / 100), (int(end) + percentage) / 100, color='#ff0000', alpha=0.7)
+            else:
+                plt.axhline(acc, (int(start) / 100), (int(end) + percentage) / 100, color='#00ff00', alpha=0.7)
+
+    plt.show()
+
+
+if __name__ == '__main__':
+    train_data = pd.read_csv('../Sprungdaten_processed/without_preprocessed/percentage/10/vector_percentage_mean_std_10_train.csv')
+    test_data = pd.read_csv('../Sprungdaten_processed/without_preprocessed/percentage/10/vector_percentage_mean_std_10_test.csv')
+    jump_core_detection(train_data, test_data, [1, 2, 3, 4], 10)
+    '''clf = SGDClassifier(loss='log', penalty='l1', alpha=0.0001,
+                            l1_ratio=0.15, fit_intercept=True, max_iter=10000,
+                            tol=0.001, shuffle=True, verbose=0, epsilon=0.1,
+                            n_jobs=None, random_state=10, learning_rate='optimal',
+                            eta0=0.0, power_t=0.5, early_stopping=False, validation_fraction=0.1,
+                            n_iter_no_change=5, class_weight=None,
+                            warm_start=False, average=False).fit(X_train, y_train)
+        y_pred = clf.predict(X_test)
+        if accuracy_score(y_test, y_pred) > 0:
+            print(f"Accuracy score:  {str(accuracy_score(y_test, y_pred).__round__(4))}")
+            mean_prec, mean_rec, mean_f, mean_youden = metrics(y_test, y_pred)
+            print(f"Accuracy youden score: {str(mean_youden.round(4))}")
+            print(f"Accuracy f1 score: {str(mean_f.round(4))}")'''
