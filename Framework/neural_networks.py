@@ -288,7 +288,6 @@ def prepare_data_CNN(data_train, data_test, pp_list, only_pp=None):
     num_columns = len(data_train.columns) - 2       # without Sprungtyp and SprungID
     jump_data_length = len(data_train[data_train['SprungID'] == data_train['SprungID'].unique()[0]])
 
-
     x_train = np.array(x_train)
     x_train = x_train.reshape(x_train.shape[0], jump_data_length, num_columns, 1)
     x_test = np.array(x_test)
@@ -470,20 +469,29 @@ def gen_shap_CNN(model, part, sample_train, sample_test, x_train, y_train, x_tes
     return shap_values, to_explain, index_names
 
 
-def predict_CNN(model, data):
+def predict_CNN(model, data, pp_list):
     """
     Predicts the classes of given x data
 
     :param model: a CNN model
-    :param data: path to a csv file
+    :param data: dataframe
     :return: prediction
     """
 
-    data = pd.read_csv(data)
-
-    data = data.drop(['Sprungtyp'], axis=1)     # TODO: remove
-
     x = []
+
+    first_djumps = set([col for col in data.columns if 'DJump' in col]) \
+                   - set([col for col in data.columns if 'DJump_SIG_I_S' in col]) \
+                   - set([col for col in data.columns if 'DJump_ABS_I_S' in col]) \
+                   - set([col for col in data.columns if 'DJump_I_ABS_S' in col])
+    if 1 not in pp_list:
+        data = data.drop(first_djumps, axis=1)
+    if 2 not in pp_list:
+        data = data.drop([col for col in data.columns if 'DJump_SIG_I_S' in col], axis=1)
+    if 3 not in pp_list:
+        data = data.drop([col for col in data.columns if 'DJump_ABS_I_S' in col], axis=1)
+    if 4 not in pp_list:
+        data = data.drop([col for col in data.columns if 'DJump_I_ABS_S' in col], axis=1)
 
     for id in data['SprungID'].unique():
         subframe = data[data['SprungID'] == id]    # TODO: create an ID
@@ -664,18 +672,27 @@ def gen_shap_DFF(model, sample_train, sample_test, x_train, y_train, x_test, y_t
     return shap_values
 
 
-def predict_DFF(model, data):
+def predict_DFF(model, data, pp_list):
     """
         Predicts the classes of given x data
 
         :param model: a DFF model
-        :param data: path to a csv file
+        :param data: dataframe
         :return: prediction
         """
 
-    data = pd.read_csv(data)
-
-    data = data.drop(['Sprungtyp'], axis=1)  # TODO: remove
+    first_djumps = set([col for col in data.columns if 'DJump' in col]) \
+                   - set([col for col in data.columns if 'DJump_SIG_I_S' in col]) \
+                   - set([col for col in data.columns if 'DJump_ABS_I_S' in col]) \
+                   - set([col for col in data.columns if 'DJump_I_ABS_S' in col])
+    if 1 not in pp_list:
+        data = data.drop(first_djumps, axis=1)
+    if 2 not in pp_list:
+        data = data.drop([col for col in data.columns if 'DJump_SIG_I_S' in col], axis=1)
+    if 3 not in pp_list:
+        data = data.drop([col for col in data.columns if 'DJump_ABS_I_S' in col], axis=1)
+    if 4 not in pp_list:
+        data = data.drop([col for col in data.columns if 'DJump_I_ABS_S' in col], axis=1)
 
     data = data.drop(['SprungID'], axis=1)   # TODO: create an ID
 
