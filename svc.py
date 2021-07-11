@@ -23,31 +23,49 @@ gnb_logger = logging.getLogger("GNB")
 svc_logger = logging.getLogger("SVC")
 
 
-def easy_classify(X: DataFrame, y: DataFrame, kernel: str):
-    clf = SVC(kernel=kernel)
-    clf.fit(X, y)
-    return clf
+def prediction_and_evaluate(classifier, testing_sample: DataFrame, test_targets: DataFrame):
+    """
+     Predict and evaluate a data set
 
+    :param classifier: classifier built with training data
+    :param testing_sample: testing data (X)
+    :param test_targets: testing target (y)
 
-def prediction_and_evaludate(classifier: SVC, testing_sample: DataFrame, test_actual: DataFrame):
+    """
     predicted = classifier.predict(testing_sample)
-    score = accuracy_score(test_actual.to_numpy(), predicted)
+    score = accuracy_score(test_targets.to_numpy(), predicted)
     logger.info("prediction accuracy: " + str(score.round(4)))
     f1_average = 'weighted'
-    f1 = f1_score(test_actual.to_numpy(), predicted, average=f1_average)
+    f1 = f1_score(test_targets.to_numpy(), predicted, average=f1_average)
     logger.info("F1 score with param " + f1_average + " :" + str(f1.round(4)))
-    mean_prec, mean_rec, mean_f, mean_youden = metrics(test_actual.to_numpy(), predicted)
+    mean_prec, mean_rec, mean_f, mean_youden = metrics(test_targets.to_numpy(), predicted)
     logger.info("Random classifier: Youden score: " + str(mean_youden.round(4)))
     logger.info("Random classifier: F1 score: " + str(mean_f.round(4)))
 
 
 def get_samples_features(data: DataFrame, start_column: str, end_column: str):
+    """
+
+    preprocessed the data by selecting a feature range and lint the numbers to float.
+
+    :param data: data set
+    :param start_column: start feature
+    :param end_column: end feature
+
+    """
     X: DataFrame = data.loc[:, start_column:end_column]
     X.astype(dtype='float64')
     return X
 
 
 def read_processed_data(filename: str):
+    """
+
+    read and substite "," with "." to avoid error by numbers
+
+    :param filename: path of the dataset
+
+    """
     processed_data = pd.read_csv(filename)
     logger.info("read data set:" + filename)
     for column in processed_data.columns:
@@ -86,7 +104,18 @@ def get_train_test_data(datasets: list):
     return train, test
 
 
-def classify(datasets: list, feature_start: str, feature_end: str, drops_keywords: list, reverse_drop: bool):
+def svc_classify(datasets: list, feature_start: str, feature_end: str, drops_keywords: list, reverse_drop: bool):
+    """
+
+    Cassify with Support Vector Machine
+
+    :param datasets: path of the data set
+    :param feature_start: start feature
+    :param feature_end: end feature
+    :param drops_keywords: the features will be drop if it has the keywords in this list.
+    :param reverse_drop: Set to True to drop the features does not contains the keywords.
+
+    """
     train, test = get_train_test_data(datasets)
 
     # any(substring in string for substring in substring_list)
@@ -108,13 +137,24 @@ def classify(datasets: list, feature_start: str, feature_end: str, drops_keyword
 
     X = get_samples_features(train, feature_start, feature_end)
     y = get_targets(train)
-    test_actual = get_targets(test)
+    test_targets = get_targets(test)
     clf_linear = SVC(kernel='linear')
     clf_linear.fit(X, y)
-    prediction_and_evaludate(clf_linear, get_samples_features(test, feature_start, feature_end), test_actual)
+    prediction_and_evaluate(clf_linear, get_samples_features(test, feature_start, feature_end), test_targets)
 
 
 def gnb_classify(datasets: list, feature_start: str, feature_end: str, drops_keywords: list, reverse_drop: bool):
+    """
+
+    Cassify with Gaussian Naive Bayes
+
+    :param datasets: path of the data set
+    :param feature_start: start feature
+    :param feature_end: end feature
+    :param drops_keywords: the features will be drop if it has the keywords in this list.
+    :param reverse_drop: Set to True to drop the features does not contains the keywords.
+
+    """
     train, test = get_train_test_data(datasets)
     # any(substring in string for substring in substring_list)
     drops = [col for col in train.columns if any(keyword in col for keyword in drops_keywords)]
@@ -136,9 +176,9 @@ def gnb_classify(datasets: list, feature_start: str, feature_end: str, drops_key
     gnb = GaussianNB()
     X = get_samples_features(train, feature_start, feature_end)
     y = get_targets(train)
-    test_actual = get_targets(test)
+    test_targets = get_targets(test)
     gnb.fit(X, y)
-    prediction_and_evaludate(gnb, get_samples_features(test, feature_start, feature_end), test_actual)
+    prediction_and_evaluate(gnb, get_samples_features(test, feature_start, feature_end), test_targets)
 
 
 def sample_x_test(x_test, y_test, num, cnn=False):
@@ -162,6 +202,20 @@ def sample_x_test(x_test, y_test, num, cnn=False):
 
 
 def explain_model(train_data: str, test_data: str, feature_start: str, feature_end: str, drops_keywords: list, reverse_drop: bool, output_folder: str, classifier: str):
+    """
+
+    Explain the built model by shap values in form of plots.
+
+    :param train_data: path of the train data set
+    :param test_data: path of the train data set
+    :param feature_start: start feature
+    :param feature_end: end feature
+    :param drops_keywords: the features will be drop if it has the keywords in this list.
+    :param reverse_drop: Set to True to drop the features does not contains the keywords.
+    :param output_folder: output folder for bar plots
+    :param classifier: Classifier type, "SVC" or "GNB"
+
+    """
     train = pd.read_csv("Sprungdaten_processed" + train_data)
     test = pd.read_csv("Sprungdaten_processed" + test_data)
 
@@ -243,6 +297,14 @@ def explain_model(train_data: str, test_data: str, feature_start: str, feature_e
 
 
 def collect_all_data_sets(folder: str, data_sets: set):
+    """
+
+    Help function to get the datasets iteratively
+
+    :param folder: root folder for the collection
+    :param data_sets: a set object to collect the data sets iteratively
+
+    """
     dirs = listdir(folder)
     for d in dirs:
         path = join(folder, d)
@@ -260,13 +322,29 @@ def collect_all_data_sets(folder: str, data_sets: set):
 
 
 def run_svc_auto(folder: str, drops: list):
+    """
+
+    Help function to run SVC on all data sets
+
+    :param folder: root folder for the the data sets
+    :param drops: the features that should be drop
+
+    """
     data_sets = set()
     collect_all_data_sets(folder, data_sets)
     for ds in data_sets:
-        classify([ds], "", "", drops, True)
+        svc_classify([ds], "", "", drops, True)
 
 
 def run_gnb_auto(folder: str, drops: list):
+    """
+
+     Help function to run GNB on all data sets
+
+     :param folder: root folder for the the data sets
+     :param drops: the features that should be drop
+
+     """
     data_sets = set()
     collect_all_data_sets(folder, data_sets)
     for ds in data_sets:
