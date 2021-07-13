@@ -12,6 +12,7 @@ from matplotlib.colors import ListedColormap
 from neural_networks import bar_plots
 from sklearn.metrics import confusion_matrix
 from matplotlib import pyplot as plt
+from sklearn import neighbors
 
 def prepare_data(data_train, data_test, pp_list):
     first_djumps = set([col for col in data_train.columns if 'DJump' in col]) - set(
@@ -300,7 +301,18 @@ def jump_core_detection(data_train, data_test, pp_list, jump_length=0):
                 indexes.append(i * jump_length + to_delete)
         data_test_copy = data_test.drop(indexes)
         X_train, y_train, X_test, y_test = prepare_data(data_train_copy, data_test_copy, pp_list)
-        clf = GradientBoostingClassifier(n_estimators=90, max_depth=3)
+        # neighbours
+        n_neighbors = 3
+        weights = 'uniform'
+        dist_metric = 'manhattan'
+
+        # we create an instance of Neighbours Classifier and fit the data.
+        clf = neighbors.KNeighborsClassifier(n_neighbors=n_neighbors, weights=weights, metric=dist_metric, p=5)
+
+        # Train the model using the training sets
+        clf.fit(X_train, y_train)
+
+        # Predict the response for test dataset
         y_pred = clf.predict(X_test)
         print(f"Accuracy score:  {str(accuracy_score(y_test, y_pred).__round__(4))}")
         score = accuracy_score(y_test, y_pred).__round__(4)
@@ -316,7 +328,7 @@ def jump_core_detection(data_train, data_test, pp_list, jump_length=0):
 
     min_y_value = 70
     plt.figure(figsize=(13, 13))
-    plt.suptitle('GBC without pp: percentage_mean_20')
+    plt.suptitle('GBC without pp: percentage_mean_std_20')
     plt.xlabel('Data')
     plt.ylabel('Accuracy')
     plt.axis([0, full_list[-1], min_y_value, 100])
@@ -343,6 +355,6 @@ def jump_core_detection(data_train, data_test, pp_list, jump_length=0):
 
 
 if __name__ == '__main__':
-    train_data = pd.read_csv('../Sprungdaten_processed/without_preprocessed/percentage/20/vector_percentage_mean_20_train.csv')
-    test_data = pd.read_csv('../Sprungdaten_processed/without_preprocessed/percentage/20/vector_percentage_mean_20_test.csv')
+    train_data = pd.read_csv('../Sprungdaten_processed/without_preprocessed/percentage/20/vector_percentage_mean_std_20_train.csv')
+    test_data = pd.read_csv('../Sprungdaten_processed/without_preprocessed/percentage/20/vector_percentage_mean_std_20_test.csv')
     jump_core_detection(train_data, test_data, [1, 2, 3, 4], 5)

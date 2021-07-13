@@ -54,7 +54,6 @@ if __name__ == '__main__':
 
             # neighbours
             n_neighbors = 3
-
             weights = 'distance'
             dist_metric = 'manhattan'
 
