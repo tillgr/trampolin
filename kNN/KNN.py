@@ -328,7 +328,7 @@ def jump_core_detection(data_train, data_test, pp_list, jump_length=0):
 
     min_y_value = 70
     plt.figure(figsize=(13, 13))
-    plt.suptitle('GBC without pp: percentage_mean_std_20')
+    plt.suptitle('KNN without pp: percentage_mean_std_20')
     plt.xlabel('Data')
     plt.ylabel('Accuracy')
     plt.axis([0, full_list[-1], min_y_value, 100])

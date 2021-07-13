@@ -309,7 +309,7 @@ def jump_core_detection(data_train, data_test, pp_list, jump_length=0):
 
     min_y_value = 70
     plt.figure(figsize=(13, 13))
-    plt.suptitle('GBC without pp: percentage_mean_20')
+    plt.suptitle('GBC with pp: percentage_25')
     plt.xlabel('Data')
     plt.ylabel('Accuracy')
     plt.axis([0, full_list[-1], min_y_value, 100])
@@ -336,6 +336,6 @@ def jump_core_detection(data_train, data_test, pp_list, jump_length=0):
 
 
 if __name__ == '__main__':
-    train_data = pd.read_csv('../Sprungdaten_processed/without_preprocessed/percentage/20/vector_percentage_mean_20_train.csv')
-    test_data = pd.read_csv('../Sprungdaten_processed/without_preprocessed/percentage/20/vector_percentage_mean_20_test.csv')
-    jump_core_detection(train_data, test_data, [1, 2, 3, 4], 5)
+    train_data = pd.read_csv('../Sprungdaten_processed/with_preprocessed/percentage/25/vector_percentage_25_train.csv')
+    test_data = pd.read_csv('../Sprungdaten_processed/with_preprocessed/percentage/25/vector_percentage_25_test.csv')
+    jump_core_detection(train_data, test_data, [1, 2, 3, 4], 4)
