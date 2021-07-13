@@ -43,16 +43,23 @@ def prepare_data(data_train, data_test, pp_list):
 
 def random_search_all_parameters(data_train, data_test, pp_list):
     X_train, y_train, X_test, y_test = prepare_data(data_train, data_test, pp_list)
-    model = GradientBoostingClassifier()
+    for losses in ['log', 'modified_huber', 'squared_hinge', 'perceptron']:
+        for penalty in ['l2', 'l1', 'elasticnet']:
+            for maxi in [10000]:
+                clf = SGDClassifier(loss=losses, penalty=penalty, alpha=0.0001,
+                                    l1_ratio=0.15, fit_intercept=True, max_iter=maxi,
+                                    tol=0.001, shuffle=True, verbose=0, epsilon=0.1,
+                                    n_jobs=None, random_state=10, learning_rate='optimal',
+                                    eta0=0.0, power_t=0.5, early_stopping=False, validation_fraction=0.1,
+                                    n_iter_no_change=5, class_weight=None,
+                                    warm_start=False, average=False).fit(X_train, y_train)
+                y_pred = clf.predict(X_test)
 
-    param_dist = {'n_estimators': [10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 200],
-                  'max_depth': [3, 4, 5, 6, 7]}
-    n_iter = 15
-
-    grid = RandomizedSearchCV(estimator=model, param_distributions=param_dist, verbose=1, n_iter=n_iter, n_jobs=7, cv=2)
-    grid_result = grid.fit(X_test, y_test)
-    print(f"Params: {grid_result.best_params_}")
-    print(f"Score: {grid_result.best_score_}")
+                print(
+                    f"Accuracy score: {losses} , {penalty} , {maxi}:  {str(accuracy_score(y_test, y_pred).__round__(4))}")
+                mean_prec, mean_rec, mean_f, mean_youden = metrics(y_test, y_pred)
+                print(f"Accuracy youden score: {str(mean_youden.round(4))}")
+                print(f"Accuracy f1 score: {str(mean_f.round(4))}")
 
 
 def test_all_datasets_with_all_parameters(pp_list):
@@ -293,7 +300,7 @@ def jump_core_detection(data_train, data_test, pp_list, jump_length=0):
                 indexes.append(i * jump_length + to_delete)
         data_test_copy = data_test.drop(indexes)
         X_train, y_train, X_test, y_test = prepare_data(data_train_copy, data_test_copy, pp_list)
-        clf = GradientBoostingClassifier(n_estimators=90, max_depth=3).fit(X_train, y_train)
+        clf = GradientBoostingClassifier(n_estimators=90, max_depth=3)
         y_pred = clf.predict(X_test)
         print(f"Accuracy score:  {str(accuracy_score(y_test, y_pred).__round__(4))}")
         score = accuracy_score(y_test, y_pred).__round__(4)
