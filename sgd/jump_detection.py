@@ -1,60 +1,68 @@
 import numpy as np
 import pandas as pd
-
-
-def number_of_jumps(data):
-    jump_list = []
-    for i in range(10000):
-        jump_list.append(data[i])
-    jumps = list(dict.fromkeys(jump_list))
-    return print(len(jumps))
-
-
-def data_size(data):
-    jump_list = []
-    for i in range(10000):
-        jump_list.append(data[i])
-    print(len(jump_list))
+import matplotlib.pyplot as plt
 
 
 def cost(threshold: int):
     count = 0
-    for i in range(10000):
-        if y[i] > y[i + 1] and y[i] > y[i - 1] and y[i] > threshold:
-            count += 1
-            if count > 10:
-                break
+    for i in range(len(y) - 100):
+        i += 50
+        if y[i] > threshold:
+            if all(l < y[i] for l in y[i - 50:i]):
+                if all(l < y[i] for l in y[i + 1:i + 50]):
+                    count += 1
+    print(count)
     return count
 
 
 def estimate_threshhold(threshold: int):
-    while cost(threshold) != jumps_amount:
-        if cost(threshold) > jumps_amount:
-            threshold += 1
-            cost(threshold)
+    threshold_cost = cost(threshold)
+    while threshold_cost != jumps_amount:
+        if threshold_cost > jumps_amount:
+            threshold += ((abs(threshold_cost - jumps_amount)) / 100)
+            threshold_cost = cost(threshold)
         else:
-            threshold -= 1
-            cost(threshold)
+            threshold -= ((abs(threshold_cost - jumps_amount)) / 100)
+            threshold_cost = cost(threshold)
     return threshold
 
 
 if __name__ == '__main__':
     # jumps_amount = 5927 / 5463628 # jumps amount = 101 / 100000
     # jumps_amount = 3 / 2715 # jumps_amount = 1072 / 1000000 # all = 5463628 # jumps_amount = 10 / 10000
-    thresholdMin = 0
+    thresholdMin = 40
     thresholdMax = 100
-    jumps_amount = 10
-    data = pd.read_csv("../sgd/all_data_new.csv")
+    data = pd.read_csv("../Sprungdaten_processed/without_preprocessed/data_only_jumps.csv")
+    jumps_to_classify = 100     # len(data['SprungID'].unique())
+    last_index = np.where(data['SprungID'] == data['SprungID'].unique()[jumps_to_classify - 1])[0][-1]
+    data = data[:last_index]
+    jumps_amount = len(data['SprungID'].unique())
     x = np.array((data['Time']))
     y = np.array((data['Acc_N_Fil']))
     z = np.array((data['SprungID']))
-    # plt.plot(x[0:2700], y[0:2700])
-    # plt.show()
-    # number_of_jumps(z);
-    thresholdMin = estimate_threshhold(thresholdMin)
-    thresholdMax = estimate_threshhold(thresholdMax)
 
-    for i in range(10000):
-        if y[i] > y[i + 1] and y[i] > y[i - 1] and y[i] > thresholdMax:
-            print(f" index: {i + 2}:, time: {x[i]}, acceleration: {y[i]}, id: {z[i]}")
+    y = np.pad(y, (50, 50), 'constant')
+
+    #plt.plot(y[50:len(y) - 50])
+    #plt.show()
+    thresholdMin = estimate_threshhold(thresholdMin)        # 64
+    thresholdMax = estimate_threshhold(thresholdMax)        # 64
+
+    print("With ThreshholdMin:")
+    for i in range(len(y) - 100):
+        i += 50
+        if y[i] > thresholdMax:
+            if all(l < y[i] for l in y[i - 50:i]):
+                if all(l < y[i] for l in y[i + 1:i + 50]):
+                    print(f" index: {i - 50}:, time: {x[i - 100]}, acceleration: {y[i]}, id: {z[i - 100]}")
+
+    print("")
+    print("With ThreshholdMin:")
+
+    for i in range(len(y) - 100):
+        i += 50
+        if y[i] > thresholdMin:
+            if all(l < y[i] for l in y[i - 50:i]):
+                if all(l < y[i] for l in y[i + 1:i + 50]):
+                    print(f" index: {i - 50}:, time: {x[i - 100]}, acceleration: {y[i]}, id: {z[i - 100]}")
     print(f"the threshold is between {thresholdMin} and {thresholdMax}")
