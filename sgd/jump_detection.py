@@ -45,8 +45,8 @@ if __name__ == '__main__':
 
     #plt.plot(y[50:len(y) - 50])
     #plt.show()
-    thresholdMin = estimate_threshhold(thresholdMin)        # 64
-    thresholdMax = estimate_threshhold(thresholdMax)        # 64
+    thresholdMin = estimate_threshhold(thresholdMin)        # 64.34999999999997
+    thresholdMax = estimate_threshhold(thresholdMax)        # 64.42999999999999
 
     print("With ThreshholdMin:")
     for i in range(len(y) - 100):
