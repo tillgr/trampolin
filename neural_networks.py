@@ -649,14 +649,14 @@ def bar_plots(shap_values, shap_x_test, shap_y_test, save_data, bar='summary', s
 
 
 def main():
-    neural_network = 'dff'  # 'dff'  'cnn'
+    neural_network = 'cnn'  # 'dff'  'cnn'
     run_modus = ''  # 'multi' 'grid' 'core'
     run = 100  # for multi runs or how often random grid search runs
     data_train = pd.read_csv(
-        "Sprungdaten_processed/with_preprocessed/percentage/25/vector_percentage_mean_std_25_train.csv")
+        "Sprungdaten_processed/without_preprocessed/percentage/5/percentage_mean_5_train.csv")
     data_test = pd.read_csv(
-        "Sprungdaten_processed/with_preprocessed/percentage/25/vector_percentage_mean_std_25_test.csv")
-    pp_list = [1, 2, 3, 4]
+        "Sprungdaten_processed/without_preprocessed/percentage/5/percentage_mean_5_test.csv")
+    pp_list = [3]
 
     if neural_network == 'cnn':
         x_train, y_train, x_test, y_test, jump_data_length, num_columns, num_classes = prepare_data(data_train,
@@ -702,7 +702,7 @@ def main():
             jump_core_detection('dff', data_train, data_test, pp_list)
 
     # model.save("models/DFF_only_pp_")
-    model = keras.models.load_model("models/DFF_only_pp_")
+    model = keras.models.load_model("models/CNN_without_mean_5")
     # model.summary()
     # model.evaluate(x_test, y_test, verbose=1)
     shap.initjs()
@@ -728,7 +728,7 @@ def main():
 
     # ListedColormap(process_cmap('winter'))
 
-    # """
+    """
     # DFF
 
     shap_x_test, shap_y_test = sample_x_test(x_test, y_test, 3)
@@ -742,13 +742,13 @@ def main():
     with open('plots/DFF/with_preprocessed/only_preprocessed/' + 'shap_data.pkl', 'wb') as f:  # Python 3: open(..., 'wb')
         pickle.dump([shap_values, shap_x_train, shap_y_train, shap_x_test, shap_y_test], f)
 
-    """
-    #with open('plots/DFF/with_preprocessed/only_preprocessed/shap_data.pkl', 'rb') as f: 
-        shap_values, shap_x_test, shap_y_test, shap_x_train, shap_y_train = pickle.load(f)
-    """
-
-
     #"""
+    #with open('plots/DFF/with_preprocessed/only_preprocessed/shap_data.pkl', 'rb') as f:
+        #shap_values, shap_x_test, shap_y_test, shap_x_train, shap_y_train = pickle.load(f)
+    """
+
+
+    """
     """
     
     shap.summary_plot(shap_values, shap_x_test, plot_type='bar', plot_size=(25, 20), color=bar_cm, class_names=shap_y_test.unique(), max_display=20)
@@ -774,15 +774,15 @@ def main():
         # plt.savefig('plots/DFF/with_preprocessed/jump_analysis/' + jump.replace('/', '-') + '.png')
         plt.clf()
     """
-    #"""
+    """
     bar_plots(shap_values, shap_x_test, shap_y_test, bar='percentual', save_data='plots/DFF/with_preprocessed/only_preprocessed/')
 
     bar_plots(shap_values, shap_x_test, shap_y_test, bar='percentual', jumps=['Salto A', 'Salto B', 'Salto C', 'Salto rw A', 'Salto rw B', 'Salto rw C', 'Schraubensalto', 'Schraubensalto A', 'Schraubensalto C',  'Doppelsalto B', 'Doppelsalto C'], name='Saltos', save_data='plots/DFF/with_preprocessed/only_preprocessed/')
     # bar_plots(shap_values, shap_x_test, shap_y_test)
-    #"""
+    """
 
     # CNN
-    """
+    #"""
     shap_x_test, shap_y_test = sample_x_test(x_test, y_test, 3, cnn=True)
     shap_x_train, shap_y_train = sample_x_test(x_train, y_train, 6, cnn=True)
 
@@ -803,9 +803,12 @@ def main():
         d = dict(enumerate(np.array(y_test.columns).flatten(), 0))
         index_names = np.vectorize(lambda i: d[i])(indexes)
 
+        with open('plots/CNN/without_preprocessed/shap_data' + str(j) + '.pkl', 'wb') as f:
+            pickle.dump([shap_values, to_explain, index_names], f)
+
         shap.image_plot(shap_values, to_explain, index_names, show=False)
-        plt.savefig('plots/CNN/with_preprocessed/CNN_with_mean_std_20_part' + str(j) + '.png')
-    """
+        #plt.savefig('plots/CNN/with_preprocessed/CNN_with_mean_std_20_part' + str(j) + '.png')
+    #"""
     """
     # Shap for specific Class
     i = y_test.index[y_test['Salto C'] == 1]
@@ -816,12 +819,11 @@ def main():
     shap.image_plot(shap_values, -x_test[i])  # , labels=list(y_test.columns))
     """
 
-    # """
+    #"""
     # Confusion matrix to find mistakes in classification
     cm = sklearn.metrics.confusion_matrix(y_test.idxmax(axis=1), pd.DataFrame(model.predict(x_test), columns=y_test.columns).idxmax(axis=1))
     # save data:
-    pd.DataFrame(cm, columns=y_test.columns, index=y_test.columns).to_csv('plots/DFF/with_preprocessed/only_preprocessed/confosion_matrix.csv')
-
+    pd.DataFrame(cm, columns=y_test.columns, index=y_test.columns).to_csv('plots/CNN/without_preprocessed/confusion_matrix.csv')
 
     disp = sklearn.metrics.ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=y_test.columns)
     disp.plot(cmap=cmap_cm)
@@ -830,7 +832,7 @@ def main():
     disp.figure_.autofmt_xdate()
     plt.show()
     #plt.savefig('CNN_confusion_matrix_flag.png')
-    # """
+    #"""
 
     return
 

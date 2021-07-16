@@ -563,7 +563,7 @@ def gen_shap_CNN(model, part, sample_train, sample_test, x_train, y_train, x_tes
     d = dict(enumerate(np.array(y_test.columns).flatten(), 0))
     index_names = np.vectorize(lambda i: d[i])(indexes)
 
-    with open("plots/CNN/shp_values " + part + ".pkl", 'wb') as f:
+    with open("plots/CNN/shp_values" + str(part) + ".pkl", 'wb') as f:
         pickle.dump([shap_values, to_explain, index_names], f)
 
     return shap_values, to_explain, index_names
