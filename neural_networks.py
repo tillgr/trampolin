@@ -95,10 +95,10 @@ def prepare_data_oneliner(data_train, data_test, pp_list):
     x_test = x_test.drop(['SprungID'], axis=1)
 
     #for Djump only
-    #"""
+    """
     x_train = x_train.drop([col for col in x_train.columns if 'DJump' not in col], axis=1)
     x_test = x_test.drop([col for col in x_test.columns if 'DJump' not in col], axis=1)
-    #"""
+    """
 
     num_columns = len(x_train.columns)
 
@@ -649,13 +649,13 @@ def bar_plots(shap_values, shap_x_test, shap_y_test, save_data, bar='summary', s
 
 
 def main():
-    neural_network = 'cnn'  # 'dff'  'cnn'
+    neural_network = 'dff'  # 'dff'  'cnn'
     run_modus = ''  # 'multi' 'grid' 'core'
     run = 100  # for multi runs or how often random grid search runs
     data_train = pd.read_csv(
-        "Sprungdaten_processed/without_preprocessed/percentage/5/percentage_mean_5_train.csv")
+        "Sprungdaten_processed/without_preprocessed/percentage/20/vector_percentage_mean_std_20_train.csv")
     data_test = pd.read_csv(
-        "Sprungdaten_processed/without_preprocessed/percentage/5/percentage_mean_5_test.csv")
+        "Sprungdaten_processed/without_preprocessed/percentage/20/vector_AJ_percentage_mean_std_20.csv")
     pp_list = [3]
 
     if neural_network == 'cnn':
@@ -702,7 +702,7 @@ def main():
             jump_core_detection('dff', data_train, data_test, pp_list)
 
     # model.save("models/DFF_only_pp_")
-    model = keras.models.load_model("models/CNN_without_mean_5")
+    model = keras.models.load_model("models/DFF_without_mean_std_20")
     # model.summary()
     # model.evaluate(x_test, y_test, verbose=1)
     shap.initjs()
@@ -728,7 +728,7 @@ def main():
 
     # ListedColormap(process_cmap('winter'))
 
-    """
+    #"""
     # DFF
 
     shap_x_test, shap_y_test = sample_x_test(x_test, y_test, 3)
@@ -739,7 +739,7 @@ def main():
 
     bar_cm = create_colormap(shap_y_test, shap_values)
 
-    with open('plots/DFF/with_preprocessed/only_preprocessed/' + 'shap_data.pkl', 'wb') as f:  # Python 3: open(..., 'wb')
+    with open('plots/DFF/without_preprocessed/AJ/' + 'shap_data_AJ.pkl', 'wb') as f:  # Python 3: open(..., 'wb')
         pickle.dump([shap_values, shap_x_train, shap_y_train, shap_x_test, shap_y_test], f)
 
     #"""
@@ -774,15 +774,15 @@ def main():
         # plt.savefig('plots/DFF/with_preprocessed/jump_analysis/' + jump.replace('/', '-') + '.png')
         plt.clf()
     """
-    """
-    bar_plots(shap_values, shap_x_test, shap_y_test, bar='percentual', save_data='plots/DFF/with_preprocessed/only_preprocessed/')
+    #"""
+    bar_plots(shap_values, shap_x_test, shap_y_test, bar='percentual', save_data='plots/DFF/without_preprocessed/AJ/')
 
-    bar_plots(shap_values, shap_x_test, shap_y_test, bar='percentual', jumps=['Salto A', 'Salto B', 'Salto C', 'Salto rw A', 'Salto rw B', 'Salto rw C', 'Schraubensalto', 'Schraubensalto A', 'Schraubensalto C',  'Doppelsalto B', 'Doppelsalto C'], name='Saltos', save_data='plots/DFF/with_preprocessed/only_preprocessed/')
+    bar_plots(shap_values, shap_x_test, shap_y_test, bar='percentual', jumps=['Salto A', 'Salto B', 'Salto C', 'Salto rw A', 'Salto rw B', 'Salto rw C', 'Schraubensalto', 'Schraubensalto A', 'Schraubensalto C',  'Doppelsalto B', 'Doppelsalto C'], name='Saltos', save_data='plots/DFF/without_preprocessed/AJ/')
     # bar_plots(shap_values, shap_x_test, shap_y_test)
-    """
+    #"""
 
     # CNN
-    #"""
+    """
     shap_x_test, shap_y_test = sample_x_test(x_test, y_test, 3, cnn=True)
     shap_x_train, shap_y_train = sample_x_test(x_train, y_train, 6, cnn=True)
 
@@ -808,7 +808,7 @@ def main():
 
         shap.image_plot(shap_values, to_explain, index_names, show=False)
         #plt.savefig('plots/CNN/with_preprocessed/CNN_with_mean_std_20_part' + str(j) + '.png')
-    #"""
+    """
     """
     # Shap for specific Class
     i = y_test.index[y_test['Salto C'] == 1]
@@ -823,7 +823,7 @@ def main():
     # Confusion matrix to find mistakes in classification
     cm = sklearn.metrics.confusion_matrix(y_test.idxmax(axis=1), pd.DataFrame(model.predict(x_test), columns=y_test.columns).idxmax(axis=1))
     # save data:
-    pd.DataFrame(cm, columns=y_test.columns, index=y_test.columns).to_csv('plots/CNN/without_preprocessed/confusion_matrix.csv')
+    pd.DataFrame(cm, columns=y_test.columns, index=y_test.columns).to_csv('plots/DFF/without_preprocessed/AJ/confusion_matrix_AJ.csv')
 
     disp = sklearn.metrics.ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=y_test.columns)
     disp.plot(cmap=cmap_cm)
