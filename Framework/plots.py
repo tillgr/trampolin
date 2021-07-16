@@ -175,6 +175,10 @@ def bar_plots(shap_values, shap_x_test, shap_y_test, bar='summary', size=None, j
             sum_values = np.sum(values)
             jump_dict[jump] = [(v / sum_values) * 100 for v in values]
 
+        if folder is not None:
+            with open(folder + "percentual_plot" + name + ".txt", 'w') as f:
+                print(jump, file=f)
+
         # creates the plot
         labels = list(jump_dict.keys())
         data = np.array(list(jump_dict.values()))

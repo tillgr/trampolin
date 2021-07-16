@@ -6,6 +6,7 @@ from keras.layers import Dense, Conv2D, MaxPooling2D, Input, Flatten
 from sklearn.model_selection import RandomizedSearchCV
 from keras.wrappers.scikit_learn import KerasClassifier
 import shap
+import pickle
 
 
 """
@@ -562,6 +563,9 @@ def gen_shap_CNN(model, part, sample_train, sample_test, x_train, y_train, x_tes
     d = dict(enumerate(np.array(y_test.columns).flatten(), 0))
     index_names = np.vectorize(lambda i: d[i])(indexes)
 
+    with open("plots/CNN/shp_values.pkl", 'wb') as f:
+        pickle.dump([shap_values, to_explain, index_names], f)
+
     return shap_values, to_explain, index_names
 
 
@@ -808,6 +812,9 @@ def gen_shap_DFF(model, sample_train, sample_test, x_train, y_train, x_test, y_t
 
     explainer = shap.KernelExplainer(model, shap_x_train)
     shap_values = explainer.shap_values(shap_x_test)
+
+    with open("plots/CNN/shp_values.pkl", 'wb') as f:
+        pickle.dump([shap_values, shap_x_train, shap_y_train, shap_x_test, shap_y_test], f)
 
     return shap_values
 
