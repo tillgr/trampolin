@@ -13,6 +13,7 @@ from sklearn.model_selection import GridSearchCV, RandomizedSearchCV
 from keras.wrappers.scikit_learn import KerasClassifier
 from holoviews.plotting.util import process_cmap
 import holoviews as hv
+import pickle
 
 
 def prepare_data(data_train, data_test, pp_list):
@@ -93,9 +94,11 @@ def prepare_data_oneliner(data_train, data_test, pp_list):
     x_test = data_test.drop('Sprungtyp', axis=1)
     x_test = x_test.drop(['SprungID'], axis=1)
 
-    # for Djump only
-    #x_train = x_train.drop([col for col in x_train.columns if 'DJump' not in col], axis=1)
-    #x_test = x_test.drop([col for col in x_test.columns if 'DJump' not in col], axis=1)
+    #for Djump only
+    #"""
+    x_train = x_train.drop([col for col in x_train.columns if 'DJump' not in col], axis=1)
+    x_test = x_test.drop([col for col in x_test.columns if 'DJump' not in col], axis=1)
+    #"""
 
     num_columns = len(x_train.columns)
 
@@ -477,7 +480,7 @@ def create_colormap(shap_y_test, shap_values=None):
     return cmap
 
 
-def bar_plots(shap_values, shap_x_test, shap_y_test, bar='summary', size=None, jumps=None, folder=None, name=None, max_display=None):
+def bar_plots(shap_values, shap_x_test, shap_y_test, save_data, bar='summary', size=None, jumps=None, folder=None, name=None, max_display=None):
     """
     :param shap_values:
     :param shap_x_test:
@@ -552,6 +555,10 @@ def bar_plots(shap_values, shap_x_test, shap_y_test, bar='summary', size=None, j
             sum_values = np.sum(values)
             jump_dict[jump] = [(v / sum_values) * 100 for v in values]
 
+
+        #
+        with open(save_data+'percentual_plot' + name + '.txt', 'w') as f:
+            print(jump_dict, file=f)
         # creates the plot
         labels = list(jump_dict.keys())
         data = np.array(list(jump_dict.values()))
@@ -649,7 +656,7 @@ def main():
         "Sprungdaten_processed/with_preprocessed/percentage/25/vector_percentage_mean_std_25_train.csv")
     data_test = pd.read_csv(
         "Sprungdaten_processed/with_preprocessed/percentage/25/vector_percentage_mean_std_25_test.csv")
-    pp_list = [3]
+    pp_list = [1, 2, 3, 4]
 
     if neural_network == 'cnn':
         x_train, y_train, x_test, y_test, jump_data_length, num_columns, num_classes = prepare_data(data_train,
@@ -695,7 +702,7 @@ def main():
             jump_core_detection('dff', data_train, data_test, pp_list)
 
     # model.save("models/DFF_only_pp_")
-    model = keras.models.load_model("models/DFF_with_mean_std_25")
+    model = keras.models.load_model("models/DFF_only_pp_")
     # model.summary()
     # model.evaluate(x_test, y_test, verbose=1)
     shap.initjs()
@@ -731,10 +738,23 @@ def main():
     shap_values = explainer.shap_values(shap_x_test)
 
     bar_cm = create_colormap(shap_y_test, shap_values)
+
+    with open('plots/DFF/with_preprocessed/only_preprocessed/' + 'shap_data.pkl', 'wb') as f:  # Python 3: open(..., 'wb')
+        pickle.dump([shap_values, shap_x_test, shap_y_test, shap_x_train, shap_y_train], f)
     """
-    # shap.summary_plot(shap_values, shap_x_test, plot_type='bar', plot_size=(25, 20), color=bar_cm, class_names=shap_y_test.unique(), max_display=20)
-    # shap.summary_plot(shap_values, shap_x_test, plot_type='bar', plot_size=(25, 20), color=ListedColormap('#616161'), class_names=shap_y_test.unique(), max_display=len(shap_x_test.columns))
+    with open('plots/DFF/with_preprocessed/only_preprocessed/shap_data.pkl', 'rb') as f: 
+        shap_values, shap_x_test, shap_y_test, shap_x_train, shap_y_train = pickle.load(f)
+    """
+
+
+    #"""
+    """
+    
+    shap.summary_plot(shap_values, shap_x_test, plot_type='bar', plot_size=(25, 20), color=bar_cm, class_names=shap_y_test.unique(), max_display=20)
+    shap.summary_plot(shap_values, shap_x_test, plot_type='bar', plot_size=(25, 20), color=ListedColormap('#616161'), class_names=shap_y_test.unique(), max_display=len(shap_x_test.columns))
     bar_plots(shap_values, shap_x_test, shap_y_test)
+    """
+    """
     saltoA = np.where(shap_y_test.unique() == 'Salto A')[0][0]
     shap.summary_plot(shap_values[saltoA], shap_x_test, plot_size=(25, 15), title='Salto A')
 
@@ -742,7 +762,9 @@ def main():
     shap.summary_plot(shap_values[saltoB], shap_x_test, plot_size=(25, 15), title='Salto B')
     saltoC = np.where(shap_y_test.unique() == 'Salto C')[0][0]
     shap.summary_plot(shap_values[saltoC], shap_x_test, plot_size=(25, 15), title='Salto C')
-    
+    """
+    """
+
     # creating vor each jump a bar chart
     for jump in shap_y_test.unique():
         color_string = create_colormap(jump)
@@ -751,11 +773,12 @@ def main():
         # plt.savefig('plots/DFF/with_preprocessed/jump_analysis/' + jump.replace('/', '-') + '.png')
         plt.clf()
     """
-    bar_plots(shap_values, shap_x_test, shap_y_test, bar='percentual')
+    #"""
+    bar_plots(shap_values, shap_x_test, shap_y_test, bar='percentual', save_data='plots/DFF/with_preprocessed/only_preprocessed/')
 
-    bar_plots(shap_values, shap_x_test, shap_y_test, bar='percentual', jumps=['Salto A', 'Salto B', 'Salto C', 'Salto rw A', 'Salto rw B', 'Salto rw C', 'Schraubensalto', 'Schraubensalto A', 'Schraubensalto C',  'Doppelsalto B', 'Doppelsalto C'])
-    bar_plots(shap_values, shap_x_test, shap_y_test)
-    # """
+    bar_plots(shap_values, shap_x_test, shap_y_test, bar='percentual', jumps=['Salto A', 'Salto B', 'Salto C', 'Salto rw A', 'Salto rw B', 'Salto rw C', 'Schraubensalto', 'Schraubensalto A', 'Schraubensalto C',  'Doppelsalto B', 'Doppelsalto C'], name='Saltos', save_data='plots/DFF/with_preprocessed/only_preprocessed/')
+    # bar_plots(shap_values, shap_x_test, shap_y_test)
+    #"""
 
     # CNN
     """
@@ -792,9 +815,13 @@ def main():
     shap.image_plot(shap_values, -x_test[i])  # , labels=list(y_test.columns))
     """
 
-    """
+    # """
     # Confusion matrix to find mistakes in classification
     cm = sklearn.metrics.confusion_matrix(y_test.idxmax(axis=1), pd.DataFrame(model.predict(x_test), columns=y_test.columns).idxmax(axis=1))
+    # save data:
+    pd.DataFrame(cm, columns=y_test.columns, index=y_test.columns).to_csv('plots/DFF/with_preprocessed/only_preprocessed/confosion_matrix.csv')
+
+
     disp = sklearn.metrics.ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=y_test.columns)
     disp.plot(cmap=cmap_cm)
     disp.figure_.set_figwidth(35)
@@ -802,7 +829,7 @@ def main():
     disp.figure_.autofmt_xdate()
     plt.show()
     #plt.savefig('CNN_confusion_matrix_flag.png')
-    """
+    # """
 
     return
 
