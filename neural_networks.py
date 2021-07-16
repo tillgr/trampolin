@@ -740,9 +740,10 @@ def main():
     bar_cm = create_colormap(shap_y_test, shap_values)
 
     with open('plots/DFF/with_preprocessed/only_preprocessed/' + 'shap_data.pkl', 'wb') as f:  # Python 3: open(..., 'wb')
-        pickle.dump([shap_values, shap_x_test, shap_y_test, shap_x_train, shap_y_train], f)
+        pickle.dump([shap_values, shap_x_train, shap_y_train, shap_x_test, shap_y_test], f)
+
     """
-    with open('plots/DFF/with_preprocessed/only_preprocessed/shap_data.pkl', 'rb') as f: 
+    #with open('plots/DFF/with_preprocessed/only_preprocessed/shap_data.pkl', 'rb') as f: 
         shap_values, shap_x_test, shap_y_test, shap_x_train, shap_y_train = pickle.load(f)
     """
 
