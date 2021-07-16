@@ -14,8 +14,13 @@ def create_colormap(shap_y_test, shap_values=None):
     -> contains color dict for all jumps, that are used until now, so must be updated if more jumps available.
     An overview of the colors can be found in cmap.pdf
 
-    :param shap_values: output from explainer.shap_values(shap_x_test); If shap_values are None, shap_y_test must be a string.
-    :param shap_y_test: sampled y_test or single string jump
+    Parameters
+    ----------
+    shap_values : list of arrays
+        output from explainer.shap_values(shap_x_test); If shap_values are None, shap_y_test must be a string.
+    shap_y_test : pandas.Dataframe
+        sampled y_test or single string jump
+
     :return: colormap or single color if shap_values=None
     """
 
@@ -83,18 +88,29 @@ def bar_plots(shap_values, shap_x_test, shap_y_test, bar='summary', size=None, j
     Function used to plot different bar charts. Used for global feature importance, global feature importance per class,
     feature importance per class and percentual feature importance across the jumps
 
-    :param shap_values: output from explainer.shap_values(shap_x_test)
-    :param shap_x_test: sampled x data
-    :param shap_y_test: sampled y data
-    :param bar: 'summary', 'summary_color', 'single' or 'percentual', default: 'summary';
-        different bar plots
-    :param size: tuple (int, int);
+    Parameters
+    ----------
+
+    shap_values : list of arrays
+        output from explainer.shap_values(shap_x_test)
+    shap_x_test : pandas.Dataframe
+        sampled x data
+    shap_y_test : pandas.Dataframe
+        sampled y data
+    bar : str
+        'summary', 'summary_color', 'single' or 'percentual', default: 'summary'; different bar plots
+    size : tuple (int, int)
         for individual plot size
-    :param jumps: for 'single' and 'percentual' you can input a list with the jump names, for which a bar plot should be created
-    :param folder: path, where the plots should be saved, when its empty, plots will be shown and not be saved
-    :param name: for saving the plot you can choose an other name
-    :param max_display: int;
+    jumps : list
+        for 'single' and 'percentual' you can input a list with the jump names, for which a bar plot should be created
+    folder : str
+        path, where the plots should be saved, when its empty, plots will be shown and not be saved
+    name : str
+        for saving the plot you can choose an other name
+    max_display : int
         for 'summary' and 'summary_color' plots, if its none, than all features will be displayed
+
+    :return:
     """
 
     if size is None:
@@ -249,14 +265,22 @@ def beeswarm(shap_values, shap_x_test, shap_y_test, jump, size=(25, 15), folder=
     """
     for beeswarm plots
 
-    :param shap_values: calculated shap_values from the model
-    :param shap_x_test: sampled x data
-    :param shap_y_test: sampled y data
-    :param jump: name of jump (String)
-    :param size: tuple (int,int);
+    Parameters
+    ----------
+    shap_values : list of arrays
+        calculated shap_values from the model
+    shap_x_test : pandas.Dataframe
+        sampled x data
+    shap_y_test : pandas.Dataframe
+        sampled y data
+    jump : str
+        name of jump
+    size : tuple (int,int)
         for individual size
-    :param folder: default is None;
+    folder : str, default=None
         if folder is None, plot will be shown, else plot will be saved in the given path
+
+    :return:
     """
 
     jump_data = np.where(shap_y_test.unique() == jump)[0][0]
@@ -271,15 +295,23 @@ def confusion_matrix(model, x_test, y_test, size=(35, 25), folder=None, name='co
     """
     for creating confusion matrix plot
 
-    :param model: need the model
-    :param x_test: dataframe
-    :param y_test: dataframe
-    :param size: (int,int);
+    Parameters
+    ----------
+    model : model
+        need the model
+    x_test : pandas.Dataframe
+        test data
+    y_test : pandas.Dataframe
+        classes of test data
+    size: tuple(int, int)
         to adjust the size of the plot
-    :param folder: default None or input path as a string;
+    folder: str, default=None
         if folder is None, the plot will be shown and not saved,
         plot will be otherwise saved in this folder
-    :param name: unique name for saving the plot
+    name: str
+        unique name for saving the plot
+
+    :return:
     """
 
     if len(y_test) == len(y_test.columns):
@@ -310,19 +342,24 @@ def jump_core_plot(scores, percentage, min_y_value=70, size=(13, 13), title='', 
     """
     creates a flying bar char for the jump core detection
 
-    :param scores: dict with values
-    :param percentage: int;
+    Parameters
+    ----------
+    scores : dict
+        dict with values
+    percentage : int
         percentage step size
-    :param min_y_value: int between 0 and 70;
-        remove y axis under min_y_value
-    :param size: (int,int)
+    min_y_value : int (between 0 and 99)
+        remove y axis under min_y_value, we used 70
+    size : tuple(int,int)
         to adjust plot size
-    :param title: optional str;
+    title : str, optional
         title on the plot
-    :param folder: default None or input path as a string;
+    folder : str, default=None
         if folder is None, the plot will be shown and not saved,
         plot will be otherwise saved in this folder
-    :param name: unique name for saving the file
+    name : str
+        unique name for saving the file
+
     :return:
     """
 
@@ -359,13 +396,21 @@ def image_plot(shap_values, to_explain, index_names, folder=None, name='CNN_imag
     """
     Image plot for shap values of CNN.
 
-    :param shap_values: Return value of gen_shap_CNN
-    :param to_explain: Return value of gen_shap_CNN
-    :param index_names: Return value of gen_shap_CNN
-    :param folder: default None or input path as a string;
+    Parameters
+    ----------
+    shap_values : list of arrays
+        Return value of gen_shap_CNN
+    to_explain : list
+        Return value of gen_shap_CNN
+    index_names : list
+        Return value of gen_shap_CNN
+    folder : str, default=None
         if folder is None, the plot will be shown and not saved,
         plot will be otherwise saved in this folder
-    :param name: unique name for saving the file
+    name : str
+        unique name for saving the file
+
+    :return:
     """
 
     if folder is None:

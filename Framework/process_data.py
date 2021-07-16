@@ -18,8 +18,14 @@ def read_raw_csv_data(file):
     Reads the data from the raw data csv files.
     It skips the first 2 rows to get only the data. For the columns it ready only the first row.
 
-    :param file: Path to csv file -> e.g. "Sprungdaten Innotramp/.../Rohdaten...csv"
-    :return: A Dataframe with the raw data
+    Parameters
+    ----------
+    file : str
+        Path to csv file -> e.g. "Sprungdaten Innotramp/.../Rohdaten...csv"
+
+    :return: Dataframe with raw data
+
+
     """
 
     raw_data = pd.read_csv(file, header=None, skiprows=2, delimiter=";")
@@ -33,7 +39,11 @@ def read_xlsx_data(file):
     """
     Reads the data from an excel file.
 
-    :param file: Path to xslx file -> e.g. "Sprungdaten Innotramp/.../Sprungzuordnung...xlsx"
+    Parameters
+    ----------
+    file : str
+        Path to xslx file -> e.g. "Sprungdaten Innotramp/.../Sprungzuordnung...xlsx"
+
     :return: A Dataframe with the raw data
     """
 
@@ -81,9 +91,16 @@ def save_as_csv(data, name, folder=""):
 
     It always saves into Sprungdaten_processed/...
 
-    :param data: dataset to be saved
-    :param name: name of the dataset with .csv
-    :param folder: folder after Sprungdaten_processed/  -> gets created if not already there
+    Parameters
+    ----------
+    data : pandas.Dataframe
+        dataset to be saved
+    name : str
+        name of the dataset with .csv
+    folder : str
+        folder after Sprungdaten_processed/  -> gets created if not already there
+
+    :return:
 
     """
 
@@ -110,7 +127,11 @@ def sort_out_errors(data):
     """
     Sorts out all unwanted data and fixes the class names with spelling errors
 
-    :param data: data to be fixed
+    Parameters
+    ----------
+    data : pandas.Dataframe
+        data to be fixed
+
     :return: fixed data
     """
 
@@ -182,10 +203,16 @@ def split_train_test(data, test_size=0.2, min_num_jumps=2):
 
     We also drop all jumps which occur less than 2 times. As 2 isnt enough for the stratify algorithm.
 
-    :param data: data to be split
-    :param test_size: the fraction of the data to be the test set. default=0.2 -> 80 / 20 split
-    :param min_num_jumps: the max number of occurences a jump can have and still be deleted. All jumps with min_num_jumps + 1 will be kept
-    :return: train data and test data
+    Parameters
+    ----------
+    data : pandas.Dataframe
+        data to be split
+    test_size : float
+        the fraction of the data to be the test set. default=0.2 -> 80 / 20 split
+    min_num_jumps : int
+        the max number of occurences a jump can have and still be deleted. All jumps with min_num_jumps + 1 will be kept
+
+    :return: train data and test data Dataframes
     """
 
     # if the data consists of only one row per jump we can use the easy way
@@ -256,7 +283,11 @@ def calc_avg_std(data):
     """
     Calculates the avg and std data for each column of each jump.
 
-    :param data: data for calculation
+    Parameters
+    ----------
+    data : pandas.Dataframe
+        data for calculation
+
     :return: avg_data dataframe and std_data dataframe
     """
 
@@ -315,8 +346,13 @@ def combine_avg_std(avg_data, std_data):
     """
     Combines the avg_data and std_data in such a way that the average and std of a column are always beside each other
 
-    :param avg_data: avg_data dataframe
-    :param std_data: std_data dataframe
+    Parameters
+    ----------
+    avg_data : pandas.Dataframe
+        avg_data dataframe
+    std_data : pandas.Dataframe
+        std_data dataframe
+
     :return: avg_std_data
     """
 
@@ -337,9 +373,15 @@ def percentage_cutting(data, percent_steps, method=None):
 
     Relative to the percent_steps we get a different number of datapoints per jump. e.g. using 1% we get 100 datapoints, using 20% we get 5 datapoints
 
-    :param data: Data to be turned into percentage based data
-    :param percent_steps: value between 0 - 1, 100 has to be divisible by the value. We use [0.01, 0.02, 0.05, 0.1, 0.2, 0.25] -> [1%, 2%, 5%, 10%, 20%, 25%]
-    :param method: None: Just keeps the original datapoints at each percentage step, 'mean': calculates the average value for each column in the percentage step, 'mean_std': calculates the average and std value for each column in the percentage step
+    Parameters
+    ----------
+    data : pandas.Dataframe
+        Data to be turned into percentage based data
+    percent_steps : float
+        value between 0 - 1, 100 has to be divisible by the value. We use [0.01, 0.02, 0.05, 0.1, 0.2, 0.25] -> [1%, 2%, 5%, 10%, 20%, 25%]
+    method : None : str or None
+        Just keeps the original datapoints at each percentage step, 'mean': calculates the average value for each column in the percentage step, 'mean_std': calculates the average and std value for each column in the percentage step
+
     :return: Dataframe with percentage data
     """
 
@@ -446,7 +488,11 @@ def vectorize(data):
     """
     vectorizes data by putting the datapoints of each jump into one row.
 
-    :param data: data to vectorize
+    Parameters
+    ----------
+    data : pandas.Dataframe
+        data to vectorize
+
     :return: vectorized data
     """
 
@@ -487,7 +533,11 @@ def mean_jump_generator(data):
     """
     Create one average jump for each type of jump.
 
-    :param data: data to be used
+    Parameters
+    ----------
+    data : pandas.Dataframe
+        data to be used
+
     :return: dataframe with all average jumps
     """
 
@@ -508,7 +558,11 @@ def devectorize(data):
     """
     Devectorizes a dataframe to use with CNNs.
 
-    :param data: data to be devectorized
+    Parameters
+    ----------
+    data : pandas.Dataframe
+        data to be devectorized
+
     :return: devectorized dataframe
     """
 
@@ -647,7 +701,13 @@ def make_data_only_jumps(num_strecksprung=300):
 
     We save a copy with preprocessed data and one without preprocessed data
 
-    :param num_strecksprung: The number of Strecksprünge to which it should undersample. default=300
+    Parameters
+    ----------
+    num_strecksprung : int
+        The number of Strecksprünge to which it should undersample. default=300
+
+    :return:
+
     """
 
     all_data = pd.read_csv("Sprungdaten_processed/all_data.csv")
@@ -679,7 +739,12 @@ def make_avg_std_data(preprocessed):
 
     avg_std_data: avg_data and std_data combined with the corresponding columns besides each other
 
-    :param preprocessed: 'with_preprocessed' or 'without_preprocessed'
+    Parameters
+    ----------
+    preprocessed : str
+        'with_preprocessed' or 'without_preprocessed'
+
+    :return:
     """
 
     if preprocessed not in ['with_preprocessed', 'without_preprocessed']:
@@ -712,9 +777,16 @@ def make_percentage_data(preprocessed, percentage_steps, method):
     """
     Creates all the percentage data specified in the parameters.
 
-    :param preprocessed: 'with_preprocessed' or 'without_preprocessed'
-    :param percentage_steps: a list with fraction values which divide 100. We use ['0.25', '0.20', '0.10', '0.05', '0.02', '0.01']
-    :param method: None, 'mean', or 'mean_std'
+    Parameters
+    ----------
+    preprocessed : str
+        'with_preprocessed' or 'without_preprocessed'
+    percentage_steps : list of str
+        a list with fraction values which divide 100. We use ['0.25', '0.20', '0.10', '0.05', '0.02', '0.01']
+    method : str or None
+        None, 'mean', or 'mean_std'
+
+    :return:
     """
 
     if preprocessed not in ['with_preprocessed', 'without_preprocessed']:
@@ -759,9 +831,16 @@ def vectorize_data(preprocessed, name, percentages):
     """
     Vectorizes the percentage data previously created.
 
-    :param preprocessed: 'with_preprocessed' or 'without_preprocessed'
-    :param name: 'percentage_mean_std', 'percentage_mean', or 'percentage'
-    :param percentages: a list with values which divide 100. We use ['25', '20', '10', '5', '2', '1']
+    Parameters
+    ----------
+    preprocessed : str
+        'with_preprocessed' or 'without_preprocessed'
+    name : str
+        'percentage_mean_std', 'percentage_mean', or 'percentage'
+    percentages :list of str
+        a list with values which divide 100. We use ['25', '20', '10', '5', '2', '1']
+
+    :return:
     """
 
     if preprocessed not in ['with_preprocessed', 'without_preprocessed']:
@@ -797,9 +876,16 @@ def make_AJ_jumps(preprocessed, name, percentages):
 
     It automatically generates a vectorized and unvectorized version.
 
-    :param preprocessed: 'with_preprocessed' or 'without_preprocessed'
-    :param name: 'percentage_mean_std', 'percentage_mean', or 'percentage'
-    :param percentages: a list with values which divide 100. We use ['25', '20', '10', '5', '2', '1']
+    Parameters
+    ----------
+    preprocessed : str
+        'with_preprocessed' or 'without_preprocessed'
+    name : str
+        'percentage_mean_std', 'percentage_mean', or 'percentage'
+    percentages : list of str
+        a list with values which divide 100. We use ['25', '20', '10', '5', '2', '1']
+
+    :return:
     """
 
     if preprocessed not in ['with_preprocessed', 'without_preprocessed']:

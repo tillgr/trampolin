@@ -21,7 +21,12 @@ def calc_scores(scores):
     """
     Prints the youden and the fscore for a model
 
-    :param scores: the return value of model.evaluate, contains accuracy, tp, tn, fp, fn
+    Parameters
+    ----------
+    scores : tuple
+        the return value of model.evaluate, contains accuracy, tp, tn, fp, fn
+
+    :return:
     """
 
     tp = scores[2]
@@ -40,10 +45,20 @@ def grid_search(modeltype, param_grid, run, x_test, y_test):
     """
     Uses Randomized Grid Search to find good parameters for the model
 
-    :param modeltype: 'CNN' or 'DFF'
-    :param param_grid: all parameters needed for the model
-    :param run: how many iterations to be randomly searched
-    :return: locally best parameters for modle
+    Parameters
+    ----------
+    modeltype : str
+        'CNN' or 'DFF'
+    param_grid : list
+        all parameters needed for the model
+    run : int
+        how many iterations to be randomly searched
+    x_test : pandas.Dataframe
+        test data
+    y_test : pandas.Dataframe
+        classes of test data
+
+    :return: prints locally best parameters for model
     """
 
     """
@@ -75,11 +90,18 @@ def sample_x_test(x_test, y_test, num, cnn=False):
     """
     Samples data by retrieving only a certain number of each jump.
 
-    :param x_test: can be x_test and x_train
-    :param y_test: can be y_test and y_train
-    :param num: number of each jump to retrieve
-    :param cnn: check True for CNN
-    :return: sampled data
+    Parameters
+    ----------
+    :param x_test : pandas.Dataframe
+        can be x_test and x_train
+    :param y_test : pandas.Dataframe
+        can be y_test and y_train
+    :param num : int
+        number of each jump to retrieve
+    :param cnn : bool
+        check True for CNN
+
+    :return: sampled data Dataframe
     """
 
     if cnn:
@@ -138,12 +160,21 @@ def jump_core_detection(modeltype, data_train, data_test, pp_list, runs, params)
     """
     Trains many different models with differently cut data. We cut from back to front, front to back, and from both sides
 
-    :param modeltype: 'CNN' or 'DFF'
-    :param data_train: dataframe read from .csv file
-    :param data_test: dataframe read from .csv file
-    :param pp_list: pp_list: a list with values from 1 to 4: [1, 2, 3, 4]. Corresponds to the blocks of preprocessed data. 1: first 9 columns, 2, 3, 4: 12 columns each
-    :param runs: how many models should be trained for each dataset
-    :param params: a list with all parameters for the model. e.g. CNN: [3, 3, 2, 2, 'tanh', 'categorical_crossentropy', 'Nadam', 40], e.g. DFF: ['relu', 'categorical_crossentropy', 'Nadam', 100]
+    Parameters
+    ----------
+    modeltype : str
+        'CNN' or 'DFF'
+    data_train : pandas.Dataframe
+        dataframe read from .csv file
+    data_test : pandas.Dataframe
+        dataframe read from .csv file
+    pp_list : list
+        a list with values from 1 to 4: [1, 2, 3, 4]. Corresponds to the blocks of preprocessed data. 1: first 9 columns, 2, 3, 4: 12 columns each
+    runs : int
+        how many models should be trained for each dataset
+    params : list
+        a list with all parameters for the model. e.g. CNN: [3, 3, 2, 2, 'tanh', 'categorical_crossentropy', 'Nadam', 40], e.g. DFF: ['relu', 'categorical_crossentropy', 'Nadam', 100]
+
     :return: dictionary with scores of all trained models
     """
 
@@ -238,10 +269,17 @@ def prepare_data_CNN(data_train, data_test, pp_list, only_pp=None):
     """
     Prepares the data for the CNN by reshaping the X... data to a 4-dim ndarray and one-hot-encoding the y... data
 
-    :param data_train: dataframe read from .csv file
-    :param data_test: dataframe read from .csv file
-    :param pp_list: a list with values from 1 to 4: [1, 2, 3, 4]. Corresponds to the blocks of preprocessed data. 1: first 9 columns, 2, 3, 4: 12 columns each
-    :param only_pp: if not None: drops all columns except for the preprocessed data
+    Parameters
+    ----------
+    data_train : pandas.Dataframe
+        dataframe read from .csv file
+    data_test : pandas.Dataframe
+        dataframe read from .csv file
+    pp_list : list
+        a list with values from 1 to 4: [1, 2, 3, 4]. Corresponds to the blocks of preprocessed data. 1: first 9 columns, 2, 3, 4: 12 columns each
+    only_pp : None or any
+        if not None: drops all columns except for the preprocessed data
+
     :return: x_train, y_train, x_test, y_test, jump_data_length, num_columns, num_classes
     """
 
@@ -305,16 +343,29 @@ def build_model_CNN(jump_data_length, num_columns, num_classes, conv, kernel, po
     """
     Builds a CNN model.
 
-    :param jump_data_length: how many rows for each jump. Return value of prepare_data_CNN
-    :param num_columns: how many columns exist. Return value of prepare_data_CNN
-    :param num_classes: how many classes exist. Return value of prepare_data_CNN
-    :param conv: how many extra convolutional layers to add. 1 is the base
-    :param kernel: kernel size of convolutional layers.
-    :param pool: pool size of MaxPooling layers.
-    :param dense: how many dense layers to add.
-    :param act_func: activation function for all layers except the last
-    :param loss: loss
-    :param optim: optimizer
+    Parameters
+    ----------
+    jump_data_length : int
+        how many rows for each jump. Return value of prepare_data_CNN
+    num_columns : int
+        how many columns exist. Return value of prepare_data_CNN
+    num_classes : int
+        how many classes exist. Return value of prepare_data_CNN
+    conv : int
+        how many extra convolutional layers to add. 1 is the base
+    kernel : int
+        kernel size of convolutional layers.
+    pool : int
+        pool size of MaxPooling layers.
+    dense : int
+        how many dense layers to add.
+    act_func : str
+        activation function for all layers except the last
+    loss : str
+        loss
+    optim : str
+        optimizer
+
     :return: model
     """
 
@@ -340,13 +391,23 @@ def build_model_CNN_sequentiel(jump_data_length, num_columns, num_classes, conv,
     """
     Nearly the same as build_model_CNN, just a sequential model. Have to use this for grid search.
 
-    :param jump_data_length: how many rows for each jump. Return value of prepare_data_CNN
-    :param num_columns: how many columns exist. Return value of prepare_data_CNN
-    :param num_classes: how many classes exist. Return value of prepare_data_CNN
-    :param conv: how many extra convolutional layers to add. 1 is the base
-    :param act_func: activation function for all layers except the last
-    :param loss: loss
-    :param optim: optimizer
+    Parameters
+    ----------
+    jump_data_length : int
+        how many rows for each jump. Return value of prepare_data_CNN
+    num_columns : int
+        how many columns exist. Return value of prepare_data_CNN
+    num_classes : int
+        how many classes exist. Return value of prepare_data_CNN
+    conv : int
+        how many extra convolutional layers to add. 1 is the base
+    act_func : str
+        activation function for all layers except the last
+    loss : str
+        loss
+    optim : str
+        optimizer
+
     :return: sequential model
     """
 
@@ -373,22 +434,41 @@ def run_multiple_times_CNN(jump_data_length, num_columns, num_classes, runs, con
     """
     Builds multiple CNN models and chooses the best one according to accuracy
 
-    :param jump_data_length: how many rows for each jump. Return value of prepare_data_CNN
-    :param num_columns: how many columns exist. Return value of prepare_data_CNN
-    :param num_classes: how many classes exist. Return value of prepare_data_CNN
-    :param runs: how many models to train
-    :param conv: how many extra convolutional layers to add. 1 is the base
-    :param kernel: kernel size of convolutional layers.
-    :param pool: pool size of MaxPooling layers.
-    :param dense: how many dense layers to add.
-    :param act_func: activation function for all layers except the last
-    :param loss: loss
-    :param optim: optimizer
-    :param epochs: how many epochs to train each model
-    :param x_train: prepared data
-    :param y_train: prepared data
-    :param x_test: prepared data
-    :param y_test: prepared data
+    Parameters
+    ----------
+    jump_data_length : int
+        how many rows for each jump. Return value of prepare_data_CNN
+    num_columns : int
+        how many columns exist. Return value of prepare_data_CNN
+    num_classes : int
+        how many classes exist. Return value of prepare_data_CNN
+    runs : int
+        how many models to train
+    conv : int
+        how many extra convolutional layers to add. 1 is the base
+    kernel : int
+        kernel size of convolutional layers.
+    pool : int
+        pool size of MaxPooling layers.
+    dense : int
+        how many dense layers to add.
+    act_func : str
+        activation function for all layers except the last
+    loss : str
+        loss
+    optim : str
+        optimizer
+    epochs : int
+        how many epochs to train each model
+    x_train : pandas.Dataframe
+        prepared data
+    y_train : pandas.Dataframe
+        prepared data
+    x_test : pandas.Dataframe
+        prepared data
+    y_test : pandas.Dataframe
+        prepared data
+
     :return: best model of all runs
     """
 
@@ -419,8 +499,13 @@ def get_index(jump_list, y_test):
     """
     Get the indexes for all jumps in the jump_list
 
-    :param jump_list: list with jump names
-    :param y_test: y_test
+    Parameters
+    ----------
+    jump_list: list
+        list with jump names
+    y_test: pandas.Dataframe
+        y_test
+
     :return: a list with indexes of all jumps in the jump_list
     """
 
@@ -434,14 +519,25 @@ def gen_shap_CNN(model, part, sample_train, sample_test, x_train, y_train, x_tes
     """
     generates the shap values for the CNN. We do this in predefined parts to lower the amount of images in the image plot
 
-    :param model: CNN model
-    :param part: 1 - 8. related jumps. see code
-    :param sample_train: integer number. how often each jump should be sampled into the train data. We used 6
-    :param sample_test: integer number. how often each jump should be sampled into the test data. We used 3
-    :param x_train: return value of prepare_data_CNN
-    :param y_train: return value of prepare_data_CNN
-    :param x_test: return value of prepare_data_CNN
-    :param y_test: return value of prepare_data_CNN
+    Parameters
+    ----------
+    model : keras.model
+        CNN model
+    part : int
+        1 - 8. related jumps. see code
+    sample_train : int
+        how often each jump should be sampled into the train data. We used 6
+    sample_test : int
+        how often each jump should be sampled into the test data. We used 3
+    x_train : pandas.Dataframe
+        return value of prepare_data_CNN
+    y_train : pandas.Dataframe
+        return value of prepare_data_CNN
+    x_test : pandas.Dataframe
+        return value of prepare_data_CNN
+    y_test : pandas.Dataframe
+        return value of prepare_data_CNN
+
     :return: shap_values, to_explain and index_names for image plot
     """
 
@@ -473,8 +569,13 @@ def predict_CNN(model, data, pp_list):
     """
     Predicts the classes of given x data
 
-    :param model: a CNN model
-    :param data: dataframe
+    Parameters
+    ----------
+    model : keras.model
+        a CNN model
+    data : pandas.Dataframe
+        data to be predicted
+
     :return: prediction
     """
 
@@ -494,7 +595,7 @@ def predict_CNN(model, data, pp_list):
         data = data.drop([col for col in data.columns if 'DJump_I_ABS_S' in col], axis=1)
 
     for id in data['SprungID'].unique():
-        subframe = data[data['SprungID'] == id]    # TODO: create an ID
+        subframe = data[data['SprungID'] == id]
         subframe = subframe.drop(['SprungID'], axis=1)
         num_columns = len(subframe.columns)
         jump_data_length = len(subframe)
@@ -532,10 +633,17 @@ def prepare_data_DFF(data_train, data_test, pp_list, only_pp=None):
     """
     Prepares the data for the DFF and one-hot-encoding of y... data
 
-    :param data_train: dataframe read from .csv file
-    :param data_test: dataframe read from .csv file
-    :param pp_list: a list with values from 1 to 4: [1, 2, 3, 4]. Corresponds to the blocks of preprocessed data. 1: first 9 columns, 2, 3, 4: 12 columns each
-    :param only_pp: if not None: drops all columns except for the preprocessed data
+    Parameters
+    ----------
+    data_train : pandas.Dataframe
+        dataframe read from .csv file
+    data_test : pandas.Dataframe
+        dataframe read from .csv file
+    pp_list : list
+        a list with values from 1 to 4: [1, 2, 3, 4]. Corresponds to the blocks of preprocessed data. 1: first 9 columns, 2, 3, 4: 12 columns each
+    only_pp : None or any
+        if not None: drops all columns except for the preprocessed data
+
     :return: x_train, y_train, x_test, y_test, num_columns, num_classes
     """
 
@@ -582,11 +690,19 @@ def build_model_DFF(num_columns, num_classes, act_func, loss, optim):
     """
     Builds a DFF model.
 
-    :param num_columns: how many columns exist. Return value of prepare_data_DFF
-    :param num_classes: how many classes exist. Return value of prepare_data_DFF
-    :param act_func: activation function
-    :param loss: loss
-    :param optim: optimizer
+    Parameters
+    ----------
+    num_columns : int
+        how many columns exist. Return value of prepare_data_DFF
+    num_classes : int
+        how many classes exist. Return value of prepare_data_DFF
+    act_func : str
+        activation function
+    loss : str
+        loss
+    optim : str
+        optimizer
+
     :return: model
     """
 
@@ -612,17 +728,31 @@ def run_multiple_times_DFF(num_columns, num_classes, runs, act_func, loss, optim
     """
     Builds multiple DFF models and chooses the best one according to accuracy
 
-    :param num_columns: how many columns exist. Return value of prepare_data_DFF
-    :param num_classes: how many classes exist. Return value of prepare_data_DFF
-    :param runs: how many models to train
-    :param act_func: activation function for all layers except the last
-    :param loss: loss
-    :param optim: optimizer
-    :param epochs: how many epochs to train each model
-    :param x_train: prepared data
-    :param y_train: prepared data
-    :param x_test: prepared data
-    :param y_test: prepared data
+    Parameters
+    ----------
+    num_columns : int
+        how many columns exist. Return value of prepare_data_DFF
+    num_classes : int
+        how many classes exist. Return value of prepare_data_DFF
+    runs : int
+        how many models to train
+    act_func : str
+        activation function for all layers except the last
+    loss : str
+        loss
+    optim : str
+        optimizer
+    epochs : int
+        how many epochs to train each model
+    x_train : pandas.Dataframe
+        prepared data
+    y_train : pandas.Dataframe
+        prepared data
+    x_test : pandas.Dataframe
+        prepared data
+    y_test : pandas.Dataframe
+        prepared data
+
     :return: best model of all runs
     """
 
@@ -653,13 +783,23 @@ def gen_shap_DFF(model, sample_train, sample_test, x_train, y_train, x_test, y_t
     """
     generates the shap values for DFF
 
-    :param model: DFF model
-    :param sample_train: integer number. how often each jump should be sampled into the train data. We used 6
-    :param sample_test: integer number. how often each jump should be sampled into the test data. We used 3
-    :param x_train: return value of prepare_data_DFF
-    :param y_train: return value of prepare_data_DFF
-    :param x_test: return value of prepare_data_DFF
-    :param y_test: return value of prepare_data_DFF
+    Parameters
+    ----------
+    model : keras.model
+        DFF model
+    sample_train : int
+        integer number. how often each jump should be sampled into the train data. We used 6
+    sample_test : int
+        integer number. how often each jump should be sampled into the test data. We used 3
+    x_train : pandas.Dataframe
+        return value of prepare_data_DFF
+    y_train : pandas.Dataframe
+        return value of prepare_data_DFF
+    x_test : pandas.Dataframe
+        return value of prepare_data_DFF
+    y_test : pandas.Dataframe
+        return value of prepare_data_DFF
+
     :return: shap_values
     """
 
@@ -674,12 +814,17 @@ def gen_shap_DFF(model, sample_train, sample_test, x_train, y_train, x_test, y_t
 
 def predict_DFF(model, data, pp_list):
     """
-        Predicts the classes of given x data
+    Predicts the classes of given x data
 
-        :param model: a DFF model
-        :param data: dataframe
-        :return: prediction
-        """
+    Parameters
+    ----------
+    model : keras.model
+        a DFF model
+    data : pandas.Dataframe
+        data to be predicted
+
+    :return: prediction
+    """
 
     first_djumps = set([col for col in data.columns if 'DJump' in col]) \
                    - set([col for col in data.columns if 'DJump_SIG_I_S' in col]) \

@@ -8,8 +8,13 @@ def cost(threshold: int, y):
     """
     Calculates the number of jumps that would currently be found with the threshold
 
-    :param threshold: int - Current threshold to test
-    :param y: array - ACC_N_Fil Column of data
+    Parameters
+    ----------
+    threshold : int
+        Current threshold to test
+    y : array
+        ACC_N_Fil Column of data
+
     :return: number of jumps found
     """
 
@@ -28,9 +33,15 @@ def estimate_threshhold(threshold: int, jumps_amount, y):
     """
     Calculates a threshold, which can find the correct amount of jumps for a given dataset
 
-    threshold: int - Current threshold to test
-    :param jumps_amount: int - Number of jumps to find
-    :param y: array - ACC_N_Fil Column of data
+    Parameters
+    ----------
+    threshold : int
+        Current threshold to test
+    jumps_amount : int
+        Number of jumps to find
+    y : array
+        Acc_N_Fil Column of data
+
     :return: correct threshold
     """
 
@@ -49,7 +60,12 @@ def find_threshold(jumps_to_classify):
     """
     Finds a threshold bottom-up and top-down
 
-    :param jumps_to_classify: int - number of jumps in data. For all jumps use len(data['SprungID'].unique())
+    Parameters
+    ----------
+    jumps_to_classify : int
+        number of jumps in data. For all jumps use len(data['SprungID'].unique())
+
+    :return:
     """
 
     thresholdMin = 40
@@ -91,7 +107,11 @@ def detect_jump_starts(data):
     """
     Detects the start of each jump so we can then classify all the jumps in the data
 
-    :param data: dataframe - read from csv file
+    Parameters
+    ----------
+    data : pandas.Dataframe
+        read from csv file
+
     :return: dataframe with id, segmented by jumps
     """
 
