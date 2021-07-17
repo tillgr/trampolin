@@ -11,6 +11,13 @@ A short Documentation of the Framework
 3. [Predictions](#predictions)
     1. [Steps for predictions](#steps-for-predictions)
 4. [Plots](#plots)
+    1. [Confusion Matrix Plot](#confusion-matrix-plot)
+    2. [Beeswarm Plot](#beeswarm-plot)
+    3. [Summary Plot](#summary-plot)
+    4. [Summary Color Plot](#summary-color-plot)
+    5. [Single Plot](#single-plot)
+    6. [Percentual Plot](#percentual-plot)
+    7. [Image Plot](#image-plot)
 
 ## Dataintegration
 We will first cover how we create all the different data and how we can detect jump starts.
@@ -157,3 +164,37 @@ We can't just predict on the raw data that will be delivered. We will now show w
 4. Predict on the data using the correct model
 
 ## Plots
+Plots can be created via calling the functions in `plots.py`.
+
+### Confusion Matrix Plot
+This plot is used to see which jumps get classified as what.<br>
+Can be useful to see which jumps seem similar to the model and which jumps the model has the most problems to classify.
+
+### Beeswarm Plot
+This shows the positive and negative influence of the feature on a single jump class.<br>
+Can be used to identify the most important feature for a type of jump.
+
+### Summary Plot
+This plot is used to show the importance of feature across all jumps. It is therefore only in one color as the exact distribution of the jumps is not that import. For that see Summary Color Plots
+
+### Summary Color Plot
+This plot is not really used anymore, but the function to create it is still in the file.
+
+This plot shows the impact of feature for each jump. But we can see this impact better in the other plots.
+
+### Single Plot
+The single plots show the feature importance for only one type of jump.<br>
+Can be usefull if you want to get a better look at a single type of jump.
+
+### Percentual Plot
+In this plot the feature importance is mapped to the types of jumps. Using this you can compare the importance of features between jumps.
+
+### Image Plot
+The image plot is only used with CNN's.
+For better visibility they are divided into different parts with similar jumps.
+
+On the far left you can see the data we feed into the model. Then there are the 4 most probable classes predicted by the CNN. If the Model predicts correctly, the first one will have the most Red Dots, meaning that the positive impact of that data causes the model to predict that class.
+
+To understand the shape of the image better you need to understand the shape of the data. Let's look at an example:<br>
+If we take our 5% dataset, we have a datapoint every 5% steps. So we have 20 Datapoints. In the diagram you can see that the image is 20 'pixels' long.<br>
+The width of the image corresponds to the features (columns). Each column has one 'pixel'. So without_preprocessed data the width is way smaller than with_preprocessed data.
