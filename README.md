@@ -6,9 +6,11 @@ A short Documentation of the Framework
     2. [Split of train and test data](#split-of-train-and-test-data)
     3. [Jump detection](#jump-detection)
     4. [How to create data](#how-to-create-data)
-3. [Models](#models)
-4. [Predictions](#predictions)
-5. [Plots](#plots)
+2. [Models](#models)
+    1. [How to train the models for predictions](#how-to-train-the-models-for-predictions)
+3. [Predictions](#predictions)
+    1. [Steps for predictions](#steps-for-predictions)
+4. [Plots](#plots)
 
 ## Dataintegration
 We will first cover how we create all the different data and how we can detect jump starts.
@@ -120,7 +122,38 @@ Keep in mind this will take some time regardless of what you choose.
 Also make sure that the raw data is located in individual folders in `Sprungdaten Innotramp/` and both the Rohdaten and the Sprungzuordnung have corresponding names.
 
 ## Models
+We tested 7 different machine learning algorithms to determine the best.
+- Convolutional Neural Network  (CNN)
+- Deep Feed Forward Neural Network  (DFF)
+- k-nearest Neighbours  (KNN)
+- Support Vector Classifier (SVC)
+- Gradient Boosting Classifier  (GBC)
+- Stochastic Gradient Descent   (SGD)
+- Gaussian Naive Bayes  (GNB)
+
+We will not explain here in detail what each of them does.
+
+Important to know is, that we achieved the best results for with_preprocessed data with the CNN, and the best result for without_preprocessed data with the DFF.
+
+### How to train the models for predictions
+The easiest way to train the models is to run the `make_models.py` script. This will prompt you to enter, whether you want to train the DFF (used for predicting data without preprocessed), or CNN (used for preprocessed data). You can also train both.<br>
+Please make sure that all the needed data was created before. For that see [How to create data](#how-to-create-data).<br>
+Each of the options will trigger the training of the models which can take some time. It uses the best parameter we could determine using our trainings data.
+
+If you want to change the parameters, this can be done via calling the functions in `neural_networks.py`.
 
 ## Predictions
+To make predictions using our models you can call `make_prediction.py`.<br>
+The prediction will be made on data, that is in `Prediction data/`.
+
+When you made sure that the data is there, you can then run the `make_predictions.py` script. You then need to enter, whether or not the data contains preprocessed data, as we use different models for predicting those. The process should then start and should'nt take too long.
+
+### Steps for predictions
+We can't just predict on the raw data that will be delivered. We will now show which steps we take in order to make predictions.
+
+1. Detect start of each jump
+2. Give unique ID to each jump
+3. Apply percentage preprocessing to the data
+4. Predict on the data using the correct model
 
 ## Plots
