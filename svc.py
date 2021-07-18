@@ -27,11 +27,14 @@ svc_logger = logging.getLogger("SVC")
 
 def prediction_and_evaluate(classifier, testing_sample: DataFrame, test_targets: DataFrame):
     """
-     Predict and evaluate a data set
 
-    :param classifier: classifier built with training data
-    :param testing_sample: testing data (X)
-    :param test_targets: testing target (y)
+    Predict and evaluate a data set
+
+    Parameters
+    ----------
+    classifier: classifier built with training data
+    testing_sample: DataFrame - testing data (X)
+    test_targets: DataFrame - testing target (y)
 
     """
     predicted = classifier.predict(testing_sample)
@@ -48,13 +51,17 @@ def prediction_and_evaluate(classifier, testing_sample: DataFrame, test_targets:
 def get_samples_features(data: DataFrame, start_column: str, end_column: str):
     """
 
-    preprocessed the data by selecting a feature range and lint the numbers to float.
+     preprocessed the data by selecting a feature range and lint the numbers to float.
 
-    :param data: data set
-    :param start_column: start feature
-    :param end_column: end feature
+     Parameters
+     ----------
+     data: DataFrame - data set
+     start_column: str - start feature
+     end_column: str - end feature
 
-    """
+     :return: X: X of training or testing
+
+     """
     X: DataFrame = data.loc[:, start_column:end_column]
     X.astype(dtype='float64')
     return X
@@ -63,11 +70,14 @@ def get_samples_features(data: DataFrame, start_column: str, end_column: str):
 def read_processed_data(filename: str):
     """
 
-    read and substite "," with "." to avoid error by numbers
+     read dataset from path and substitute "," with "." to avoid error by numbers
 
-    :param filename: path of the dataset
+     Parameters
+     ----------
+     filename: str - the relative path to the dataset
 
-    """
+     :return: processed_data: Dataframe
+     """
     processed_data = pd.read_csv(filename)
     logger.info("read data set:" + filename)
     for column in processed_data.columns:
@@ -79,19 +89,32 @@ def read_processed_data(filename: str):
 
 
 def get_targets(data: DataFrame):
+    """
+
+     get targets of a dataset
+
+     Parameters
+     ----------
+     data: DataFrame - dataset
+
+     :return: data['Sprungtyp']: targets(y) of a dataset
+     """
     targets = set(data['Sprungtyp'])
     return data['Sprungtyp']
 
 
-def get_jumptypes_set(data: DataFrame):
-    return set(data['Sprungtyp'])
-
-
-def get_jumps_by_type(data: DataFrame, type: str):
-    return data[type]
-
-
 def get_train_test_data(datasets: list):
+    """
+
+    get targets of a dataset
+
+    Parameters
+    ----------
+    datasets: list - list of datasets in path form but without _train.csv or _test.csv
+
+    :return: train, test: return the dataframes of train and test data
+
+    """
     next = 1
     train = read_processed_data(datasets[0] + "_train.csv")
     test = read_processed_data(datasets[0] + "_test.csv")
@@ -108,14 +131,15 @@ def get_train_test_data(datasets: list):
 
 def svc_classify(datasets: list, feature_start: str, feature_end: str, drops_keywords: list, reverse_drop: bool):
     """
+    Classify with Support Vector Machine
 
-    Cassify with Support Vector Machine
-
-    :param datasets: path of the data set
-    :param feature_start: start feature
-    :param feature_end: end feature
-    :param drops_keywords: the features will be drop if it has the keywords in this list.
-    :param reverse_drop: Set to True to drop the features does not contains the keywords.
+    Parameters
+    ----------
+    datasets: list - list of datasets in path form but without _train.csv or _test.csv
+    feature_start: str - start feature
+    feature_end: str - end feature
+    drops_keywords: list - the features will be drop if it has the keywords in this list.
+    reverse_drop: bool - Set to True to drop the features does not contains the keywords.
 
     """
     train, test = get_train_test_data(datasets)
@@ -147,14 +171,15 @@ def svc_classify(datasets: list, feature_start: str, feature_end: str, drops_key
 
 def gnb_classify(datasets: list, feature_start: str, feature_end: str, drops_keywords: list, reverse_drop: bool):
     """
+    Classify with Gaussian Naive Bayes
 
-    Cassify with Gaussian Naive Bayes
-
-    :param datasets: path of the data set
-    :param feature_start: start feature
-    :param feature_end: end feature
-    :param drops_keywords: the features will be drop if it has the keywords in this list.
-    :param reverse_drop: Set to True to drop the features does not contains the keywords.
+    Parameters
+    ----------
+    datasets: list - list of datasets in path form but without _train.csv or _test.csv
+    feature_start: str - start feature
+    feature_end: str - end feature
+    drops_keywords: list - the features will be drop if it has the keywords in this list.
+    reverse_drop: bool - Set to True to drop the features does not contains the keywords.
 
     """
     train, test = get_train_test_data(datasets)
@@ -183,7 +208,19 @@ def gnb_classify(datasets: list, feature_start: str, feature_end: str, drops_key
     prediction_and_evaluate(gnb, get_samples_features(test, feature_start, feature_end), test_targets)
 
 
-def sample_x_test(x_test, y_test, num, cnn=False):
+def sample_x_test(x_test, y_test, num):
+    """
+    Samples data by retrieving only a certain number of each jump.
+
+    Parameters
+    ----------
+    x_test : pandas.Dataframe - can be x_test and x_train
+    y_test : pandas.Dataframe - can be y_test and y_train
+    num : int - number of each jump to retrieve
+
+    :return: sampled data Dataframe
+    """
+
     df = x_test.copy()
     df['Sprungtyp'] = y_test
     counts = df['Sprungtyp'].value_counts()
@@ -384,8 +421,24 @@ def prepare_data(data_train, data_test, pp_list):
     return X_train, y_train, X_test, y_test
 
 
-def jump_core_detection(datasets, pp_list, title, jump_length=0):
+def jump_core_detection(classifier: str, datasets, pp_list, title, jump_length=0):
+    """
+    Trains many different models with differently cut data. We cut from back to front, front to back, and from both sides
 
+    Parameters
+    ----------
+    classifier : str
+        'SVC' or 'GNB'
+    data_train : pandas.Dataframe
+        dataframe read from .csv file
+    data_test : pandas.Dataframe
+        dataframe read from .csv file
+    pp_list : list
+        a list with values from 1 to 4: [1, 2, 3, 4]. Corresponds to the blocks of preprocessed data. 1: first 9 columns, 2, 3, 4: 12 columns each
+    title : str
+        title of the plot
+    :return: dictionary with scores of all trained models
+    """
     data_train, data_test = get_train_test_data(datasets)
     scores = {}
     percentage = int(100 / jump_length)
@@ -415,7 +468,13 @@ def jump_core_detection(datasets, pp_list, title, jump_length=0):
                 indexes.append(i * jump_length + to_delete)
         data_test_copy = data_test.drop(indexes)
         X_train, y_train, X_test, y_test = prepare_data(data_train_copy, data_test_copy, pp_list)
-        clf = SVC(kernel="linear").fit(X_train, y_train)
+        if classifier == "SVC":
+            clf = SVC(kernel='linear')
+        elif classifier == "GNB":
+            clf = GaussianNB()
+        else:
+            raise RuntimeError("Invalid classifier type:" + classifier)
+        clf.fit(X_train, y_train)
         y_pred = clf.predict(X_test)
         print(f"Accuracy score:  {str(accuracy_score(y_test, y_pred).__round__(4))}")
         score = accuracy_score(y_test, y_pred).__round__(4)
@@ -458,12 +517,12 @@ def jump_core_detection(datasets, pp_list, title, jump_length=0):
 
 if __name__ == '__main__':
     drops = []
-    train = "/without_preprocessed/percentage/10/vector_percentage_mean_std_10_train.csv"
-    test = "/without_preprocessed/percentage/10/vector_AJ_percentage_mean_std_10.csv"
-    output_folder = 'plots/GNB/without_preprocessed/AJ/'
-    explain_model(train, test, "", "", [], False, output_folder, "GNB")
-    datasets = ["Sprungdaten_processed/without_preprocessed/percentage/10/vector_percentage_mean_std_10"]
-    title = 'GNB without pp: percentage_mean_std_10'
-    #jump_core_detection(datasets, [1, 2, 3, 4], title, 10)
+    #train = "/without_preprocessed/percentage/10/vector_percentage_mean_std_10_train.csv"
+    #test = "/without_preprocessed/percentage/10/vector_AJ_percentage_mean_std_10.csv"
+    #output_folder = 'plots/GNB/without_preprocessed/AJ/'
+    #explain_model(train, test, "", "", [], False, output_folder, "GNB")
+    datasets = ["Sprungdaten_processed/with_preprocessed/percentage/10/vector_percentage_mean_std_10"]
+    title = 'GNB with pp: percentage_mean_std_10'
+    jump_core_detection("GNB", datasets, [1, 2, 3, 4], title, 10)
 
 
