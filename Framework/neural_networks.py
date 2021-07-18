@@ -310,7 +310,7 @@ def prepare_data_CNN(data_train, data_test, pp_list, only_pp=None):
         subframe = data_train[data_train['SprungID'] == id]
         y_train.append(subframe['Sprungtyp'].unique()[0])
         subframe = subframe.drop(['SprungID', 'Sprungtyp'], axis=1)
-        if only_pp is None:
+        if only_pp is not None:
             subframe = subframe.drop([col for col in subframe.columns if 'DJump' not in col], axis=1)
         x_train.append(subframe)
         print("Preparing train data: " + str(len(x_train)))
@@ -319,7 +319,7 @@ def prepare_data_CNN(data_train, data_test, pp_list, only_pp=None):
         subframe = data_test[data_test['SprungID'] == id]
         y_test.append(subframe['Sprungtyp'].unique()[0])
         subframe = subframe.drop(['SprungID', 'Sprungtyp'], axis=1)
-        if only_pp is None:
+        if only_pp is not None:
             subframe = subframe.drop([col for col in subframe.columns if 'DJump' not in col], axis=1)
         x_test.append(subframe)
         print("Preparing test data: " + str(len(x_test)))
@@ -673,7 +673,7 @@ def prepare_data_DFF(data_train, data_test, pp_list, only_pp=None):
     x_test = data_test.drop('Sprungtyp', axis=1)
     x_test = x_test.drop(['SprungID'], axis=1)
 
-    if only_pp is None:
+    if only_pp is not None:
         x_train = x_train.drop([col for col in x_train.columns if 'DJump' not in col], axis=1)
         x_test = x_test.drop([col for col in x_test.columns if 'DJump' not in col], axis=1)
 
