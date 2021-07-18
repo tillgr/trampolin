@@ -384,7 +384,7 @@ def prepare_data(data_train, data_test, pp_list):
     return X_train, y_train, X_test, y_test
 
 
-def jump_core_detection(datasets, pp_list, jump_length=0):
+def jump_core_detection(datasets, pp_list, title, jump_length=0):
 
     data_train, data_test = get_train_test_data(datasets)
     scores = {}
@@ -431,7 +431,7 @@ def jump_core_detection(datasets, pp_list, jump_length=0):
 
     min_y_value = 70
     plt.figure(figsize=(13, 13))
-    plt.suptitle('SVC without pp: percentage_mean_std_25')
+    plt.suptitle(title)
     plt.xlabel('Data')
     plt.ylabel('Accuracy')
     plt.axis([0, full_list[-1], min_y_value, 100])
@@ -458,11 +458,12 @@ def jump_core_detection(datasets, pp_list, jump_length=0):
 
 if __name__ == '__main__':
     drops = []
-    #train = "/without_preprocessed/percentage/25/vector_percentage_mean_std_25_train.csv"
-    #test = "/without_preprocessed/percentage/25/vector_percentage_mean_std_25_test.csv"
-    #output_folder = 'plots/SVC/without_preprocessed/AJ/'
-    #explain_model(train, test, "", "", [], False, output_folder, "SVC")
-    datasets = ["Sprungdaten_processed/with_preprocessed/percentage/20/vector_percentage_mean_20"]
-    jump_core_detection(datasets, [1, 2, 3, 4], 5)
+    train = "/without_preprocessed/percentage/10/vector_percentage_mean_std_10_train.csv"
+    test = "/without_preprocessed/percentage/10/vector_AJ_percentage_mean_std_10.csv"
+    output_folder = 'plots/GNB/without_preprocessed/AJ/'
+    explain_model(train, test, "", "", [], False, output_folder, "GNB")
+    datasets = ["Sprungdaten_processed/without_preprocessed/percentage/10/vector_percentage_mean_std_10"]
+    title = 'GNB without pp: percentage_mean_std_10'
+    #jump_core_detection(datasets, [1, 2, 3, 4], title, 10)
 
 
