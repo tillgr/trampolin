@@ -14,6 +14,8 @@ from os.path import isfile, join
 from neural_networks import bar_plots
 from random_classifier import metrics
 from matplotlib.colors import ListedColormap
+import pickle
+
 
 
 logging.basicConfig(filename='svc_gnb.log', format='%(asctime)s[%(name)s] - %(levelname)s - %(message)s',
@@ -279,21 +281,23 @@ def explain_model(train_data: str, test_data: str, feature_start: str, feature_e
 
     # shap_values = explainer.shap_values(X_test.iloc[index].to_frame().transposei())
     shap_values = explainer.shap_values(shap_x_test)
+    with open(output_folder + 'shap_data.pkl', 'wb') as f:
+        pickle.dump([shap_values, shap_x_train, shap_y_train, shap_x_test, shap_y_test], f)
 
-    bar_plots(shap_values, shap_x_test, shap_y_test, bar='percentual', folder=output_folder, size=(50, 30))
-    bar_plots(shap_values, shap_x_test, shap_y_test, bar='summary', folder=output_folder, size=(50, 30))
-    bar_plots(shap_values, shap_x_test, shap_y_test, bar='percentual',
-              jumps=['Salto A', 'Salto B', 'Salto C', 'Salto rw A', 'Salto rw B', 'Salto rw C', 'Schraubensalto', 'Schraubensalto A',
-                     'Schraubensalto C',  'Doppelsalto B', 'Doppelsalto C'], folder=output_folder, name='Saltos', size=(50, 30))
+    # bar_plots(shap_values, shap_x_test, shap_y_test, bar='percentual', folder=output_folder, size=(50, 30))
+    # bar_plots(shap_values, shap_x_test, shap_y_test, bar='summary', folder=output_folder, size=(50, 30))
+    # bar_plots(shap_values, shap_x_test, shap_y_test, bar='percentual',
+    #           jumps=['Salto A', 'Salto B', 'Salto C', 'Salto rw A', 'Salto rw B', 'Salto rw C', 'Schraubensalto', 'Schraubensalto A',
+    #                  'Schraubensalto C',  'Doppelsalto B', 'Doppelsalto C'], folder=output_folder, name='Saltos', size=(50, 30))
 
-    shap.summary_plot(shap_values, shap_x_test, plot_type='bar', plot_size=(25, 20), color=ListedColormap(cmap), class_names=shap_y_test.unique(), max_display=20)
-    shap.summary_plot(shap_values, shap_x_test, plot_type='bar', plot_size=(25, 20), color=ListedColormap(cmap), class_names=shap_y_test.unique(), max_display=68)
-    saltoA = np.where(shap_y_test.unique() == 'Salto A')[0][0]
-    shap.summary_plot(shap_values[saltoA], shap_x_test, plot_size=(25, 15), title='Salto A')
-    saltoB = np.where(shap_y_test.unique() == 'Salto B')[0][0]
-    shap.summary_plot(shap_values[saltoB], shap_x_test, plot_size=(25, 15), title='Salto B')
-    saltoC = np.where(shap_y_test.unique() == 'Salto C')[0][0]
-    shap.summary_plot(shap_values[saltoC], shap_x_test, plot_size=(25, 15), title='Salto C')
+    # shap.summary_plot(shap_values, shap_x_test, plot_type='bar', plot_size=(25, 20), color=ListedColormap(cmap), class_names=shap_y_test.unique(), max_display=20)
+    # shap.summary_plot(shap_values, shap_x_test, plot_type='bar', plot_size=(25, 20), color=ListedColormap(cmap), class_names=shap_y_test.unique(), max_display=68)
+    # saltoA = np.where(shap_y_test.unique() == 'Salto A')[0][0]
+    # shap.summary_plot(shap_values[saltoA], shap_x_test, plot_size=(25, 15), title='Salto A')
+    # saltoB = np.where(shap_y_test.unique() == 'Salto B')[0][0]
+    # shap.summary_plot(shap_values[saltoB], shap_x_test, plot_size=(25, 15), title='Salto B')
+    # saltoC = np.where(shap_y_test.unique() == 'Salto C')[0][0]
+    # shap.summary_plot(shap_values[saltoC], shap_x_test, plot_size=(25, 15), title='Salto C')
 
 
 def collect_all_data_sets(folder: str, data_sets: set):
@@ -351,11 +355,114 @@ def run_gnb_auto(folder: str, drops: list):
         gnb_classify([ds], "", "", drops, False)
 
 
+def prepare_data(data_train, data_test, pp_list):
+    first_djumps = set([col for col in data_train.columns if 'DJump' in col]) - set(
+        [col for col in data_train.columns if 'DJump_SIG_I_S' in col]) \
+                   - set([col for col in data_train.columns if 'DJump_ABS_I_S' in col]) - set(
+        [col for col in data_train.columns if 'DJump_I_ABS_S' in col])
+    if 1 not in pp_list:
+        data_train = data_train.drop(first_djumps, axis=1)
+        data_test = data_test.drop(first_djumps, axis=1)
+    if 2 not in pp_list:
+        data_train = data_train.drop([col for col in data_train.columns if 'DJump_SIG_I_S' in col], axis=1)
+        data_test = data_test.drop([col for col in data_test.columns if 'DJump_SIG_I_S' in col], axis=1)
+    if 3 not in pp_list:
+        data_train = data_train.drop([col for col in data_train.columns if 'DJump_ABS_I_S' in col], axis=1)
+        data_test = data_test.drop([col for col in data_test.columns if 'DJump_ABS_I_S' in col], axis=1)
+    if 4 not in pp_list:
+        data_train = data_train.drop([col for col in data_train.columns if 'DJump_I_ABS_S' in col], axis=1)
+        data_test = data_test.drop([col for col in data_test.columns if 'DJump_I_ABS_S' in col], axis=1)
+
+    X_train = data_train.drop('Sprungtyp', axis=1)
+    X_train = X_train.drop(['SprungID'], axis=1)
+    X_test = data_test.drop('Sprungtyp', axis=1)
+    X_test = X_test.drop(['SprungID'], axis=1)
+
+    y_train = data_train['Sprungtyp']
+    y_test = data_test['Sprungtyp']
+
+    return X_train, y_train, X_test, y_test
+
+
+def jump_core_detection(datasets, pp_list, jump_length=0):
+
+    data_train, data_test = get_train_test_data(datasets)
+    scores = {}
+    percentage = int(100 / jump_length)
+    full_list = [l for l in range(0, 100, percentage)]
+
+    variants = []
+    for i in range(jump_length - 1):
+        variants.append([l for l in range(i + 1)])
+    for i in range(1, jump_length):
+        variants.append(list(range(i, jump_length)))
+    for i in range(int((jump_length - 1) / 2)):
+        both_sides = list(set(list(range(jump_length))) - set(list(range(0, jump_length))[i + 1:-1 - i]))
+        both_sides.sort()
+        variants.append(both_sides)
+    print(variants)
+
+    for variant in variants:
+        indexes = []
+        for i in range(int(len(data_train) / jump_length)):
+            for to_delete in variant:
+                indexes.append(i * jump_length + to_delete)
+        data_train_copy = data_train.drop(indexes)
+        print(data_train_copy)
+        indexes = []
+        for i in range(int(len(data_test) / jump_length)):
+            for to_delete in variant:
+                indexes.append(i * jump_length + to_delete)
+        data_test_copy = data_test.drop(indexes)
+        X_train, y_train, X_test, y_test = prepare_data(data_train_copy, data_test_copy, pp_list)
+        clf = SVC(kernel="linear").fit(X_train, y_train)
+        y_pred = clf.predict(X_test)
+        print(f"Accuracy score:  {str(accuracy_score(y_test, y_pred).__round__(4))}")
+        score = accuracy_score(y_test, y_pred).__round__(4)
+        print(score)
+
+        variant_output = [v * percentage for v in variant]
+        variant_output = list(set(full_list) - set(variant_output))
+        variant_output.sort()
+
+        scores[str(variant_output[0]) + ' - ' + str(variant_output[-1])] = score
+
+    print(f"scores:  {scores}")
+
+    min_y_value = 70
+    plt.figure(figsize=(13, 13))
+    plt.suptitle('SVC without pp: percentage_mean_std_25')
+    plt.xlabel('Data')
+    plt.ylabel('Accuracy')
+    plt.axis([0, full_list[-1], min_y_value, 100])
+    plt.xticks(range(0, 100 + percentage, percentage))
+    plt.yticks(range(min_y_value, 105, 5))
+    plt.grid(True, axis='x')
+    # cmap = process_cmap('brg', len(scores))
+
+    for i in range(len(scores)):
+        entry = list(scores.items())[i]
+        start, end = entry[0].split('-')
+        acc = entry[1] * 100
+        print(acc)
+        print(min_y_value)
+        if int(acc) >= min_y_value:
+            if start.replace(' ', '') == '0':
+                plt.axhline(acc, (int(start) / 100), (int(end) + percentage) / 100, color='#0000ff', alpha=0.7)
+            elif end.replace(' ', '') == str(full_list[-1]):
+                plt.axhline(acc, (int(start) / 100), (int(end) + percentage) / 100, color='#ff0000', alpha=0.7)
+            else:
+                plt.axhline(acc, (int(start) / 100), (int(end) + percentage) / 100, color='#00ff00', alpha=0.7)
+    plt.show()
+
+
 if __name__ == '__main__':
     drops = []
-    train = "/with_preprocessed/percentage/20/vector_percentage_mean_20_train.csv"
-    test = "/with_preprocessed/percentage/20/vector_AJ_percentage_mean_20.csv"
-    output_folder = 'plots/SVC/with_preprocessed/AJ/'
-    explain_model(train, test, "", "", [], False, output_folder, "SVC")
+    #train = "/without_preprocessed/percentage/25/vector_percentage_mean_std_25_train.csv"
+    #test = "/without_preprocessed/percentage/25/vector_percentage_mean_std_25_test.csv"
+    #output_folder = 'plots/SVC/without_preprocessed/AJ/'
+    #explain_model(train, test, "", "", [], False, output_folder, "SVC")
+    datasets = ["Sprungdaten_processed/with_preprocessed/percentage/20/vector_percentage_mean_20"]
+    jump_core_detection(datasets, [1, 2, 3, 4], 5)
 
 
