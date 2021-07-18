@@ -8,6 +8,9 @@ import sklearn as sk
 
 
 def main():
+    # main method for naive classifier and generate distribution for data
+
+    # for naive classifier
     pp = 'with_preprocessed'
     name = "percentage/25/percentage_25"
     trainings_data = pd.read_csv("Sprungdaten_processed/" + pp + "/" + name + "_train.csv")
@@ -16,11 +19,11 @@ def main():
     print('Accuracy = ' + str(round(acc, 10)))
     print('Youden = ' + str(round(youden, 10)))
     print('F1 = ' + str(round(f1, 10)))
-    """
+
+    # for distribution
     data = pd.read_csv("Sprungdaten_processed/with_preprocessed/data_only_jumps.csv")
     dis = distribution(data)
-    save_as_xlsx(dis, '/Sprungdaten_processed/', 'data_distribution')
-    """
+    save_as_xlsx(dis, '/Sprungdaten_processed/', 'data_distribution_all_data')
 
     return
 
@@ -29,12 +32,15 @@ def classify(trainings_data, test_data, output='mean', loops=None):
     """
     random classfier, creates probabilities based on the distribution
 
-    :param trainings_data: Dataframe
-    :param test_data:   Dataframe
-    :param output: 'mean' or 'best', default='mean';
+    Parameters
+    ----------
+    trainings_data: Dataframe - train data set
+    test_data: Dataframe - test data set
+    output: str - 'mean' or 'best', default='mean';
         function will return best or mean Accuracy, Youden and F1 Score
-    :param loops: int; how often the classifier should run, to get the best and mean score
-    :return: accuracy, youden, f1
+    loops: int; how often the classifier should run, to get the best and mean score
+
+    :return: acc - Accuracy, youden - Youden , f1 - F1 Score
     """
     dis = distribution(trainings_data).to_frame()
     dis = dis.reset_index()
@@ -45,7 +51,10 @@ def classify(trainings_data, test_data, output='mean', loops=None):
         temp = temp * dis['Anzahl'][i]
         r.extend(temp)
     random.shuffle(r)
+
+    # get targets
     label = get_target(test_data)
+
     if loops is None:
         c = random.sample(r, len(test_data['SprungID'].unique()))
 
@@ -90,7 +99,33 @@ def classify(trainings_data, test_data, output='mean', loops=None):
         return best_acc, best_youden, best_f1
 
 
+def get_target(test_data):
+    """
+    getting from each jump the "Sprungtyp" and return this as a list
+
+    Parameters
+    ----------
+    test_data: Dataframe - test data for creating distribution list
+
+    :return: labels - list of jumps
+    """
+    labels = []
+    for jump in test_data['SprungID'].unique():
+        labels.append(test_data.loc[test_data['SprungID'] == jump]['Sprungtyp'].values[0])
+    return labels
+
+
 def metrics(label, c):
+    """
+    for getting Precision, Recall, F1  and Youden Score
+
+    Parameters
+    ----------
+    label: list - y test (targets)
+    c: list - predicted labels
+
+    :return: mean_prec - Precision, mean_rec - Recall, mean_f - F1 Score, mean_youden - Youden Score
+    """
 
     mcm = sk.metrics.multilabel_confusion_matrix(label, c)
     tn = mcm[:, 0, 0]
@@ -129,19 +164,14 @@ def metrics(label, c):
     return mean_prec, mean_rec, mean_f, mean_youden
 
 
-def get_target(test_data):
-    # can maybe integrated in classify
-    labels = []
-    for jump in test_data['SprungID'].unique():
-        labels.append(test_data.loc[test_data['SprungID'] == jump]['Sprungtyp'].values[0])
-    return labels
-
-
 def distribution(data):
     """
     creates a Series, of often each jump occur
 
-    :param data: Dataframe
+    Parameters
+    ----------
+    data: Dataframe - Data for the distribution
+
     :return: Series with jump type as index
     """
 
@@ -152,9 +182,12 @@ def save_as_xlsx(data, folder, name):
     """
     save the distribution df as an xlsx
 
-    :param data: data that should be saved
-    :param folder: path as String, where data should be saved
-    :param name: name for the file
+    Parameters
+    ----------
+    data: Series or Dataframe - data that should be saved
+    folder: str - path as String, where data should be saved
+    name: str - name for the file
+
     :return:
     """
 
@@ -164,16 +197,20 @@ def save_as_xlsx(data, folder, name):
 # Print iterations progress
 def print_progress_bar(iteration, total, prefix='', suffix='', decimals=1, length=100, fill='█', print_end ="\r"):
     """
-    Call in a loop to create terminal progress bar
-    @params:
-        iteration   - Required  : current iteration (Int)
-        total       - Required  : total iterations (Int)
-        prefix      - Optional  : prefix string (Str)
-        suffix      - Optional  : suffix string (Str)
-        decimals    - Optional  : positive number of decimals in percent complete (Int)
-        length      - Optional  : character length of bar (Int)
-        fill        - Optional  : bar fill character (Str)
-        print_end    - Optional  : end character (e.g. "\r", "\r\n") (Str)
+    call in a loop to create terminal progress bar
+
+    Parameters
+    ----------
+    iteration: int - current iteration (Required)
+    total: int - total iterations(Required)
+    prefix: str - prefix string (Optional)
+    suffix: str - suffix string (Optional)
+    decimals: int - positive number of decimals in percent complete (Optional)
+    length: int - character length of bar (Optional)
+    fill: str - bar fill character (Optional)
+    print_end :str - end character (e.g. "\r", "\r\n")(Optional)
+
+    :return:
     """
 
     percent = ("{0:." + str(decimals) + "f}").format(100 * (iteration / float(total)))
