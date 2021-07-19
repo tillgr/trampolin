@@ -12,7 +12,7 @@ def train_CNN_standard(preprocessed='with_preprocessed'):
 
     elif preprocessed == 'with_preprocessed':
         data_train = pd.read_csv('Sprungdaten_processed/' + preprocessed + '/percentage/20/percentage_mean_std_20_train.csv')
-        data_test = pd.read_csv('Sprungdaten_processed/' + preprocessed + '/percentage/20/percentage_mean_std_20_train.csv')
+        data_test = pd.read_csv('Sprungdaten_processed/' + preprocessed + '/percentage/20/percentage_mean_std_20_test.csv')
         params = [10, 3, 3, 2, 2, 'tanh', 'categorical_crossentropy', 'Nadam', 40]
 
     else:
@@ -39,7 +39,7 @@ def train_DFF_standard(preprocessed='without_preprocessed'):
 
     elif preprocessed == 'with_preprocessed':
         data_train = pd.read_csv('Sprungdaten_processed/' + preprocessed + '/percentage/25/vector_percentage_mean_std_25_train.csv')
-        data_test = pd.read_csv('Sprungdaten_processed/' + preprocessed + '/percentage/25/vector_percentage_mean_std_25_train.csv')
+        data_test = pd.read_csv('Sprungdaten_processed/' + preprocessed + '/percentage/25/vector_percentage_mean_std_25_test.csv')
         params = [12, 'relu', 'categorical_crossentropy', 'Nadam', 100]
 
     else:
@@ -47,7 +47,7 @@ def train_DFF_standard(preprocessed='without_preprocessed'):
 
     pp_list = [3]
 
-    runs, conv, act_func, loss, optim, epochs = [params[i] for i in range(len(params))]
+    runs, act_func, loss, optim, epochs = [params[i] for i in range(len(params))]
 
     x_train, y_train, x_test, y_test, num_columns, num_classes = nn.prepare_data_DFF(data_train, data_test, pp_list)
     model = nn.run_multiple_times_DFF(num_columns, num_classes, runs, act_func, loss, optim, epochs,

@@ -619,7 +619,7 @@ def make_all_data():
     first_round = True
 
     folders = os.listdir('Sprungdaten Innotramp')
-    # folders = ['2019.09.30']              # for running only 1 folder
+    # folders = ['2019.08.27', '2019.10.07']              # for running only 1 folder
     for folder in folders:
         files = os.listdir("Sprungdaten Innotramp/" + folder)
         csv_files = [f for f in files if f.endswith('.csv')]
@@ -628,6 +628,10 @@ def make_all_data():
         for i in range(len(csv_files)):
             csv_data = read_raw_csv_data("Sprungdaten Innotramp/" + folder + "/" + csv_files[i])
             xlsx_data = read_xlsx_data("Sprungdaten Innotramp/" + folder + "/" + xlsx_files[i])
+
+            if first_round:
+                global_xlsx_cols = xlsx_data.columns
+            xlsx_data.columns = global_xlsx_cols
 
             csv_data['Time'] = np.round(csv_data['Time'].apply(convert_comma_to_dot), 3)  # convert time stucture
             xlsx_data["Zeit"] = xlsx_data["Zeit"].apply(convert_to_numeric)
@@ -640,7 +644,8 @@ def make_all_data():
 
             start_time = csv_data['Time'][0]
 
-            global_xlsx_col_names = ['SprungID', 'Sprungtyp'] + [col for col in xlsx_data.columns if 'DJump' in col]
+            if first_round:
+                global_xlsx_col_names = ['SprungID', 'Sprungtyp'] + [col for col in xlsx_data.columns if 'DJump' in col]
             sprungzuordnung = pd.DataFrame(columns=global_xlsx_col_names + ['Time'])  # create df with needed column names
 
             for row in xlsx_data.iterrows():
@@ -675,7 +680,7 @@ def make_all_data():
             if col in ['Acc_N_Fil', 'Gyro_x_R', 'Gyro_y_R', 'Gyro_z_R', 'Gyro_x_Fil', 'Gyro_y_Fil', 'Gyro_z_Fil']:
                 all_data[col] = all_data[col].apply(convert_comma_to_dot)
 
-        if not os.path.isdir("all_data"):
+        if not os.path.isdir("Sprungdaten_processed/all_data"):
             os.makedirs("Sprungdaten_processed/all_data")
         all_data.to_csv('Sprungdaten_processed/all_data/all_data_' + folder + '.csv', index=False)  # save smaller datasets with name of the folder
         all_data = all_data[0:0]    # clear dataframe
@@ -782,7 +787,7 @@ def make_percentage_data(preprocessed, percentage_steps, method):
     preprocessed : str
         'with_preprocessed' or 'without_preprocessed'
     percentage_steps : list of str
-        a list with fraction values which divide 100. We use ['0.25', '0.20', '0.10', '0.05', '0.02', '0.01']
+        a list with fraction values which divide 100. We use [0.25, 0.20, 0.10, 0.05, 0.02, 0.01]
     method : str or None
         None, 'mean', or 'mean_std'
 
@@ -795,7 +800,7 @@ def make_percentage_data(preprocessed, percentage_steps, method):
     if type(percentage_steps) != list:
         raise AttributeError("Variable percentage_steps not correctly defined. It needs to be a list!")
     for p in percentage_steps:
-        assert (100 / p) % 2 == 0.0, "The percentage_step should be able to divide 100"
+        assert (100 / float(p)) % 2 == 0.0, "The percentage_step should be able to divide 100"
 
     if method not in [None, 'mean', 'mean_std']:
         raise AttributeError("Variable method not correctly defined. Try None, 'mean', or 'mean_std'")
