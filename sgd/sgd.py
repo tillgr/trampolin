@@ -1,6 +1,7 @@
 import numpy as np
 import pandas as pd
 import shap
+from pandas import DataFrame
 from sklearn.linear_model import SGDClassifier
 from sklearn.metrics import accuracy_score, ConfusionMatrixDisplay
 from random_classifier import metrics
@@ -9,9 +10,26 @@ from matplotlib.colors import ListedColormap
 from neural_networks import bar_plots
 from sklearn.metrics import confusion_matrix
 from matplotlib import pyplot as plt
+import pickle
 
 
 def prepare_data(data_train, data_test, pp_list):
+    """
+
+    Prepare data for use in Classifier
+
+    Parameters
+    ----------
+    data_train: DataFrame - train data set
+    data_test: DataFrame - test data set
+    pp_list: list - list of DJumps, that should be included in train and test data sets
+
+    :return: X_train: - features of the train data set,
+             y_train: - targets of the train data set,
+             X_test: - features of the test data set,
+             y_test: - targets of the test data set
+    """
+
     first_djumps = set([col for col in data_train.columns if 'DJump' in col]) - set(
         [col for col in data_train.columns if 'DJump_SIG_I_S' in col]) \
                    - set([col for col in data_train.columns if 'DJump_ABS_I_S' in col]) - set(
@@ -41,6 +59,20 @@ def prepare_data(data_train, data_test, pp_list):
 
 
 def all_parameters_classifier(data_train, data_test, pp_list, accuracy):
+    """
+
+    Classifier with all possible parameters and with accuracy
+
+    Parameters
+    ----------
+    data_train: DataFrame - train data set
+    data_test: DataFrame - test data set
+    pp_list: list - list of DJumps, that should be included in train and test data sets
+    accuracy: float - accuracy for the Classifier
+
+    :return:
+
+    """
     X_train, y_train, X_test, y_test = prepare_data(data_train, data_test, pp_list)
     for losses in ['log', 'modified_huber', 'squared_hinge', 'perceptron']:
         for penalty in ['l2', 'l1', 'elasticnet']:
@@ -62,6 +94,18 @@ def all_parameters_classifier(data_train, data_test, pp_list, accuracy):
 
 
 def all_datasets_with_all_parameters_classifier(pp_list, accuracy):
+    """
+
+    Classifier with all possible parameters and all data sets
+
+    Parameters
+    ----------
+    pp_list: list - list of DJumps, that should be included in train and test data sets
+    accuracy: float - accuracy for the Classifier
+
+    :return:
+
+    """
     for i in [1, 2, 5, 10, 20, 25]:
         for calc_type in ['', 'mean_', 'mean_std_']:
             print(f"Folder: {i}")
@@ -93,6 +137,17 @@ def get_best_data_set_without_preprocessed():
 
 
 def get_targets(data):
+    """
+
+    Get targets of the data set
+
+    Parameters
+    ----------
+    data: DataFrame
+
+    :return: data['Sprungtyp'] - targets of the data set
+
+    """
     return data['Sprungtyp']
 
 
@@ -117,7 +172,7 @@ def sample_x_test(x_test, y_test, num):
     return x, y
 
 
-def sgd_classifier(X_train, y_train, X_test, loss: str, penalty: str, max_iter: int):
+def sgd_classifier(X_train, y_train, X_test, y_test, loss: str, penalty: str, max_iter: int):
     clf = SGDClassifier(loss=loss, penalty=penalty, alpha=0.0001,
                         l1_ratio=0.15, fit_intercept=True, max_iter=max_iter,
                         tol=0.001, shuffle=True, verbose=0, epsilon=0.1,
@@ -126,12 +181,17 @@ def sgd_classifier(X_train, y_train, X_test, loss: str, penalty: str, max_iter: 
                         n_iter_no_change=5, class_weight=None,
                         warm_start=False, average=False).fit(X_train, y_train)
     y_pred = clf.predict(X_test)
+    print(
+        f"Accuracy score: {loss} , {penalty} , {max_iter}:  {str(accuracy_score(y_test, y_pred).__round__(4))}")
+    mean_prec, mean_rec, mean_f, mean_youden = metrics(y_test, y_pred)
+    print(f"Accuracy youden score: {str(mean_youden.round(4))}")
+    print(f"Accuracy f1 score: {str(mean_f.round(4))}")
     return clf, y_pred
 
 
 def shap_plots(data_train, data_test, pp_list, loss, penalty, max_iter, aj=None):
     X_train, y_train, X_test, y_test = prepare_data(data_train, data_test, pp_list)
-    clf, y_pred = sgd_classifier(X_train, y_train, X_test, loss, penalty, max_iter)
+    clf, y_pred = sgd_classifier(X_train, y_train, X_test, y_test, loss, penalty, max_iter)
 
     if aj is None:
         cmap_cm = process_cmap('summer')
@@ -140,6 +200,9 @@ def shap_plots(data_train, data_test, pp_list, loss, penalty, max_iter, aj=None)
         cmap_cm = ListedColormap(cmap_cm)
 
         cm = confusion_matrix(y_test, y_pred, labels=clf.classes_)
+        print(y_test)
+        pd.DataFrame(cm, columns=y_test.unique(), index=y_test.unique()).to_csv(
+            '../plots/SGD/with_preprocessed/confusion_matrix.csv')
         disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=clf.classes_)
         disp.plot(cmap=cmap_cm)
         disp.figure_.set_figwidth(35)
@@ -148,7 +211,7 @@ def shap_plots(data_train, data_test, pp_list, loss, penalty, max_iter, aj=None)
         plt.tick_params(axis='x', labelsize=10, labelrotation=45, grid_linewidth=5)
         plt.title("SGD_with_mean_std_10_ConfusionMatrix")
         plt.tight_layout()
-        plt.savefig('../plots/SGD/with_preprocessed/only_preprocessed')
+        # plt.savefig('../plots/SGD/with_preprocessed/')
         plt.show()
 
     else:
@@ -156,6 +219,8 @@ def shap_plots(data_train, data_test, pp_list, loss, penalty, max_iter, aj=None)
         cmap_cm_AJ = ListedColormap(cmap_cm_AJ)
 
         cm = confusion_matrix(y_test, y_pred, labels=clf.classes_)
+        pd.DataFrame(cm, columns=y_test.unique(), index=y_test.unique()).to_csv(
+            '../plots/SGD/with_preprocessed/AJ/confusion_matrix.csv')
         disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=clf.classes_)
         disp.plot(cmap=cmap_cm_AJ)
         disp.figure_.set_figwidth(35)
@@ -164,7 +229,7 @@ def shap_plots(data_train, data_test, pp_list, loss, penalty, max_iter, aj=None)
         plt.tick_params(axis='x', labelsize=10, labelrotation=45, grid_linewidth=5)
         plt.title("SGD_with_mean_std_10_ConfusionMatrix_AJ")
         plt.tight_layout()
-        plt.savefig('../plots/SGD/with_preprocessed/only_preprocessed/AJ')
+        # plt.savefig('../plots/SGD/with_preprocessed/AJ/')
         plt.show()
 
     shap_x_test, shap_y_test = sample_x_test(X_test, y_test, 3)
@@ -173,24 +238,27 @@ def shap_plots(data_train, data_test, pp_list, loss, penalty, max_iter, aj=None)
     explainer = shap.KernelExplainer(clf.decision_function, shap_x_train)
     shap_values = explainer.shap_values(shap_x_test)
 
-    bar_plots(shap_values, shap_x_test, shap_y_test, bar='percentual', size=(50, 30),
-              folder='../plots/SGD/with_preprocessed/only_preprocessed', name='only_with_preprocessed')
+    with open('../plots/SGD/with_preprocessed/' + 'shap_data.pkl', 'wb') as f:
+        pickle.dump([shap_values, shap_x_train, shap_y_train, shap_x_test, shap_y_test], f)
 
-    bar_plots(shap_values, shap_x_test, shap_y_test, bar='percentual', size=(50, 30),
+    bar_plots(shap_values, shap_x_test, shap_y_test, save_data='../plots/SGD/with_preprocessed/',
+              bar='percentual', size=(50, 30))
+
+    bar_plots(shap_values, shap_x_test, shap_y_test, save_data='../plots/SGD/with_preprocessed/',
+              bar='percentual', size=(50, 30),
               jumps=['Salto A', 'Salto B', 'Salto C', 'Salto rw A', 'Salto rw B', 'Salto rw C', 'Schraubensalto',
                      'Schraubensalto A', 'Schraubensalto C', 'Doppelsalto B', 'Doppelsalto C'],
-              folder='../plots/SGD/with_preprocessed/only_preprocessed', name='Saltos_only_with_preprocessed')
+              name='Saltos')
 
-    bar_plots(shap_values, shap_x_test, shap_y_test, size=(30, 45), bar='summary',
-              folder='../plots/SGD/with_preprocessed/only_preprocessed',
-              name='only_with_preprocessed')
+    # bar_plots(shap_values, shap_x_test, shap_y_test, save_data='../plots/SGD/with_preprocessed/',
+    #          size=(30, 45), name='only_with_preprocessed')
 
-    saltoA = np.where(shap_y_test.unique() == 'Salto A')[0][0]
+    """ saltoA = np.where(shap_y_test.unique() == 'Salto A')[0][0]
     shap.summary_plot(shap_values[saltoA], shap_x_test, plot_size=(30, 12), title='Salto A')
     saltoB = np.where(shap_y_test.unique() == 'Salto B')[0][0]
     shap.summary_plot(shap_values[saltoB], shap_x_test, plot_size=(30, 12), title='Salto B')
     saltoC = np.where(shap_y_test.unique() == 'Salto C')[0][0]
-    shap.summary_plot(shap_values[saltoC], shap_x_test, plot_size=(30, 12), title='Salto C')
+    shap.summary_plot(shap_values[saltoC], shap_x_test, plot_size=(30, 12), title='Salto C') """
 
 
 def jump_core_detection(data_train, data_test, pp_list, jump_length=0):
@@ -271,9 +339,11 @@ def jump_core_detection(data_train, data_test, pp_list, jump_length=0):
 
 
 if __name__ == '__main__':
-    train_data = pd.read_csv('../Sprungdaten_processed/without_preprocessed/percentage/10/vector_percentage_mean_std_10_train.csv')
-    test_data = pd.read_csv('../Sprungdaten_processed/without_preprocessed/percentage/10/vector_percentage_mean_std_10_test.csv')
-    jump_core_detection(train_data, test_data, [1, 2, 3, 4], 10)
+    train_data = pd.read_csv(
+        '../Sprungdaten_processed/with_preprocessed/percentage/10/vector_percentage_mean_std_10_train.csv')
+    test_data = pd.read_csv(
+        '../Sprungdaten_processed/with_preprocessed/percentage/10/vector_percentage_mean_std_10_test.csv')
+    # jump_core_detection(train_data, test_data, [1, 2, 3, 4], 10)
     '''clf = SGDClassifier(loss='log', penalty='l1', alpha=0.0001,
                             l1_ratio=0.15, fit_intercept=True, max_iter=10000,
                             tol=0.001, shuffle=True, verbose=0, epsilon=0.1,
@@ -287,3 +357,4 @@ if __name__ == '__main__':
             mean_prec, mean_rec, mean_f, mean_youden = metrics(y_test, y_pred)
             print(f"Accuracy youden score: {str(mean_youden.round(4))}")
             print(f"Accuracy f1 score: {str(mean_f.round(4))}")'''
+    shap_plots(train_data, test_data, [1, 3, 4], 'log', 'l1', 10000)
