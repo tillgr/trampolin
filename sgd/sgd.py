@@ -46,6 +46,15 @@ def prepare_data(data_train, data_test, pp_list):
     if 4 not in pp_list:
         data_train = data_train.drop([col for col in data_train.columns if 'DJump_I_ABS_S' in col], axis=1)
         data_test = data_test.drop([col for col in data_test.columns if 'DJump_I_ABS_S' in col], axis=1)
+    if 1 in pp_list and 2 in pp_list and 3 in pp_list and 4 in pp_list and "only" in pp_list:
+        no_djumps_data_train = data_train.drop([col for col in data_train.columns if 'DJump' in col], axis=1)
+        no_djumps_data_train = no_djumps_data_train.drop('Sprungtyp', axis=1)
+        no_djumps_data_train = no_djumps_data_train.drop(['SprungID'], axis=1)
+        data_train = data_train.drop(no_djumps_data_train, axis=1)
+        no_djumps_data_test = data_test.drop([col for col in data_test.columns if 'DJump' in col], axis=1)
+        no_djumps_data_test = no_djumps_data_test.drop('Sprungtyp', axis=1)
+        no_djumps_data_test = no_djumps_data_test.drop(['SprungID'], axis=1)
+        data_test = data_test.drop(no_djumps_data_test, axis=1)
 
     X_train = data_train.drop('Sprungtyp', axis=1)
     X_train = X_train.drop(['SprungID'], axis=1)
@@ -55,6 +64,7 @@ def prepare_data(data_train, data_test, pp_list):
     y_train = data_train['Sprungtyp']
     y_test = data_test['Sprungtyp']
 
+    print(X_train)
     return X_train, y_train, X_test, y_test
 
 
@@ -191,6 +201,10 @@ def sgd_classifier(X_train, y_train, X_test, y_test, loss: str, penalty: str, ma
 
 def shap_plots(data_train, data_test, pp_list, loss, penalty, max_iter, aj=None):
     X_train, y_train, X_test, y_test = prepare_data(data_train, data_test, pp_list)
+    print(X_train)
+    print(X_test)
+    print(y_train)
+    print(y_test)
     clf, y_pred = sgd_classifier(X_train, y_train, X_test, y_test, loss, penalty, max_iter)
 
     if aj is None:
@@ -202,16 +216,16 @@ def shap_plots(data_train, data_test, pp_list, loss, penalty, max_iter, aj=None)
         cm = confusion_matrix(y_test, y_pred, labels=clf.classes_)
         print(y_test)
         pd.DataFrame(cm, columns=y_test.unique(), index=y_test.unique()).to_csv(
-            '../plots/SGD/with_preprocessed/confusion_matrix.csv')
+            '../plots/SGD/without_preprocessed/confusion_matrix.csv')
         disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=clf.classes_)
         disp.plot(cmap=cmap_cm)
         disp.figure_.set_figwidth(35)
         disp.figure_.set_figheight(25)
         disp.figure_.autofmt_xdate()
         plt.tick_params(axis='x', labelsize=10, labelrotation=45, grid_linewidth=5)
-        plt.title("SGD_with_mean_std_10_ConfusionMatrix")
+        plt.title("SGD_without_mean_std_10_ConfusionMatrix")
         plt.tight_layout()
-        # plt.savefig('../plots/SGD/with_preprocessed/')
+        plt.savefig('../plots/SGD/without_preprocessed/confusionMatrix')
         plt.show()
 
     else:
@@ -220,16 +234,16 @@ def shap_plots(data_train, data_test, pp_list, loss, penalty, max_iter, aj=None)
 
         cm = confusion_matrix(y_test, y_pred, labels=clf.classes_)
         pd.DataFrame(cm, columns=y_test.unique(), index=y_test.unique()).to_csv(
-            '../plots/SGD/with_preprocessed/AJ/confusion_matrix.csv')
+            '../plots/SGD/without_preprocessed/AJ/confusion_matrix.csv')
         disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=clf.classes_)
         disp.plot(cmap=cmap_cm_AJ)
         disp.figure_.set_figwidth(35)
         disp.figure_.set_figheight(25)
         disp.figure_.autofmt_xdate()
         plt.tick_params(axis='x', labelsize=10, labelrotation=45, grid_linewidth=5)
-        plt.title("SGD_with_mean_std_10_ConfusionMatrix_AJ")
+        plt.title("SGD_without_mean_std_10_ConfusionMatrix_AJ")
         plt.tight_layout()
-        # plt.savefig('../plots/SGD/with_preprocessed/AJ/')
+        plt.savefig('../plots/SGD/without_preprocessed/AJ/confusionMatrix_AJ')
         plt.show()
 
     shap_x_test, shap_y_test = sample_x_test(X_test, y_test, 3)
@@ -238,27 +252,27 @@ def shap_plots(data_train, data_test, pp_list, loss, penalty, max_iter, aj=None)
     explainer = shap.KernelExplainer(clf.decision_function, shap_x_train)
     shap_values = explainer.shap_values(shap_x_test)
 
-    with open('../plots/SGD/with_preprocessed/' + 'shap_data.pkl', 'wb') as f:
+    with open('../plots/SGD/without_preprocessed/' + 'shap_data.pkl', 'wb') as f:
         pickle.dump([shap_values, shap_x_train, shap_y_train, shap_x_test, shap_y_test], f)
 
-    bar_plots(shap_values, shap_x_test, shap_y_test, save_data='../plots/SGD/with_preprocessed/',
+    bar_plots(shap_values, shap_x_test, shap_y_test, save_data='../plots/SGD/without_preprocessed/',
               bar='percentual', size=(50, 30))
 
-    bar_plots(shap_values, shap_x_test, shap_y_test, save_data='../plots/SGD/with_preprocessed/',
+    bar_plots(shap_values, shap_x_test, shap_y_test, save_data='../plots/SGD/without_preprocessed/',
               bar='percentual', size=(50, 30),
               jumps=['Salto A', 'Salto B', 'Salto C', 'Salto rw A', 'Salto rw B', 'Salto rw C', 'Schraubensalto',
                      'Schraubensalto A', 'Schraubensalto C', 'Doppelsalto B', 'Doppelsalto C'],
               name='Saltos')
 
-    # bar_plots(shap_values, shap_x_test, shap_y_test, save_data='../plots/SGD/with_preprocessed/',
-    #          size=(30, 45), name='only_with_preprocessed')
+    bar_plots(shap_values, shap_x_test, shap_y_test, save_data='../plots/SGD/with_preprocessed/',
+              size=(30, 45), name='summary_without_preprocessed')
 
-    """ saltoA = np.where(shap_y_test.unique() == 'Salto A')[0][0]
+    saltoA = np.where(shap_y_test.unique() == 'Salto A')[0][0]
     shap.summary_plot(shap_values[saltoA], shap_x_test, plot_size=(30, 12), title='Salto A')
     saltoB = np.where(shap_y_test.unique() == 'Salto B')[0][0]
     shap.summary_plot(shap_values[saltoB], shap_x_test, plot_size=(30, 12), title='Salto B')
     saltoC = np.where(shap_y_test.unique() == 'Salto C')[0][0]
-    shap.summary_plot(shap_values[saltoC], shap_x_test, plot_size=(30, 12), title='Salto C') """
+    shap.summary_plot(shap_values[saltoC], shap_x_test, plot_size=(30, 12), title='Salto C')
 
 
 def jump_core_detection(data_train, data_test, pp_list, jump_length=0):
@@ -340,9 +354,9 @@ def jump_core_detection(data_train, data_test, pp_list, jump_length=0):
 
 if __name__ == '__main__':
     train_data = pd.read_csv(
-        '../Sprungdaten_processed/with_preprocessed/percentage/10/vector_percentage_mean_std_10_train.csv')
+        '../Sprungdaten_processed/without_preprocessed/percentage/10/vector_percentage_mean_std_10_train.csv')
     test_data = pd.read_csv(
-        '../Sprungdaten_processed/with_preprocessed/percentage/10/vector_percentage_mean_std_10_test.csv')
+        '../Sprungdaten_processed/without_preprocessed/percentage/10/vector_percentage_mean_std_10_test.csv')
     # jump_core_detection(train_data, test_data, [1, 2, 3, 4], 10)
     '''clf = SGDClassifier(loss='log', penalty='l1', alpha=0.0001,
                             l1_ratio=0.15, fit_intercept=True, max_iter=10000,
@@ -357,4 +371,5 @@ if __name__ == '__main__':
             mean_prec, mean_rec, mean_f, mean_youden = metrics(y_test, y_pred)
             print(f"Accuracy youden score: {str(mean_youden.round(4))}")
             print(f"Accuracy f1 score: {str(mean_f.round(4))}")'''
-    shap_plots(train_data, test_data, [1, 3, 4], 'log', 'l1', 10000)
+    shap_plots(train_data, test_data, [1, 2, 3, 4], 'perceptron', 'l1', 10000)
+    #prepare_data(train_data, test_data, [1, 2, 3, 4, "only"])
