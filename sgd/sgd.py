@@ -20,9 +20,13 @@ def prepare_data(data_train, data_test, pp_list):
 
     Parameters
     ----------
-    data_train: DataFrame - train data set
-    data_test: DataFrame - test data set
-    pp_list: list - list of DJumps, that should be included in train and test data sets
+    data_train : pandas.Dataframe
+        dataframe read from .csv file
+    data_test : pandas.Dataframe
+        dataframe read from .csv file
+    pp_list : list
+        a list with values from 1 to 4: [1, 2, 3, 4]. Corresponds to the blocks of preprocessed data. 1: first 9 columns,
+        2, 3, 4: 12 columns each
 
     :return: X_train: - features of the train data set,
              y_train: - targets of the train data set,
@@ -46,26 +50,21 @@ def prepare_data(data_train, data_test, pp_list):
     if 4 not in pp_list:
         data_train = data_train.drop([col for col in data_train.columns if 'DJump_I_ABS_S' in col], axis=1)
         data_test = data_test.drop([col for col in data_test.columns if 'DJump_I_ABS_S' in col], axis=1)
-    if 1 in pp_list and 2 in pp_list and 3 in pp_list and 4 in pp_list and "only" in pp_list:
-        no_djumps_data_train = data_train.drop([col for col in data_train.columns if 'DJump' in col], axis=1)
-        no_djumps_data_train = no_djumps_data_train.drop('Sprungtyp', axis=1)
-        no_djumps_data_train = no_djumps_data_train.drop(['SprungID'], axis=1)
-        data_train = data_train.drop(no_djumps_data_train, axis=1)
-        no_djumps_data_test = data_test.drop([col for col in data_test.columns if 'DJump' in col], axis=1)
-        no_djumps_data_test = no_djumps_data_test.drop('Sprungtyp', axis=1)
-        no_djumps_data_test = no_djumps_data_test.drop(['SprungID'], axis=1)
-        data_test = data_test.drop(no_djumps_data_test, axis=1)
 
-    X_train = data_train.drop('Sprungtyp', axis=1)
-    X_train = X_train.drop(['SprungID'], axis=1)
-    X_test = data_test.drop('Sprungtyp', axis=1)
-    X_test = X_test.drop(['SprungID'], axis=1)
+    x_train = data_train.drop('Sprungtyp', axis=1)
+    x_train = x_train.drop(['SprungID'], axis=1)
+    x_test = data_test.drop('Sprungtyp', axis=1)
+    x_test = x_test.drop(['SprungID'], axis=1)
+
+    if 1 in pp_list and 2 in pp_list and 3 in pp_list and 4 in pp_list and "only" in pp_list:
+        data_train = data_train.drop([col for col in data_train.columns if 'DJump' not in col], axis=1)
+        data_test = data_test.drop([col for col in data_test.columns if 'DJump' not in col], axis=1)
 
     y_train = data_train['Sprungtyp']
     y_test = data_test['Sprungtyp']
 
-    print(X_train)
-    return X_train, y_train, X_test, y_test
+    print(x_train)
+    return x_train, y_train, x_test, y_test
 
 
 def all_parameters_classifier(data_train, data_test, pp_list, accuracy):
@@ -75,10 +74,14 @@ def all_parameters_classifier(data_train, data_test, pp_list, accuracy):
 
     Parameters
     ----------
-    data_train: DataFrame - train data set
-    data_test: DataFrame - test data set
-    pp_list: list - list of DJumps, that should be included in train and test data sets
-    accuracy: float - accuracy for the Classifier
+    data_train: pandas.Dataframe
+        train data set
+    data_test: pandas.Dataframe
+        test data set
+    pp_list: list
+        list of DJumps, that should be included in train and test data sets
+    accuracy: float
+        accuracy for the Classifier
 
     :return:
 
@@ -110,8 +113,10 @@ def all_datasets_with_all_parameters_classifier(pp_list, accuracy):
 
     Parameters
     ----------
-    pp_list: list - list of DJumps, that should be included in train and test data sets
-    accuracy: float - accuracy for the Classifier
+    pp_list: list
+        list of DJumps, that should be included in train and test data sets
+    accuracy: float
+        accuracy for the Classifier
 
     :return:
 
@@ -129,6 +134,13 @@ def all_datasets_with_all_parameters_classifier(pp_list, accuracy):
 
 
 def get_best_data_set_with_preprocessed():
+    """
+    train and test data sets with best accuracy for preprocessed data
+
+    :return: train_data - train data set with preprocessed data and best accuracy
+             test_data - test data set with preprocessed data and best accuracy
+
+    """
     train_data = pd.read_csv(
         '../Sprungdaten_processed/with_preprocessed/percentage/10/vector_percentage_mean_std_10_train.csv')
     test_data = pd.read_csv(
@@ -139,6 +151,13 @@ def get_best_data_set_with_preprocessed():
 
 
 def get_best_data_set_without_preprocessed():
+    """
+    train and test data sets with best accuracy and without preprocessed data
+
+    :return: train_data - train data set without preprocessed data and best accuracy
+             test_data - test data set without preprocessed data and best accuracy
+
+    """
     train_data = pd.read_csv(
         '../Sprungdaten_processed/without_preprocessed/percentage/10/vector_percentage_mean_std_10_train.csv')
     test_data = pd.read_csv(
@@ -153,7 +172,7 @@ def get_targets(data):
 
     Parameters
     ----------
-    data: DataFrame
+    data: pandas.DataFrame
 
     :return: data['Sprungtyp'] - targets of the data set
 
@@ -162,6 +181,20 @@ def get_targets(data):
 
 
 def sample_x_test(x_test, y_test, num):
+    """
+        Samples data by retrieving only a certain number of each jump.
+
+        Parameters
+        ----------
+        :param x_test : pandas.Dataframe
+            can be x_test and x_train
+        :param y_test : pandas.Dataframe
+            can be y_test and y_train
+        :param num : int
+            number of each jump to retrieve
+
+        :return: sampled data Dataframe
+    """
     df = x_test.copy()
     df['Sprungtyp'] = y_test
     counts = df['Sprungtyp'].value_counts()
@@ -183,6 +216,21 @@ def sample_x_test(x_test, y_test, num):
 
 
 def sgd_classifier(X_train, y_train, X_test, y_test, loss: str, penalty: str, max_iter: int):
+    """
+
+    Parameters
+    ----------
+    X_train
+    y_train
+    X_test
+    y_test
+    loss
+    penalty
+    max_iter
+
+    :return:
+
+    """
     clf = SGDClassifier(loss=loss, penalty=penalty, alpha=0.0001,
                         l1_ratio=0.15, fit_intercept=True, max_iter=max_iter,
                         tol=0.001, shuffle=True, verbose=0, epsilon=0.1,
@@ -200,11 +248,22 @@ def sgd_classifier(X_train, y_train, X_test, y_test, loss: str, penalty: str, ma
 
 
 def shap_plots(data_train, data_test, pp_list, loss, penalty, max_iter, aj=None):
+    """
+
+    Parameters
+    ----------
+    data_train
+    data_test
+    pp_list
+    loss
+    penalty
+    max_iter
+    aj
+
+    :return:
+
+    """
     X_train, y_train, X_test, y_test = prepare_data(data_train, data_test, pp_list)
-    print(X_train)
-    print(X_test)
-    print(y_train)
-    print(y_test)
     clf, y_pred = sgd_classifier(X_train, y_train, X_test, y_test, loss, penalty, max_iter)
 
     if aj is None:
@@ -276,6 +335,23 @@ def shap_plots(data_train, data_test, pp_list, loss, penalty, max_iter, aj=None)
 
 
 def jump_core_detection(data_train, data_test, pp_list, jump_length=0):
+    """
+        Trains many different models with differently cut data. We cut from back to front, front to back, and from both sides
+
+        Parameters
+        ----------
+
+        data_train : pandas.Dataframe
+            dataframe read from .csv file
+        data_test : pandas.Dataframe
+            dataframe read from .csv file
+        pp_list : list
+            a list with values from 1 to 4: [1, 2, 3, 4]. Corresponds to the blocks of preprocessed data. 1: first 9 columns, 2, 3, 4: 12 columns each
+        jump_length : int
+
+
+        :return: dictionary with scores of all trained models
+        """
     scores = {}
     percentage = int(100 / jump_length)
     full_list = [l for l in range(0, 100, percentage)]

@@ -16,7 +16,28 @@ from sklearn.metrics import confusion_matrix
 from matplotlib import pyplot as plt
 from sklearn import neighbors
 
+
 def prepare_data(data_train, data_test, pp_list):
+    """
+
+        Prepare data for use in Classifier
+
+        Parameters
+        ----------
+        data_train : pandas.Dataframe
+            dataframe read from .csv file
+        data_test : pandas.Dataframe
+            dataframe read from .csv file
+        pp_list : list
+            a list with values from 1 to 4: [1, 2, 3, 4]. Corresponds to the blocks of preprocessed data. 1: first 9 columns,
+            2, 3, 4: 12 columns each
+
+        :return: X_train: - features of the train data set,
+                 y_train: - targets of the train data set,
+                 X_test: - features of the test data set,
+                 y_test: - targets of the test data set
+        """
+
     first_djumps = set([col for col in data_train.columns if 'DJump' in col]) - set(
         [col for col in data_train.columns if 'DJump_SIG_I_S' in col]) \
                    - set([col for col in data_train.columns if 'DJump_ABS_I_S' in col]) - set(
@@ -33,28 +54,42 @@ def prepare_data(data_train, data_test, pp_list):
     if 4 not in pp_list:
         data_train = data_train.drop([col for col in data_train.columns if 'DJump_I_ABS_S' in col], axis=1)
         data_test = data_test.drop([col for col in data_test.columns if 'DJump_I_ABS_S' in col], axis=1)
-    # for only preprocessed
-    if 1 in pp_list and 2 in pp_list and 3 in pp_list and 4 in pp_list and "only" in pp_list:
-        no_djumps_data_train = data_train.drop([col for col in data_train.columns if 'DJump' in col], axis=1)
-        no_djumps_data_train = no_djumps_data_train.drop('Sprungtyp', axis=1)
-        no_djumps_data_train = no_djumps_data_train.drop(['SprungID'], axis=1)
-        data_train = data_train.drop(no_djumps_data_train, axis=1)
-        no_djumps_data_test = data_test.drop([col for col in data_test.columns if 'DJump' in col], axis=1)
-        no_djumps_data_test = no_djumps_data_test.drop('Sprungtyp', axis=1)
-        no_djumps_data_test = no_djumps_data_test.drop(['SprungID'], axis=1)
-        data_test = data_test.drop(no_djumps_data_test, axis=1)
 
     X_train = data_train.drop('Sprungtyp', axis=1)
     X_train = X_train.drop(['SprungID'], axis=1)
     X_test = data_test.drop('Sprungtyp', axis=1)
     X_test = X_test.drop(['SprungID'], axis=1)
 
+    # for only preprocessed
+    if 1 in pp_list and 2 in pp_list and 3 in pp_list and 4 in pp_list and "only" in pp_list:
+        data_train = data_train.drop([col for col in data_train.columns if 'DJump' not in col], axis=1)
+        data_test = data_test.drop([col for col in data_test.columns if 'DJump' not in col], axis=1)
+
     y_train = data_train['Sprungtyp']
     y_test = data_test['Sprungtyp']
 
     return X_train, y_train, X_test, y_test
 
-def test_all_parameters(data_train, data_test, pp_list):
+
+def test_all_parameters(data_train, data_test, pp_list, accuracy):
+    """
+
+        Classifier with all possible parameters and with accuracy
+
+        Parameters
+        ----------
+        data_train: pandas.Dataframe
+            train data set
+        data_test: pandas.Dataframe
+            test data set
+        pp_list: list
+            list of DJumps, that should be included in train and test data sets
+        accuracy: float
+            accuracy for the Classifier
+
+        :return:
+
+        """
     X_train, y_train, X_test, y_test = prepare_data(data_train, data_test, pp_list)
     for weights in ['uniform', 'distance']:
         for dist_metrics in ['manhattan', 'chebyshev', 'minkowski']:
@@ -71,7 +106,7 @@ def test_all_parameters(data_train, data_test, pp_list):
                 y_pred = clf.predict(X_test)
 
                 # compare test and predicted targets
-                if accuracy_score(y_test, y_pred) >= 0.9:
+                if accuracy_score(y_test, y_pred) >= accuracy:
                     print(f"PARAMETER:  weights: {weights} | metric: {dist_metrics}  | neighbours: {n_neighbors}")
                     print(f"Accuracy self: ", accuracy_score(y_test, y_pred))
                     mean_prec, mean_rec, mean_f, mean_youden = metrics(y_test, y_pred)
@@ -80,7 +115,21 @@ def test_all_parameters(data_train, data_test, pp_list):
                     print("--------------------------------------------------------------")
 
 
-def test_all_datasets_with_all_parameters(pp_list):
+def test_all_datasets_with_all_parameters(pp_list, accuracy):
+    """
+
+        Classifier with all possible parameters and all data sets
+
+        Parameters
+        ----------
+        pp_list: list
+            list of DJumps, that should be included in train and test data sets
+        accuracy: float
+            accuracy for the Classifier
+
+        :return:
+
+        """
     for i in [1, 2, 5, 10, 20, 25]:
         for calc_type in ['', 'mean_', 'mean_std_']:
             print(f"Folder: {i}")
@@ -90,10 +139,11 @@ def test_all_datasets_with_all_parameters(pp_list):
             data_test = pd.read_csv("../Sprungdaten_processed/with_preprocessed/percentage/" + str(
                 i) + "/vector_percentage_" + calc_type + str(i) + "_test.csv")
 
-            test_all_parameters(data_train, data_test, pp_list)
+            test_all_parameters(data_train, data_test, pp_list, accuracy)
 
 
 def get_best_data_set_with_preprocessed():
+
     train_data = pd.read_csv(
         '../Sprungdaten_processed/with_preprocessed/percentage/10/vector_percentage_mean_10_train.csv')
     test_data = pd.read_csv(
@@ -104,6 +154,13 @@ def get_best_data_set_with_preprocessed():
 
 
 def get_best_data_set_without_preprocessed():
+    """
+        train and test data sets with best accuracy and without preprocessed data
+
+        :return: train_data - train data set without preprocessed data and best accuracy
+                 test_data - test data set without preprocessed data and best accuracy
+
+        """
     train_data = pd.read_csv(
         '../Sprungdaten_processed/without_preprocessed/percentage/20/vector_percentage_mean_std_20_train.csv')
     test_data = pd.read_csv(
@@ -112,6 +169,20 @@ def get_best_data_set_without_preprocessed():
 
 
 def sample_x_test(x_test, y_test, num):
+    """
+            Samples data by retrieving only a certain number of each jump.
+
+            Parameters
+            ----------
+            :param x_test : pandas.Dataframe
+                can be x_test and x_train
+            :param y_test : pandas.Dataframe
+                can be y_test and y_train
+            :param num : int
+                number of each jump to retrieve
+
+            :return: sampled data Dataframe
+        """
     df = x_test.copy()
     df['Sprungtyp'] = y_test
     counts = df['Sprungtyp'].value_counts()
@@ -122,7 +193,7 @@ def sample_x_test(x_test, y_test, num):
         subframe = df[df['Sprungtyp'] == jump]
         x = x.append(subframe.sample(counts[jump], random_state=1), ignore_index=True)
 
-    x = x.sample(frac=1)        # shuffle
+    x = x.sample(frac=1)  # shuffle
     y = x['Sprungtyp']
     y = y.reset_index(drop=True)
     x = x.drop(['Sprungtyp'], axis=1)
@@ -154,7 +225,7 @@ def shap_plots(data_train, data_test, pp_list, n_neighbors, weights: str, dist_m
     X_train, y_train, X_test, y_test = prepare_data(data_train, data_test, pp_list)
     clf, y_pred = knn_classifier(X_train, y_train, X_test, y_test, n_neighbors, weights, dist_metric)
 
-    #confusion matrix
+    # confusion matrix
     if aj is None:
         cmap_cm = process_cmap('summer')
         cmap_cm.insert(0, '#ffffff')
@@ -164,16 +235,16 @@ def shap_plots(data_train, data_test, pp_list, n_neighbors, weights: str, dist_m
         cm = confusion_matrix(y_test, y_pred, labels=clf.classes_)
         print(y_test)
         pd.DataFrame(cm, columns=y_test.unique(), index=y_test.unique()).to_csv(
-            '../plots/KNN/with_preprocessed/confusion_matrix.csv')  #TODO
+            '../plots/KNN/with_preprocessed/confusion_matrix.csv')  # TODO
         disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=clf.classes_)
         disp.plot(cmap=cmap_cm)
         disp.figure_.set_figwidth(35)
         disp.figure_.set_figheight(25)
         disp.figure_.autofmt_xdate()
         plt.tick_params(axis='x', labelsize=10, labelrotation=45, grid_linewidth=5)
-        plt.title("KNN_with_mean_10_ConfusionMatrix")   #TODO
+        plt.title("KNN_with_mean_10_ConfusionMatrix")  # TODO
         plt.tight_layout()
-        plt.savefig('../plots/KNN/with_preprocessed/KNN_with_mean_10_ConfusionMatrix')  #TODO
+        plt.savefig('../plots/KNN/with_preprocessed/KNN_with_mean_10_ConfusionMatrix')  # TODO
         plt.show()
 
     else:
@@ -182,16 +253,16 @@ def shap_plots(data_train, data_test, pp_list, n_neighbors, weights: str, dist_m
 
         cm = confusion_matrix(y_test, y_pred, labels=clf.classes_)
         pd.DataFrame(cm, columns=y_test.unique(), index=y_test.unique()).to_csv(
-            '../plots/KNN/without_preprocessed/AJ/confusion_matrix_AJ.csv')   #TODO
+            '../plots/KNN/without_preprocessed/AJ/confusion_matrix_AJ.csv')  # TODO
         disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=clf.classes_)
         disp.plot(cmap=cmap_cm_AJ)
         disp.figure_.set_figwidth(35)
         disp.figure_.set_figheight(25)
         disp.figure_.autofmt_xdate()
         plt.tick_params(axis='x', labelsize=10, labelrotation=45, grid_linewidth=5)
-        plt.title("KNN_without_mean_std_20_ConfusionMatrix_AJ")    #TODO
+        plt.title("KNN_without_mean_std_20_ConfusionMatrix_AJ")  # TODO
         plt.tight_layout()
-        plt.savefig('../plots/KNN/without_preprocessed/AJ/KNN_without_mean_std_20_ConfusionMatrix_AJ')   #TODO
+        plt.savefig('../plots/KNN/without_preprocessed/AJ/KNN_without_mean_std_20_ConfusionMatrix_AJ')  # TODO
         plt.show()
 
     shap_x_test, shap_y_test = sample_x_test(X_test, y_test, 3)
@@ -200,20 +271,19 @@ def shap_plots(data_train, data_test, pp_list, n_neighbors, weights: str, dist_m
     explainer = shap.KernelExplainer(clf.predict_proba, shap.kmeans(shap_x_train, 3))
     shap_values = explainer.shap_values(shap_x_test)
 
-
-    with open('../plots/KNN/with_preprocessed/' + 'shap_data.pkl', 'wb') as f:  #TODO
+    with open('../plots/KNN/with_preprocessed/' + 'shap_data.pkl', 'wb') as f:  # TODO
         pickle.dump([shap_values, shap_x_train, shap_y_train, shap_x_test, shap_y_test], f)
 
-    bar_plots(shap_values, shap_x_test, shap_y_test, save_data='../plots/KNN/with_preprocessed/',   #TODO
+    bar_plots(shap_values, shap_x_test, shap_y_test, save_data='../plots/KNN/with_preprocessed/',  # TODO
               bar='percentual', size=(50, 30))
 
-    bar_plots(shap_values, shap_x_test, shap_y_test, save_data='../plots/KNN/with_preprocessed/',   #TODO
+    bar_plots(shap_values, shap_x_test, shap_y_test, save_data='../plots/KNN/with_preprocessed/',  # TODO
               bar='percentual', size=(50, 30),
               jumps=['Salto A', 'Salto B', 'Salto C', 'Salto rw A', 'Salto rw B', 'Salto rw C', 'Schraubensalto',
                      'Schraubensalto A', 'Schraubensalto C', 'Doppelsalto B', 'Doppelsalto C'],
               name='Saltos')
 
-    bar_plots(shap_values, shap_x_test, shap_y_test, save_data='../plots/KNN/with_preprocessed/',     #TODO
+    bar_plots(shap_values, shap_x_test, shap_y_test, save_data='../plots/KNN/with_preprocessed/',  # TODO
               name='with_preprocessed', size=(30, 45))
 
     saltoA = np.where(shap_y_test.unique() == 'Salto A')[0][0]
@@ -281,7 +351,7 @@ def jump_core_detection(data_train, data_test, pp_list, jump_length=0):
 
     min_y_value = 70
     plt.figure(figsize=(13, 13))
-    plt.suptitle('KNN without pp: percentage_mean_std_20')  #TODO
+    plt.suptitle('KNN without pp: percentage_mean_std_20')  # TODO
     plt.xlabel('Data')
     plt.ylabel('Accuracy')
     plt.axis([0, full_list[-1], min_y_value, 100])
@@ -308,11 +378,13 @@ def jump_core_detection(data_train, data_test, pp_list, jump_length=0):
 
 
 if __name__ == '__main__':
-    train_data = pd.read_csv('../Sprungdaten_processed/with_preprocessed/percentage/10/vector_percentage_mean_10_train.csv')
-    test_data = pd.read_csv('../Sprungdaten_processed/with_preprocessed/percentage/10/vector_percentage_mean_10_test.csv')
-    #test_data = pd.read_csv('../Sprungdaten_processed/without_preprocessed/percentage/20/vector_AJ_percentage_mean_std_20.csv')
+    train_data = pd.read_csv(
+        '../Sprungdaten_processed/with_preprocessed/percentage/10/vector_percentage_mean_10_train.csv')
+    test_data = pd.read_csv(
+        '../Sprungdaten_processed/with_preprocessed/percentage/10/vector_percentage_mean_10_test.csv')
+    # test_data = pd.read_csv('../Sprungdaten_processed/without_preprocessed/percentage/20/vector_AJ_percentage_mean_std_20.csv')
 
-    shap_plots(train_data, test_data, [1,2,3,4], 3, 'uniform', 'manhattan')
+    shap_plots(train_data, test_data, [1, 2, 3, 4], 3, 'uniform', 'manhattan')
 
     # params knn
     # if dataType == 'with':
