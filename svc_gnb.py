@@ -17,7 +17,9 @@ from random_classifier import metrics
 from matplotlib.colors import ListedColormap
 import pickle
 
-
+"""
+This script is used to train, test, explain the Support Vector Classifiers and Gaussian Naive Bayes Classifiers.
+"""
 
 logging.basicConfig(filename='svc_gnb.log', format='%(asctime)s[%(name)s] - %(levelname)s - %(message)s',
                     level=logging.DEBUG)
