@@ -54,7 +54,7 @@ def prepare_data(data_train, data_test, pp_list):
 
     return X_train, y_train, X_test, y_test
 
-def random_search_all_parameters(data_train, data_test, pp_list):
+def test_all_parameters(data_train, data_test, pp_list):
     X_train, y_train, X_test, y_test = prepare_data(data_train, data_test, pp_list)
     for weights in ['uniform', 'distance']:
         for dist_metrics in ['manhattan', 'chebyshev', 'minkowski']:
@@ -90,7 +90,7 @@ def test_all_datasets_with_all_parameters(pp_list):
             data_test = pd.read_csv("../Sprungdaten_processed/with_preprocessed/percentage/" + str(
                 i) + "/vector_percentage_" + calc_type + str(i) + "_test.csv")
 
-            random_search_all_parameters(data_train, data_test, pp_list)
+            test_all_parameters(data_train, data_test, pp_list)
 
 
 def get_best_data_set_with_preprocessed():
