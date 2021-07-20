@@ -245,7 +245,7 @@ def sample_x_test(x_test, y_test, num):
     return x, y
 
 
-def explain_model(train_data: str, test_data: str, feature_start: str, feature_end: str, drops_keywords: list, reverse_drop: bool, output_folder: str, classifier: str):
+def explain_model(train_data: str, test_data: str, feature_start: str, feature_end: str, drops_keywords: list, reverse_drop: bool, output_folder: str, classifier: str, title: str):
     """
 
     Explain the built model by shap values in form of plots.
@@ -267,7 +267,7 @@ def explain_model(train_data: str, test_data: str, feature_start: str, feature_e
 
     drops = [col for col in train.columns if any(keyword in col for keyword in drops_keywords)]
     if reverse_drop:
-        drops = [x for x in train.columns.tolist()[2:-1] if x not in drops]
+        drops = [x for x in train.columns.tolist()[2:] if x not in drops]
 
     train = train.drop(columns=drops)
     test = test.drop(columns=drops)
@@ -290,6 +290,14 @@ def explain_model(train_data: str, test_data: str, feature_start: str, feature_e
     clf.fit(X, y)
     X_test = get_samples_features(test, feature_start, feature_end)
 
+    create_confision_matrix(X_test, y_test, clf, output_folder, classifier, title)
+
+    cmap = ['#393b79','#5254a3','#6b6ecf','#9c9ede','#637939','#8ca252','#b5cf6b','#cedb9c','#8c6d31','#bd9e39','#e7ba52',
+     '#e7cb94','#843c39','#ad494a','#d6616b','#e7969c','#7b4173','#a55194','#ce6dbd','#de9ed6','#3182bd','#6baed6',
+     '#9ecae1','#c6dbef','#e6550d','#fd8d3c','#fdae6b','#fdd0a2','#31a354','#74c476','#a1d99b','#c7e9c0','#756bb1',
+     '#9e9ac8','#bcbddc','#dadaeb','#636363','#969696','#969696','#d9d9d9','#f0027f','#f781bf','#f7b6d2','#fccde5',
+     '#8dd3c7','#ffffb3','#bebada','#fb8072','#80b1d3','#fdb462','#b3de69','#fccde5','#d9d9d9','#bc80bd','#ccebc5','#ffed6f']
+
     shap.initjs()
 
     shap_x_train, shap_y_train = sample_x_test(X, y, 3)
@@ -306,8 +314,13 @@ def explain_model(train_data: str, test_data: str, feature_start: str, feature_e
     with open(output_folder + 'shap_data.pkl', 'wb') as f:
         pickle.dump([shap_values, shap_x_train, shap_y_train, shap_x_test, shap_y_test], f)
 
-    bar_plots(shap_values, shap_x_test, shap_y_test, bar='percentual', folder=output_folder, size=(50, 30))
-    bar_plots(shap_values, shap_x_test, shap_y_test, bar='summary', folder=output_folder, size=(50, 30))
+    bar_plots(shap_values, shap_x_test, shap_y_test, bar='percentual', folder=output_folder, save_data=output_folder, size=(55, 30))
+    bar_plots(shap_values, shap_x_test, shap_y_test, bar='summary', folder=output_folder, save_data=output_folder, size=(55, 30))
+    bar_plots(shap_values, shap_x_test, shap_y_test, save_data=output_folder,
+              bar='percentual', size=(50, 30),
+              jumps=['Salto A', 'Salto B', 'Salto C', 'Salto rw A', 'Salto rw B', 'Salto rw C', 'Schraubensalto',
+                     'Schraubensalto A', 'Schraubensalto C', 'Doppelsalto B', 'Doppelsalto C'],
+              name='Saltos')
 
     shap.summary_plot(shap_values, shap_x_test, plot_type='bar', plot_size=(25, 20), color=ListedColormap(cmap), class_names=shap_y_test.unique(), max_display=20)
     shap.summary_plot(shap_values, shap_x_test, plot_type='bar', plot_size=(25, 20), color=ListedColormap(cmap), class_names=shap_y_test.unique(), max_display=68)
@@ -319,7 +332,7 @@ def explain_model(train_data: str, test_data: str, feature_start: str, feature_e
     shap.summary_plot(shap_values[saltoC], shap_x_test, plot_size=(25, 15), title='Salto C')
 
 
-def create_confision_matrix(X_test, y_test, clf):
+def create_confision_matrix(X_test, y_test, clf, output_folder, classifier, title):
     """
 
     create confusion matrix.
@@ -337,14 +350,16 @@ def create_confision_matrix(X_test, y_test, clf):
     cmap_cm.insert(-1, '#000000')
     cmap_cm = ListedColormap(cmap_cm)
     cm = confusion_matrix(y_test, y_pred, labels=clf.classes_)
+    pd.DataFrame(cm, columns=y_test.unique(), index=y_test.unique()).to_csv(output_folder + "confusion_matrix.csv")
     disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=clf.classes_)
     disp.plot(cmap=cmap_cm)
     disp.figure_.set_figwidth(35)
     disp.figure_.set_figheight(25)
     disp.figure_.autofmt_xdate()
-    plt.title("SVC/without_preprocessed/vector_percentage_mean_std_25")
+    plt.title(classifier + title)
     plt.tight_layout()
-    plt.savefig('SVC_with_vector_percentage_mean_std_25.png')
+    plt.savefig(output_folder + classifier+"_" + title + '_ConfusionMatrix.png')
+
 
 
 def collect_all_data_sets(folder: str, data_sets: set):
@@ -536,12 +551,12 @@ def jump_core_detection(classifier: str, datasets, pp_list, title, jump_length=0
 
 if __name__ == '__main__':
     drops = []
-    #train = "/without_preprocessed/percentage/10/vector_percentage_mean_std_10_train.csv"
-    #test = "/without_preprocessed/percentage/10/vector_AJ_percentage_mean_std_10.csv"
-    #output_folder = 'plots/GNB/without_preprocessed/AJ/'
-    #explain_model(train, test, "", "", [], False, output_folder, "GNB")
-    datasets = ["Sprungdaten_processed/with_preprocessed/percentage/10/vector_percentage_mean_std_10"]
-    title = 'GNB with pp: percentage_mean_std_10'
-    jump_core_detection("GNB", datasets, [1, 2, 3, 4], title, 10)
+    train = "/with_preprocessed/percentage/20/vector_percentage_mean_20_train.csv"
+    test = "/with_preprocessed/percentage/20/vector_percentage_mean_20_test.csv"
+    output_folder = 'plots/SVC/with_preprocessed/only_preprocessed/'
+    explain_model(train, test, "", "", ["DJump"], True, output_folder, "SVC", "only_preprocessed_vector_percentage_mean_20")
+    #datasets = ["Sprungdaten_processed/with_preprocessed/percentage/10/vector_percentage_mean_std_10"]
+    #title = 'GNB with pp: percentage_mean_std_10'
+    #jump_core_detection("GNB", datasets, [1, 2, 3, 4], title, 10)
 
 
