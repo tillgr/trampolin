@@ -1,5 +1,6 @@
 import shap
 import pandas as pd
+from holoviews.plotting.util import process_cmap
 from pandas import DataFrame
 import logging
 import matplotlib.pyplot as plt
@@ -131,6 +132,7 @@ def get_train_test_data(datasets: list):
 
 def svc_classify(datasets: list, feature_start: str, feature_end: str, drops_keywords: list, reverse_drop: bool):
     """
+
     Classify with Support Vector Machine
 
     Parameters
@@ -171,6 +173,7 @@ def svc_classify(datasets: list, feature_start: str, feature_end: str, drops_key
 
 def gnb_classify(datasets: list, feature_start: str, feature_end: str, drops_keywords: list, reverse_drop: bool):
     """
+
     Classify with Gaussian Naive Bayes
 
     Parameters
@@ -245,14 +248,16 @@ def explain_model(train_data: str, test_data: str, feature_start: str, feature_e
 
     Explain the built model by shap values in form of plots.
 
-    :param train_data: path of the train data set
-    :param test_data: path of the train data set
-    :param feature_start: start feature
-    :param feature_end: end feature
-    :param drops_keywords: the features will be drop if it has the keywords in this list.
-    :param reverse_drop: Set to True to drop the features does not contains the keywords.
-    :param output_folder: output folder for bar plots
-    :param classifier: Classifier type, "SVC" or "GNB"
+    Parameters
+    ----------
+    train_data: str - path of the train data set
+    test_data: str - path of the train data set
+    feature_start: str - start feature
+    feature_end: str - end feature
+    drops_keywords: list - the features will be drop if it has the keywords in this list.
+    reverse_drop: bool - Set to True to drop the features does not contains the keywords.
+    output_folder: str - output folder for bar plots
+    classifier: str - Classifier type, "SVC" or "GNB"
 
     """
     train = pd.read_csv("Sprungdaten_processed" + train_data)
@@ -283,27 +288,6 @@ def explain_model(train_data: str, test_data: str, feature_start: str, feature_e
     clf.fit(X, y)
     X_test = get_samples_features(test, feature_start, feature_end)
 
-
-    cmap = ['#393b79','#5254a3','#6b6ecf','#9c9ede','#637939','#8ca252','#b5cf6b','#cedb9c','#8c6d31','#bd9e39','#e7ba52',
-     '#e7cb94','#843c39','#ad494a','#d6616b','#e7969c','#7b4173','#a55194','#ce6dbd','#de9ed6','#3182bd','#6baed6',
-     '#9ecae1','#c6dbef','#e6550d','#fd8d3c','#fdae6b','#fdd0a2','#31a354','#74c476','#a1d99b','#c7e9c0','#756bb1',
-     '#9e9ac8','#bcbddc','#dadaeb','#636363','#969696','#969696','#d9d9d9','#f0027f','#f781bf','#f7b6d2','#fccde5',
-     '#8dd3c7','#ffffb3','#bebada','#fb8072','#80b1d3','#fdb462','#b3de69','#fccde5','#d9d9d9','#bc80bd','#ccebc5','#ffed6f']
-    '''
-    cmap_cm = process_cmap('summer')
-    cmap_cm.insert(0, '#ffffff')
-    cmap_cm.insert(-1, '#000000')
-    cmap_cm = ListedColormap(cmap_cm)
-    cm = confusion_matrix(y_test, y_pred, labels=clf_linear.classes_)
-    disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=clf_linear.classes_)
-    disp.plot(cmap=cmap_cm)
-    disp.figure_.set_figwidth(35)
-    disp.figure_.set_figheight(25)
-    disp.figure_.autofmt_xdate()
-    plt.title("SVC/without_preprocessed/vector_percentage_mean_std_25")
-    plt.tight_layout()
-    plt.savefig('SVC_with_vector_percentage_mean_std_25.png')
-    '''
     shap.initjs()
 
     shap_x_train, shap_y_train = sample_x_test(X, y, 3)
@@ -316,25 +300,49 @@ def explain_model(train_data: str, test_data: str, feature_start: str, feature_e
     else:
         raise RuntimeError("Invalid classifier type:" + classifier)
 
-    # shap_values = explainer.shap_values(X_test.iloc[index].to_frame().transposei())
     shap_values = explainer.shap_values(shap_x_test)
     with open(output_folder + 'shap_data.pkl', 'wb') as f:
         pickle.dump([shap_values, shap_x_train, shap_y_train, shap_x_test, shap_y_test], f)
 
-    # bar_plots(shap_values, shap_x_test, shap_y_test, bar='percentual', folder=output_folder, size=(50, 30))
-    # bar_plots(shap_values, shap_x_test, shap_y_test, bar='summary', folder=output_folder, size=(50, 30))
-    # bar_plots(shap_values, shap_x_test, shap_y_test, bar='percentual',
-    #           jumps=['Salto A', 'Salto B', 'Salto C', 'Salto rw A', 'Salto rw B', 'Salto rw C', 'Schraubensalto', 'Schraubensalto A',
-    #                  'Schraubensalto C',  'Doppelsalto B', 'Doppelsalto C'], folder=output_folder, name='Saltos', size=(50, 30))
+    bar_plots(shap_values, shap_x_test, shap_y_test, bar='percentual', folder=output_folder, size=(50, 30))
+    bar_plots(shap_values, shap_x_test, shap_y_test, bar='summary', folder=output_folder, size=(50, 30))
 
-    # shap.summary_plot(shap_values, shap_x_test, plot_type='bar', plot_size=(25, 20), color=ListedColormap(cmap), class_names=shap_y_test.unique(), max_display=20)
-    # shap.summary_plot(shap_values, shap_x_test, plot_type='bar', plot_size=(25, 20), color=ListedColormap(cmap), class_names=shap_y_test.unique(), max_display=68)
-    # saltoA = np.where(shap_y_test.unique() == 'Salto A')[0][0]
-    # shap.summary_plot(shap_values[saltoA], shap_x_test, plot_size=(25, 15), title='Salto A')
-    # saltoB = np.where(shap_y_test.unique() == 'Salto B')[0][0]
-    # shap.summary_plot(shap_values[saltoB], shap_x_test, plot_size=(25, 15), title='Salto B')
-    # saltoC = np.where(shap_y_test.unique() == 'Salto C')[0][0]
-    # shap.summary_plot(shap_values[saltoC], shap_x_test, plot_size=(25, 15), title='Salto C')
+    shap.summary_plot(shap_values, shap_x_test, plot_type='bar', plot_size=(25, 20), color=ListedColormap(cmap), class_names=shap_y_test.unique(), max_display=20)
+    shap.summary_plot(shap_values, shap_x_test, plot_type='bar', plot_size=(25, 20), color=ListedColormap(cmap), class_names=shap_y_test.unique(), max_display=68)
+    saltoA = np.where(shap_y_test.unique() == 'Salto A')[0][0]
+    shap.summary_plot(shap_values[saltoA], shap_x_test, plot_size=(25, 15), title='Salto A')
+    saltoB = np.where(shap_y_test.unique() == 'Salto B')[0][0]
+    shap.summary_plot(shap_values[saltoB], shap_x_test, plot_size=(25, 15), title='Salto B')
+    saltoC = np.where(shap_y_test.unique() == 'Salto C')[0][0]
+    shap.summary_plot(shap_values[saltoC], shap_x_test, plot_size=(25, 15), title='Salto C')
+
+
+def create_confision_matrix(X_test, y_test, clf):
+    """
+
+    create confusion matrix.
+
+    Parameters
+    ----------
+    X_test: Dataframe - X of the test dataset
+    y_test: Series - y of the test dataset
+    clf: - trained classifier
+
+    """
+    y_pred = clf.predict(X_test)
+    cmap_cm = process_cmap('summer')
+    cmap_cm.insert(0, '#ffffff')
+    cmap_cm.insert(-1, '#000000')
+    cmap_cm = ListedColormap(cmap_cm)
+    cm = confusion_matrix(y_test, y_pred, labels=clf.classes_)
+    disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=clf.classes_)
+    disp.plot(cmap=cmap_cm)
+    disp.figure_.set_figwidth(35)
+    disp.figure_.set_figheight(25)
+    disp.figure_.autofmt_xdate()
+    plt.title("SVC/without_preprocessed/vector_percentage_mean_std_25")
+    plt.tight_layout()
+    plt.savefig('SVC_with_vector_percentage_mean_std_25.png')
 
 
 def collect_all_data_sets(folder: str, data_sets: set):
@@ -342,8 +350,12 @@ def collect_all_data_sets(folder: str, data_sets: set):
 
     Help function to get the datasets iteratively
 
-    :param folder: root folder for the collection
-    :param data_sets: a set object to collect the data sets iteratively
+    Parameters
+    ----------
+    folder: str - root folder for the the data sets
+    data_sets: set - a set object to collect the data sets iteratively
+
+    :return: data_sets - a set of dataset filepath from the given folder
 
     """
     dirs = listdir(folder)
@@ -367,10 +379,13 @@ def run_svc_auto(folder: str, drops: list):
 
     Help function to run SVC on all data sets
 
-    :param folder: root folder for the the data sets
-    :param drops: the features that should be drop
+    Parameters
+    ----------
+    folder: str - root folder for the the data sets
+    drops: list - the features that should be drop
 
     """
+
     data_sets = set()
     collect_all_data_sets(folder, data_sets)
     for ds in data_sets:
@@ -380,12 +395,14 @@ def run_svc_auto(folder: str, drops: list):
 def run_gnb_auto(folder: str, drops: list):
     """
 
-     Help function to run GNB on all data sets
+    Help function to run GNB on all data sets
 
-     :param folder: root folder for the the data sets
-     :param drops: the features that should be drop
+    Parameters
+    ----------
+    folder: str - root folder for the the data sets
+    drops: list - the features that should be drop
 
-     """
+    """
     data_sets = set()
     collect_all_data_sets(folder, data_sets)
     for ds in data_sets:
