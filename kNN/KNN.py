@@ -312,7 +312,7 @@ if __name__ == '__main__':
     test_data = pd.read_csv('../Sprungdaten_processed/without_preprocessed/percentage/20/vector_percentage_mean_std_20_test.csv')
     #test_data = pd.read_csv('../Sprungdaten_processed/without_preprocessed/percentage/20/vector_AJ_percentage_mean_std_20.csv')
 
-    shap_plots(train_data, test_data, [1,2,3,4], 3, 'distance', 'manhattan', )
+    shap_plots(train_data, test_data, [1,2,3,4], 3, 'distance', 'manhattan')
 
     # params knn
     # if dataType == 'with':
