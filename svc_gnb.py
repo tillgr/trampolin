@@ -245,7 +245,8 @@ def sample_x_test(x_test, y_test, num):
     return x, y
 
 
-def explain_model(train_data: str, test_data: str, feature_start: str, feature_end: str, drops_keywords: list, reverse_drop: bool, output_folder: str, classifier: str, title: str):
+def explain_model(train_data: str, test_data: str, feature_start: str, feature_end: str, drops_keywords: list, reverse_drop: bool, output_folder: str, classifier: str,
+                  title: str, load_shap_from_disk):
     """
 
     Explain the built model by shap values in form of plots.
@@ -310,10 +311,16 @@ def explain_model(train_data: str, test_data: str, feature_start: str, feature_e
     else:
         raise RuntimeError("Invalid classifier type:" + classifier)
 
-    shap_values = explainer.shap_values(shap_x_test)
-    with open(output_folder + 'shap_data.pkl', 'wb') as f:
-        pickle.dump([shap_values, shap_x_train, shap_y_train, shap_x_test, shap_y_test], f)
+    if not load_shap_from_disk:
+        shap_values = explainer.shap_values(shap_x_test)
+        with open(output_folder + 'shap_data.pkl', 'wb') as f:
+            pickle.dump([shap_values, shap_x_train, shap_y_train, shap_x_test, shap_y_test], f)
+    else:
+        with open(output_folder + "shap_data.pkl", 'rb') as f:
+            shaps = pickle.load(f)
+            shap_values = shaps[0]
 
+    """
     bar_plots(shap_values, shap_x_test, shap_y_test, bar='percentual', folder=output_folder, save_data=output_folder, size=(55, 30))
     bar_plots(shap_values, shap_x_test, shap_y_test, bar='summary', folder=output_folder, save_data=output_folder, size=(55, 30))
     bar_plots(shap_values, shap_x_test, shap_y_test, save_data=output_folder,
@@ -321,7 +328,7 @@ def explain_model(train_data: str, test_data: str, feature_start: str, feature_e
               jumps=['Salto A', 'Salto B', 'Salto C', 'Salto rw A', 'Salto rw B', 'Salto rw C', 'Schraubensalto',
                      'Schraubensalto A', 'Schraubensalto C', 'Doppelsalto B', 'Doppelsalto C'],
               name='Saltos')
-
+    """
     shap.summary_plot(shap_values, shap_x_test, plot_type='bar', plot_size=(25, 20), color=ListedColormap(cmap), class_names=shap_y_test.unique(), max_display=20)
     shap.summary_plot(shap_values, shap_x_test, plot_type='bar', plot_size=(25, 20), color=ListedColormap(cmap), class_names=shap_y_test.unique(), max_display=68)
     saltoA = np.where(shap_y_test.unique() == 'Salto A')[0][0]
@@ -554,7 +561,7 @@ if __name__ == '__main__':
     train = "/with_preprocessed/percentage/20/vector_percentage_mean_20_train.csv"
     test = "/with_preprocessed/percentage/20/vector_percentage_mean_20_test.csv"
     output_folder = 'plots/SVC/with_preprocessed/only_preprocessed/'
-    explain_model(train, test, "", "", ["DJump"], True, output_folder, "SVC", "only_preprocessed_vector_percentage_mean_20")
+    explain_model(train, test, "", "", ["DJump"], True, output_folder, "SVC", "preprocessed_vector_percentage_mean_20", False)
     #datasets = ["Sprungdaten_processed/with_preprocessed/percentage/10/vector_percentage_mean_std_10"]
     #title = 'GNB with pp: percentage_mean_std_10'
     #jump_core_detection("GNB", datasets, [1, 2, 3, 4], title, 10)

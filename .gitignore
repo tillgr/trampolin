@@ -13,7 +13,7 @@ Sprungdaten_processed/data_point_jumps.csv
 /Sprungdaten_processed/data_only_jumps_float_converted_no_strecksprung.csv
 
 __pycache__/
-svc.log
+svc_gnb.log
 
 Sprungdaten_processed/normalized_data.csv
 
@@ -57,3 +57,4 @@ Sprungdaten_processed/without_preprocessed/data_only_jumps.csv
 /sgd/all_data_new.csv
 
 venv/
+/svc_gnb.log
