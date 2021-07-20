@@ -36,32 +36,32 @@ def sample_x_test(x_test, y_test, num):
 
 if __name__ == '__main__':
 
-    for dataType in ['without']: #['with', 'without']:
-        for aj in ['', 'AJ']:
+    for dataType in ['with']:
+        for aj in ['AJ']:
             print("---")
             print(dataType)
             print(aj)
 
             if dataType == 'with':
                 train_data = pd.read_csv(
-                    '../Sprungdaten_processed/with_preprocessed/percentage/25/vector_percentage_25_train.csv')
+                    '../../../Sprungdaten_processed/with_preprocessed/percentage/25/vector_percentage_25_train.csv')
 
                 test_data = pd.read_csv(
-                    '../Sprungdaten_processed/with_preprocessed/percentage/25/vector_percentage_25_test.csv')
+                    '../../../Sprungdaten_processed/with_preprocessed/percentage/25/vector_percentage_25_test.csv')
                 if aj == 'AJ':
                     test_data = pd.read_csv(
-                        '../Sprungdaten_processed/with_preprocessed/percentage/25/vector_AJ_percentage_25.csv')
+                        '../../../Sprungdaten_processed/with_preprocessed/percentage/25/vector_AJ_percentage_25.csv')
 
 
             if dataType == 'without':
                 train_data = pd.read_csv(
-                    '../Sprungdaten_processed/without_preprocessed/percentage/20/vector_percentage_mean_20_train.csv')
+                    '../../../Sprungdaten_processed/without_preprocessed/percentage/20/vector_percentage_mean_20_train.csv')
 
                 test_data = pd.read_csv(
-                    '../Sprungdaten_processed/without_preprocessed/percentage/20/vector_percentage_mean_20_test.csv')
+                    '../../../Sprungdaten_processed/without_preprocessed/percentage/20/vector_percentage_mean_20_test.csv')
                 if aj == 'AJ':
                     test_data = pd.read_csv(
-                        '../Sprungdaten_processed/without_preprocessed/percentage/20/vector_AJ_percentage_mean_20.csv')
+                        '../../../Sprungdaten_processed/without_preprocessed/percentage/20/vector_AJ_percentage_mean_20.csv')
 
             # get_features (X)
             if dataType == 'with':
@@ -170,7 +170,7 @@ if __name__ == '__main__':
                 if aj == '':
                     cm = confusion_matrix(y_test, y_pred, labels=clf.classes_)
                     disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=clf.classes_)
-                    disp.plot(cmap=cmap_cm)
+                    disp.plot(cmap=cmap)
                     disp.figure_.set_figwidth(35)
                     disp.figure_.set_figheight(25)
                     disp.figure_.autofmt_xdate()
@@ -197,7 +197,7 @@ if __name__ == '__main__':
                 if aj == '':
                     cm = confusion_matrix(y_test, y_pred, labels=clf.classes_)
                     disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=clf.classes_)
-                    disp.plot(cmap=cmap_cm)
+                    disp.plot(cmap=cmap)
                     disp.figure_.set_figwidth(35)
                     disp.figure_.set_figheight(25)
                     disp.figure_.autofmt_xdate()

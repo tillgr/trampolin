@@ -35,12 +35,12 @@ def sample_x_test(x_test, y_test, num):
 if __name__ == '__main__':
 
     train_data = pd.read_csv(
-        '../Sprungdaten_processed/with_preprocessed/percentage/10/vector_percentage_mean_10_train.csv')
+        '../../Sprungdaten_processed/with_preprocessed/percentage/10/vector_percentage_mean_10_train.csv')
 
     '''test_data = pd.read_csv(
         '../Sprungdaten_processed/with_preprocessed/percentage/10/vector_percentage_mean_10_test.csv')'''
     test_data = pd.read_csv(
-        '../Sprungdaten_processed/with_preprocessed/percentage/10/vector_AJ_percentage_mean_10.csv')
+        '../../Sprungdaten_processed/with_preprocessed/percentage/10/vector_AJ_percentage_mean_10.csv')
 
 
     '''train_data = pd.read_csv(

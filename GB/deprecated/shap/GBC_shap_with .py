@@ -44,24 +44,24 @@ if __name__ == '__main__':
 
             if dataType == 'with':
                 train_data = pd.read_csv(
-                    '../../Sprungdaten_processed/with_preprocessed/percentage/25/vector_percentage_25_train.csv')
+                    '../../../Sprungdaten_processed/with_preprocessed/percentage/25/vector_percentage_25_train.csv')
 
                 test_data = pd.read_csv(
-                    '../../Sprungdaten_processed/with_preprocessed/percentage/25/vector_percentage_25_test.csv')
+                    '../../../Sprungdaten_processed/with_preprocessed/percentage/25/vector_percentage_25_test.csv')
                 if aj == 'AJ':
                     test_data = pd.read_csv(
-                        '../../Sprungdaten_processed/with_preprocessed/percentage/25/vector_AJ_percentage_25.csv')
+                        '../../../Sprungdaten_processed/with_preprocessed/percentage/25/vector_AJ_percentage_25.csv')
 
 
             if dataType == 'without':
                 train_data = pd.read_csv(
-                    '../../Sprungdaten_processed/without_preprocessed/percentage/20/vector_percentage_mean_20_train.csv')
+                    '../../../Sprungdaten_processed/without_preprocessed/percentage/20/vector_percentage_mean_20_train.csv')
 
                 test_data = pd.read_csv(
-                    '../../Sprungdaten_processed/without_preprocessed/percentage/20/vector_percentage_mean_20_test.csv')
+                    '../../../Sprungdaten_processed/without_preprocessed/percentage/20/vector_percentage_mean_20_test.csv')
                 if aj == 'AJ':
                     test_data = pd.read_csv(
-                        '../../Sprungdaten_processed/without_preprocessed/percentage/20/vector_AJ_percentage_mean_20.csv')
+                        '../../../Sprungdaten_processed/without_preprocessed/percentage/20/vector_AJ_percentage_mean_20.csv')
 
             # get_features (X)
             if dataType == 'with':

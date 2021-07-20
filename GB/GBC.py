@@ -1,3 +1,5 @@
+import pickle
+
 import numpy as np
 import pandas as pd
 from sklearn.ensemble import GradientBoostingClassifier
@@ -30,6 +32,16 @@ def prepare_data(data_train, data_test, pp_list):
     if 4 not in pp_list:
         data_train = data_train.drop([col for col in data_train.columns if 'DJump_I_ABS_S' in col], axis=1)
         data_test = data_test.drop([col for col in data_test.columns if 'DJump_I_ABS_S' in col], axis=1)
+    # for only preprocessed
+    if 1 in pp_list and 2 in pp_list and 3 in pp_list and 4 in pp_list and "only" in pp_list:
+        no_djumps_data_train = data_train.drop([col for col in data_train.columns if 'DJump' in col], axis=1)
+        no_djumps_data_train = no_djumps_data_train.drop('Sprungtyp', axis=1)
+        no_djumps_data_train = no_djumps_data_train.drop(['SprungID'], axis=1)
+        data_train = data_train.drop(no_djumps_data_train, axis=1)
+        no_djumps_data_test = data_test.drop([col for col in data_test.columns if 'DJump' in col], axis=1)
+        no_djumps_data_test = no_djumps_data_test.drop('Sprungtyp', axis=1)
+        no_djumps_data_test = no_djumps_data_test.drop(['SprungID'], axis=1)
+        data_test = data_test.drop(no_djumps_data_test, axis=1)
 
     X_train = data_train.drop('Sprungtyp', axis=1)
     X_train = X_train.drop(['SprungID'], axis=1)
@@ -107,7 +119,7 @@ def sample_x_test(x_test, y_test, num):
     return x, y
 
 
-def gbc_classifier(X_train, y_train, X_test, estimators: str, depth: str):
+def gbc_classifier(X_train, y_train, X_test, y_test, estimators: str, depth: str):
     clf = GradientBoostingClassifier(n_estimators=estimators, max_depth=depth)
 
     # Train the model using the training sets
@@ -115,154 +127,86 @@ def gbc_classifier(X_train, y_train, X_test, estimators: str, depth: str):
 
     # Predict the response for test dataset
     y_pred = clf.predict(X_test)
+
+    # compare test and predicted targets
+    print(f"Accuracy: ", accuracy_score(y_test, y_pred).__round__(4))
+    mean_prec, mean_rec, mean_f, mean_youden = metrics(y_test, y_pred)
+    print(f"Accuracy youden score: {str(mean_youden.round(4))}")
+    print(f"Accuracy f1 score: {str(mean_f.round(4))}")
+
     return clf, y_pred
 
 def shap_plots(data_train, data_test, pp_list, estimators, depth, aj=None):
     X_train, y_train, X_test, y_test = prepare_data(data_train, data_test, pp_list)
-    clf, y_pred = gbc_classifier(X_train, y_train, X_test, estimators, depth)
+    clf, y_pred = gbc_classifier(X_train, y_train, X_test, y_test, estimators, depth)
 
-    for dataType in ['with', 'without']:
-        for aj in ['', 'AJ']:
-            print("---")
-            print(dataType)
-            print(aj)
+    # confusion matrix
+    if aj is None:
+        cmap_cm = process_cmap('summer')
+        cmap_cm.insert(0, '#ffffff')
+        cmap_cm.insert(-1, '#000000')
+        cmap_cm = ListedColormap(cmap_cm)
 
-            #todo
-            if dataType == 'with':
-                train_data = pd.read_csv(
-                    '../Sprungdaten_processed/with_preprocessed/percentage/25/vector_percentage_25_train.csv')
+        cm = confusion_matrix(y_test, y_pred, labels=clf.classes_)
+        print(y_test)
+        pd.DataFrame(cm, columns=y_test.unique(), index=y_test.unique()).to_csv(
+            '../plots/GBC/with_preprocessed/confusion_matrix.csv')  # TODO
+        disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=clf.classes_)
+        disp.plot(cmap=cmap_cm)
+        disp.figure_.set_figwidth(35)
+        disp.figure_.set_figheight(25)
+        disp.figure_.autofmt_xdate()
+        plt.tick_params(axis='x', labelsize=10, labelrotation=45, grid_linewidth=5)
+        plt.title("GBC_with_25_ConfusionMatrix")  # TODO
+        plt.tight_layout()
+        plt.savefig('../plots/GBC/with_preprocessed/GBC_with_25_ConfusionMatrix')  # TODO
+        plt.show()
 
-                test_data = pd.read_csv(
-                    '../Sprungdaten_processed/with_preprocessed/percentage/25/vector_percentage_25_test.csv')
-                if aj == 'AJ':
-                    test_data = pd.read_csv(
-                        '../Sprungdaten_processed/with_preprocessed/percentage/25/vector_AJ_percentage_25.csv')
+    else:
+        cmap_cm_AJ = ['#ffffff', '#048166']
+        cmap_cm_AJ = ListedColormap(cmap_cm_AJ)
 
-            if dataType == 'without':
-                train_data = pd.read_csv(
-                    '../Sprungdaten_processed/without_preprocessed/percentage/20/vector_percentage_mean_20_train.csv')
+        cm = confusion_matrix(y_test, y_pred, labels=clf.classes_)
+        pd.DataFrame(cm, columns=y_test.unique(), index=y_test.unique()).to_csv(
+            '../plots/GBC/with_preprocessed/AJ/confusion_matrix_AJ.csv')  # TODO
+        disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=clf.classes_)
+        disp.plot(cmap=cmap_cm_AJ)
+        disp.figure_.set_figwidth(35)
+        disp.figure_.set_figheight(25)
+        disp.figure_.autofmt_xdate()
+        plt.tick_params(axis='x', labelsize=10, labelrotation=45, grid_linewidth=5)
+        plt.title("GBC_with_25_ConfusionMatrix_AJ")  # TODO
+        plt.tight_layout()
+        plt.savefig('../plots/GBC/with_preprocessed/AJ/GBC_with_25_ConfusionMatrix_AJ')  # TODO
+        plt.show()
 
-                test_data = pd.read_csv(
-                    '../Sprungdaten_processed/without_preprocessed/percentage/20/vector_percentage_mean_20_test.csv')
-                if aj == 'AJ':
-                    test_data = pd.read_csv(
-                        '../Sprungdaten_processed/without_preprocessed/percentage/20/vector_AJ_percentage_mean_20.csv')
+    shap_x_test, shap_y_test = sample_x_test(X_test, y_test, 3)
+    shap_x_train, shap_y_train = sample_x_test(X_train, y_train, 6)
 
-            # get_features (X)
-            if dataType == 'with':
-                start_column: str = '0_Acc_N_Fil'
-                end_column: str = '75_Gyro_z_Fil'
+    explainer = shap.KernelExplainer(clf.predict_proba, shap.kmeans(shap_x_train, 3))
+    shap_values = explainer.shap_values(shap_x_test)
 
-            if dataType == 'without':
-                start_column: str = '0_Acc_N_Fil'
-                end_column: str = '80_Gyro_z_Fil'
+    with open('../plots/GBC/with_preprocessed/' + 'shap_data.pkl', 'wb') as f:  # TODO
+        pickle.dump([shap_values, shap_x_train, shap_y_train, shap_x_test, shap_y_test], f)
 
+    bar_plots(shap_values, shap_x_test, shap_y_test, save_data='../plots/GBC/with_preprocessed/',  # TODO
+              bar='percentual', size=(50, 30))
 
-            X_train = train_data.loc[:, start_column:end_column]
-            y_train = (train_data['Sprungtyp'])
+    bar_plots(shap_values, shap_x_test, shap_y_test, save_data='../plots/GBC/with_preprocessed/',  # TODO
+              bar='percentual', size=(50, 30),
+              jumps=['Salto A', 'Salto B', 'Salto C', 'Salto rw A', 'Salto rw B', 'Salto rw C', 'Schraubensalto',
+                     'Schraubensalto A', 'Schraubensalto C', 'Doppelsalto B', 'Doppelsalto C'],
+              name='Saltos')
 
-            X_test = test_data.loc[:, start_column:end_column]
-            y_test = (test_data['Sprungtyp'])
+    bar_plots(shap_values, shap_x_test, shap_y_test, save_data='../plots/GBC/with_preprocessed/',  # TODO
+              name='with_preprocessed', size=(30, 45))
 
-            # params
-            if dataType == 'with':
-                estimators = 200
-                depth = 7
-
-            if dataType == 'without':
-                estimators = 90
-                depth = 3
-
-            clf = GradientBoostingClassifier(n_estimators=estimators, max_depth=depth)
-            clf.fit(X_train, y_train)
-
-            y_pred = clf.predict(X_test)
-
-            cmap_cm = process_cmap('summer')
-            cmap_cm.insert(0, '#ffffff')
-            cmap_cm.insert(-1, '#000000')
-            cmap_cm = ListedColormap(cmap_cm)
-
-            cmap_cm_AJ = ['#ffffff', '#048166']
-            cmap_cm_AJ = ListedColormap(cmap_cm_AJ)
-
-            shap_x_test, shap_y_test = sample_x_test(X_test, y_test, 3)
-            shap_x_train, shap_y_train = sample_x_test(X_train, y_train, 6)
-
-            explainer = shap.KernelExplainer(clf.predict_proba, shap_x_train)
-            shap_values = explainer.shap_values(shap_x_test)
-
-
-            bar_plots(shap_values, shap_x_test, shap_y_test,
-                      bar='percentual',
-                      folder='../plots/GBC/' + dataType + '_preprocessed/',
-                      name=aj + '_' + dataType + '_preprocessed')
-            bar_plots(shap_values, shap_x_test, shap_y_test,
-                      bar='percentual',
-                      jumps=['Salto A', 'Salto B', 'Salto C', 'Salto rw A', 'Salto rw B', 'Salto rw C',
-                             'Schraubensalto',
-                             'Schraubensalto A', 'Schraubensalto C', 'Doppelsalto B', 'Doppelsalto C'],
-                      folder='../plots/GBC/' + dataType + '_preprocessed/',
-                      name=aj + '_Saltos')
-            bar_plots(shap_values, shap_x_test, shap_y_test,
-                      folder='../plots/GBC/' + dataType + '_preprocessed/',
-                      name=aj + '_' + dataType + '_preprocessed')
-
-            # confusion matrix
-            if dataType == 'with':
-                if aj == 'AJ':
-                    cm = confusion_matrix(y_test, y_pred, labels=clf.classes_)
-                    disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=clf.classes_)
-                    disp.plot(cmap=cmap_cm_AJ)
-                    disp.figure_.set_figwidth(35)
-                    disp.figure_.set_figheight(25)
-                    disp.figure_.autofmt_xdate()
-                    plt.tick_params(axis='x', labelsize=10, labelrotation=45, grid_linewidth=5)
-                    plt.title("GBC/with_preprocessed/vector_AJ_percentage_25_train")
-                    plt.tight_layout()
-                    plt.savefig('../plots/GBC/with_preprocessed/cf_AJ')
-                    plt.show()
-
-                if aj == '':
-                    cm = confusion_matrix(y_test, y_pred, labels=clf.classes_)
-                    disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=clf.classes_)
-                    disp.plot(cmap=cmap_cm)
-                    disp.figure_.set_figwidth(35)
-                    disp.figure_.set_figheight(25)
-                    disp.figure_.autofmt_xdate()
-                    plt.tick_params(axis='x', labelsize=10, labelrotation=45, grid_linewidth=5)
-                    plt.title("GBC/with_preprocessed/vector_percentage_25_train")
-                    plt.tight_layout()
-                    plt.savefig('../plots/GBC/with_preprocessed/cf_noAJ')
-                    plt.show()
-
-            if dataType == 'without':
-                if aj == 'AJ':
-                    cm = confusion_matrix(y_test, y_pred, labels=clf.classes_)
-                    disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=clf.classes_)
-                    disp.plot(cmap=cmap_cm_AJ)
-                    disp.figure_.set_figwidth(35)
-                    disp.figure_.set_figheight(25)
-                    disp.figure_.autofmt_xdate()
-                    plt.tick_params(axis='x', labelsize=10, labelrotation=45, grid_linewidth=5)
-                    plt.title("GBC/without_preprocessed/vector_AJ_percentage_mean_20_train")
-                    plt.tight_layout()
-                    plt.savefig('../plots/GBC/without_preprocessed/cf_AJ')
-                    plt.show()
-
-                if aj == '':
-                    cm = confusion_matrix(y_test, y_pred, labels=clf.classes_)
-                    disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=clf.classes_)
-                    disp.plot(cmap=cmap_cm)
-                    disp.figure_.set_figwidth(35)
-                    disp.figure_.set_figheight(25)
-                    disp.figure_.autofmt_xdate()
-                    plt.tick_params(axis='x', labelsize=10, labelrotation=45, grid_linewidth=5)
-                    plt.title("GBC/without_preprocessed/vector_percentage_mean_20_train")
-                    plt.tight_layout()
-                    plt.savefig('../plots/GBC/without_preprocessed/cf_noAJ')
-                    plt.show()
-
+    saltoA = np.where(shap_y_test.unique() == 'Salto A')[0][0]
+    shap.summary_plot(shap_values[saltoA], shap_x_test, plot_size=(30, 12), title='Salto A')
+    saltoB = np.where(shap_y_test.unique() == 'Salto B')[0][0]
+    shap.summary_plot(shap_values[saltoB], shap_x_test, plot_size=(30, 12), title='Salto B')
+    saltoC = np.where(shap_y_test.unique() == 'Salto C')[0][0]
+    shap.summary_plot(shap_values[saltoC], shap_x_test, plot_size=(30, 12), title='Salto C')
 
 def jump_core_detection(data_train, data_test, pp_list, jump_length=0):
     scores = {}
@@ -293,7 +237,8 @@ def jump_core_detection(data_train, data_test, pp_list, jump_length=0):
                 indexes.append(i * jump_length + to_delete)
         data_test_copy = data_test.drop(indexes)
         X_train, y_train, X_test, y_test = prepare_data(data_train_copy, data_test_copy, pp_list)
-        clf = GradientBoostingClassifier(n_estimators=90, max_depth=3).fit(X_train, y_train)
+        clf = GradientBoostingClassifier(n_estimators=90, max_depth=3)
+        clf.fit(X_train, y_train)
         y_pred = clf.predict(X_test)
         print(f"Accuracy score:  {str(accuracy_score(y_test, y_pred).__round__(4))}")
         score = accuracy_score(y_test, y_pred).__round__(4)
@@ -338,4 +283,17 @@ def jump_core_detection(data_train, data_test, pp_list, jump_length=0):
 if __name__ == '__main__':
     train_data = pd.read_csv('../Sprungdaten_processed/with_preprocessed/percentage/25/vector_percentage_25_train.csv')
     test_data = pd.read_csv('../Sprungdaten_processed/with_preprocessed/percentage/25/vector_percentage_25_test.csv')
-    jump_core_detection(train_data, test_data, [1, 2, 3, 4], 4)
+    # test_data = pd.read_csv('../Sprungdaten_processed/without_preprocessed/percentage/20/vector_AJ_percentage_mean_std_20.csv')
+
+    shap_plots(train_data, test_data, [1, 2, 3, 4], 200, 7)
+
+    # params gb
+    # if dataType == 'with':
+    #     estimators = 200
+    #     depth = 7
+    # vector_percentage_25
+    #
+    # if dataType == 'without':
+    #     estimators = 90
+    #     depth = 3
+    # vector_percentage_mean_20

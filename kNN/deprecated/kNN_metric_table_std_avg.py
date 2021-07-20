@@ -35,8 +35,10 @@ if __name__ == '__main__':
             start_column: str = 'avg_Acc_N_Fil'
             end_column: str = 'std_Gyro_z_Fil' '''
 
-            train_merged = pd.read_csv('../Sprungdaten_processed/with_preprocessed/avg_std_data/avg_std_data_train.csv')
-            test_merged = pd.read_csv('../Sprungdaten_processed/with_preprocessed/avg_std_data/avg_std_data_test.csv')
+            train_merged = pd.read_csv(
+                '../../Sprungdaten_processed/with_preprocessed/avg_std_data/avg_std_data_train.csv')
+            test_merged = pd.read_csv(
+                '../../Sprungdaten_processed/with_preprocessed/avg_std_data/avg_std_data_test.csv')
             start_column: str = 'avg_Acc_N_Fil'
             end_column: str = 'avg_DJump_ABS_I_S4_z LapEnd'
 
