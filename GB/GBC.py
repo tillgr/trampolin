@@ -119,7 +119,7 @@ def sample_x_test(x_test, y_test, num):
     return x, y
 
 
-def gbc_classifier(X_train, y_train, X_test, y_test, estimators: str, depth: str):
+def gbc_classifier(X_train, y_train, X_test, y_test, estimators, depth):
     clf = GradientBoostingClassifier(n_estimators=estimators, max_depth=depth)
 
     # Train the model using the training sets
