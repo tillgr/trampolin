@@ -36,8 +36,8 @@ def sample_x_test(x_test, y_test, num):
 
 if __name__ == '__main__':
 
-    for dataType in ['without']:
-        for aj in ['']:
+    for dataType in ['without']: #['with', 'without']:
+        for aj in ['', 'AJ']:
             print("---")
             print(dataType)
             print(aj)
@@ -170,7 +170,7 @@ if __name__ == '__main__':
                 if aj == '':
                     cm = confusion_matrix(y_test, y_pred, labels=clf.classes_)
                     disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=clf.classes_)
-                    disp.plot(cmap=cmap)
+                    disp.plot(cmap=cmap_cm)
                     disp.figure_.set_figwidth(35)
                     disp.figure_.set_figheight(25)
                     disp.figure_.autofmt_xdate()
@@ -197,7 +197,7 @@ if __name__ == '__main__':
                 if aj == '':
                     cm = confusion_matrix(y_test, y_pred, labels=clf.classes_)
                     disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=clf.classes_)
-                    disp.plot(cmap=cmap)
+                    disp.plot(cmap=cmap_cm)
                     disp.figure_.set_figwidth(35)
                     disp.figure_.set_figheight(25)
                     disp.figure_.autofmt_xdate()
