@@ -164,16 +164,16 @@ def shap_plots(data_train, data_test, pp_list, n_neighbors, weights: str, dist_m
         cm = confusion_matrix(y_test, y_pred, labels=clf.classes_)
         print(y_test)
         pd.DataFrame(cm, columns=y_test.unique(), index=y_test.unique()).to_csv(
-            '../plots/KNN/without_preprocessed/confusion_matrix.csv')  #TODO
+            '../plots/KNN/with_preprocessed/confusion_matrix.csv')  #TODO
         disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=clf.classes_)
         disp.plot(cmap=cmap_cm)
         disp.figure_.set_figwidth(35)
         disp.figure_.set_figheight(25)
         disp.figure_.autofmt_xdate()
         plt.tick_params(axis='x', labelsize=10, labelrotation=45, grid_linewidth=5)
-        plt.title("KNN_without_mean_std_20_ConfusionMatrix")   #TODO
+        plt.title("KNN_with_mean_10_ConfusionMatrix")   #TODO
         plt.tight_layout()
-        plt.savefig('../plots/KNN/without_preprocessed/KNN_without_mean_std_20_ConfusionMatrix')  #TODO
+        plt.savefig('../plots/KNN/with_preprocessed/KNN_with_mean_10_ConfusionMatrix')  #TODO
         plt.show()
 
     else:
@@ -201,20 +201,20 @@ def shap_plots(data_train, data_test, pp_list, n_neighbors, weights: str, dist_m
     shap_values = explainer.shap_values(shap_x_test)
 
 
-    with open('../plots/KNN/without_preprocessed/' + 'shap_data.pkl', 'wb') as f:  #TODO
+    with open('../plots/KNN/with_preprocessed/' + 'shap_data.pkl', 'wb') as f:  #TODO
         pickle.dump([shap_values, shap_x_train, shap_y_train, shap_x_test, shap_y_test], f)
 
-    bar_plots(shap_values, shap_x_test, shap_y_test, save_data='../plots/KNN/without_preprocessed/',   #TODO
+    bar_plots(shap_values, shap_x_test, shap_y_test, save_data='../plots/KNN/with_preprocessed/',   #TODO
               bar='percentual', size=(50, 30))
 
-    bar_plots(shap_values, shap_x_test, shap_y_test, save_data='../plots/KNN/without_preprocessed/',   #TODO
+    bar_plots(shap_values, shap_x_test, shap_y_test, save_data='../plots/KNN/with_preprocessed/',   #TODO
               bar='percentual', size=(50, 30),
               jumps=['Salto A', 'Salto B', 'Salto C', 'Salto rw A', 'Salto rw B', 'Salto rw C', 'Schraubensalto',
                      'Schraubensalto A', 'Schraubensalto C', 'Doppelsalto B', 'Doppelsalto C'],
               name='Saltos')
 
-    bar_plots(shap_values, shap_x_test, shap_y_test, save_data='../plots/KNN/without_preprocessed/',     #TODO
-              name='without_preprocessed', size=(30, 45))
+    bar_plots(shap_values, shap_x_test, shap_y_test, save_data='../plots/KNN/with_preprocessed/',     #TODO
+              name='with_preprocessed', size=(30, 45))
 
     saltoA = np.where(shap_y_test.unique() == 'Salto A')[0][0]
     shap.summary_plot(shap_values[saltoA], shap_x_test, plot_size=(30, 12), title='Salto A')
@@ -308,11 +308,11 @@ def jump_core_detection(data_train, data_test, pp_list, jump_length=0):
 
 
 if __name__ == '__main__':
-    train_data = pd.read_csv('../Sprungdaten_processed/without_preprocessed/percentage/20/vector_percentage_mean_std_20_train.csv')
-    test_data = pd.read_csv('../Sprungdaten_processed/without_preprocessed/percentage/20/vector_percentage_mean_std_20_test.csv')
+    train_data = pd.read_csv('../Sprungdaten_processed/with_preprocessed/percentage/10/vector_percentage_mean_10_train.csv')
+    test_data = pd.read_csv('../Sprungdaten_processed/with_preprocessed/percentage/10/vector_percentage_mean_10_test.csv')
     #test_data = pd.read_csv('../Sprungdaten_processed/without_preprocessed/percentage/20/vector_AJ_percentage_mean_std_20.csv')
 
-    shap_plots(train_data, test_data, [1,2,3,4], 3, 'distance', 'manhattan')
+    shap_plots(train_data, test_data, [1,2,3,4], 3, 'uniform', 'manhattan')
 
     # params knn
     # if dataType == 'with':
@@ -326,19 +326,3 @@ if __name__ == '__main__':
     #     weights = distance
     #     dist_metric = manhattan
     # vector_percentage_mean_std_20
-
-
-
-
-
-
-    # params gb
-    # if dataType == 'with':
-    #     estimators = 200
-    #     depth = 7
-    #
-    #
-    # if dataType == 'without':
-    #     estimators = 90
-    #     depth = 3
-    #
