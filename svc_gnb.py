@@ -246,7 +246,7 @@ def sample_x_test(x_test, y_test, num):
 
 
 def explain_model(train_data: str, test_data: str, feature_start: str, feature_end: str, drops_keywords: list, reverse_drop: bool, output_folder: str, classifier: str,
-                  title: str, load_shap_from_disk):
+                  title: str, load_shap_from_disk: bool):
     """
 
     Explain the built model by shap values in form of plots.
@@ -261,6 +261,8 @@ def explain_model(train_data: str, test_data: str, feature_start: str, feature_e
     reverse_drop: bool - Set to True to drop the features does not contains the keywords.
     output_folder: str - output folder for bar plots
     classifier: str - Classifier type, "SVC" or "GNB"
+    title: str - title for confusion matrix
+    load_shap_from_disk: bool - set to true to load the saved shap values, false to generate new shap values.
 
     """
     train = pd.read_csv("Sprungdaten_processed" + train_data)
@@ -321,14 +323,15 @@ def explain_model(train_data: str, test_data: str, feature_start: str, feature_e
             shap_values = shaps[0]
 
 
-    bar_plots(shap_values, shap_x_test, shap_y_test, bar='percentual', folder=output_folder, save_data=output_folder, size=(55, 30))
-    bar_plots(shap_values, shap_x_test, shap_y_test, bar='summary', folder=output_folder, save_data=output_folder, size=(55, 30))
-    bar_plots(shap_values, shap_x_test, shap_y_test, save_data=output_folder,
+    #bar_plots(shap_values, shap_x_test, shap_y_test, bar='percentual', folder=output_folder, save_data=output_folder, size=(55, 30))
+    #bar_plots(shap_values, shap_x_test, shap_y_test, bar='summary', folder=output_folder, save_data=output_folder, size=(55, 30))
+    bar_plots(shap_values, shap_x_test, shap_y_test, folder=output_folder, save_data=output_folder,
               bar='percentual', size=(50, 30),
               jumps=['Salto A', 'Salto B', 'Salto C', 'Salto rw A', 'Salto rw B', 'Salto rw C', 'Schraubensalto',
                      'Schraubensalto A', 'Schraubensalto C', 'Doppelsalto B', 'Doppelsalto C'],
               name='Saltos')
 
+"""
     shap.summary_plot(shap_values, shap_x_test, plot_type='bar', plot_size=(25, 20), color=ListedColormap(cmap), class_names=shap_y_test.unique(), max_display=20)
     shap.summary_plot(shap_values, shap_x_test, plot_type='bar', plot_size=(25, 20), color=ListedColormap(cmap), class_names=shap_y_test.unique(), max_display=68)
     saltoA = np.where(shap_y_test.unique() == 'Salto A')[0][0]
@@ -337,7 +340,7 @@ def explain_model(train_data: str, test_data: str, feature_start: str, feature_e
     shap.summary_plot(shap_values[saltoB], shap_x_test, plot_size=(25, 15), title='Salto B')
     saltoC = np.where(shap_y_test.unique() == 'Salto C')[0][0]
     shap.summary_plot(shap_values[saltoC], shap_x_test, plot_size=(25, 15), title='Salto C')
-
+"""
 
 def create_confision_matrix(X_test, y_test, clf, output_folder, classifier, title):
     """
@@ -557,13 +560,19 @@ def jump_core_detection(classifier: str, datasets, pp_list, title, jump_length=0
 
 
 if __name__ == '__main__':
-    drops = []
-    train = "/without_preprocessed/percentage/25/vector_percentage_mean_std_25_train.csv"
-    test = "/without_preprocessed/percentage/25/vector_AJ_percentage_mean_std_25.csv"
-    output_folder = 'plots/SVC/without_preprocessed/AJ/'
-    explain_model(train, test, "", "", [], False, output_folder, "SVC", "without_vector_percentage_mean_25", True)
+    """
+    train = "/with_preprocessed/percentage/10/vector_percentage_mean_std_10_train.csv"
+    test = "/with_preprocessed/percentage/10/vector_percentage_mean_std_10_test.csv"
+    output_folder = 'plots/GNB/with_preprocessed/only_preprocessed/'
+    explain_model(train, test, "", "", ["DJump"], True, output_folder, "GNB", "only_preprocessed_vector_percentage_mean_std_10", True)
     #datasets = ["Sprungdaten_processed/with_preprocessed/percentage/10/vector_percentage_mean_std_10"]
     #title = 'GNB with pp: percentage_mean_std_10'
     #jump_core_detection("GNB", datasets, [1, 2, 3, 4], title, 10)
+"""
+    train = "/with_preprocessed/percentage/20/vector_percentage_mean_20_train.csv"
+    test = "/with_preprocessed/percentage/20/vector_percentage_mean_20_test.csv"
+    output_folder = 'plots/SVC/with_preprocessed/only_preprocessed/'
+    explain_model(train, test, "", "", ["DJump"], True, output_folder, "SVC",
+                  "only_preprocessed_vector_percentage_mean_20", True)
 
 
