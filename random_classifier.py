@@ -34,11 +34,15 @@ def classify(trainings_data, test_data, output='mean', loops=None):
 
     Parameters
     ----------
-    trainings_data: Dataframe - train data set
-    test_data: Dataframe - test data set
-    output: str - 'mean' or 'best', default='mean';
+    trainings_data: pandas.Dataframe
+        train data set
+    test_data: pandas.Dataframe
+        test data set
+    output: str
+        'mean' or 'best', default='mean';
         function will return best or mean Accuracy, Youden and F1 Score
-    loops: int; how often the classifier should run, to get the best and mean score
+    loops: int
+        how often the classifier should run, to get the best and mean score
 
     :return: acc - Accuracy, youden - Youden , f1 - F1 Score
     """
@@ -105,7 +109,8 @@ def get_target(test_data):
 
     Parameters
     ----------
-    test_data: Dataframe - test data for creating distribution list
+    test_data: pandas.Dataframe
+        test data for creating distribution list
 
     :return: labels - list of jumps
     """
@@ -121,8 +126,10 @@ def metrics(label, c):
 
     Parameters
     ----------
-    label: list - y test (targets)
-    c: list - predicted labels
+    label: list
+        y test (targets)
+    c: list
+        predicted labels
 
     :return: mean_prec - Precision, mean_rec - Recall, mean_f - F1 Score, mean_youden - Youden Score
     """
@@ -170,7 +177,8 @@ def distribution(data):
 
     Parameters
     ----------
-    data: Dataframe - Data for the distribution
+    data: pandas.Dataframe
+        Data for the distribution
 
     :return: Series with jump type as index
     """
@@ -184,9 +192,12 @@ def save_as_xlsx(data, folder, name):
 
     Parameters
     ----------
-    data: Series or Dataframe - data that should be saved
-    folder: str - path as String, where data should be saved
-    name: str - name for the file
+    data: Series or pandas.Dataframe
+        data that should be saved
+    folder: str
+        path as String, where data should be saved
+    name: str
+        name for the file
 
     :return:
     """
@@ -201,14 +212,22 @@ def print_progress_bar(iteration, total, prefix='', suffix='', decimals=1, lengt
 
     Parameters
     ----------
-    iteration: int - current iteration (Required)
-    total: int - total iterations(Required)
-    prefix: str - prefix string (Optional)
-    suffix: str - suffix string (Optional)
-    decimals: int - positive number of decimals in percent complete (Optional)
-    length: int - character length of bar (Optional)
-    fill: str - bar fill character (Optional)
-    print_end :str - end character (e.g. "\r", "\r\n")(Optional)
+    iteration: int
+        current iteration (Required)
+    total: int
+        total iterations(Required)
+    prefix: str
+        prefix string (Optional)
+    suffix: str
+        suffix string (Optional)
+    decimals: int
+        positive number of decimals in percent complete (Optional)
+    length: int
+        character length of bar (Optional)
+    fill: str
+        bar fill character (Optional)
+    print_end :str
+        end character (e.g. "\r", "\r\n")(Optional)
 
     :return:
     """

@@ -16,7 +16,23 @@ import holoviews as hv
 import pickle
 
 
-def prepare_data(data_train, data_test, pp_list):
+def prepare_data(data_train, data_test, pp_list, only_pp=None):
+    """
+    Prepares the data for the CNN by reshaping the X... data to a 4-dim ndarray and one-hot-encoding the y... data
+
+    Parameters
+    ----------
+    data_train : pandas.Dataframe
+        dataframe read from .csv file
+    data_test : pandas.Dataframe
+        dataframe read from .csv file
+    pp_list : list
+        a list with values from 1 to 4: [1, 2, 3, 4]. Corresponds to the blocks of preprocessed data. 1: first 9 columns, 2, 3, 4: 12 columns each
+    only_pp : None or any
+        if not None: drops all columns except for the preprocessed data
+
+    :return: x_train, y_train, x_test, y_test, jump_data_length, num_columns, num_classes
+    """
     first_djumps = set([col for col in data_train.columns if 'DJump' in col]) - set(
         [col for col in data_train.columns if 'DJump_SIG_I_S' in col]) \
                    - set([col for col in data_train.columns if 'DJump_ABS_I_S' in col]) - set(
@@ -48,6 +64,8 @@ def prepare_data(data_train, data_test, pp_list):
         y_train.append(subframe['Sprungtyp'].unique()[0])
         # 'Time', 'TimeInJump',
         subframe = subframe.drop(['SprungID', 'Sprungtyp'], axis=1)
+        if only_pp is not None:
+            subframe = subframe.drop([col for col in subframe.columns if 'DJump' not in col], axis=1)
         x_train.append(subframe)
         print("Preparing train data: " + str(len(x_train)))
 
@@ -55,6 +73,8 @@ def prepare_data(data_train, data_test, pp_list):
         subframe = data_test[data_test['SprungID'] == id]
         y_test.append(subframe['Sprungtyp'].unique()[0])
         subframe = subframe.drop(['SprungID', 'Sprungtyp'], axis=1)
+        if only_pp is not None:
+            subframe = subframe.drop([col for col in subframe.columns if 'DJump' not in col], axis=1)
         x_test.append(subframe)
         print("Preparing test data: " + str(len(x_test)))
 
@@ -71,7 +91,23 @@ def prepare_data(data_train, data_test, pp_list):
     return x_train, y_train, x_test, y_test, jump_data_length, num_columns, num_classes
 
 
-def prepare_data_oneliner(data_train, data_test, pp_list):
+def prepare_data_oneliner(data_train, data_test, pp_list, only_pp=None):
+    """
+    Prepares the data for the DFF and one-hot-encoding of y... data
+
+    Parameters
+    ----------
+    data_train : pandas.Dataframe
+        dataframe read from .csv file
+    data_test : pandas.Dataframe
+        dataframe read from .csv file
+    pp_list : list
+        a list with values from 1 to 4: [1, 2, 3, 4]. Corresponds to the blocks of preprocessed data. 1: first 9 columns, 2, 3, 4: 12 columns each
+    only_pp : None or any
+        if not None: drops all columns except for the preprocessed data
+
+    :return: x_train, y_train, x_test, y_test, num_columns, num_classes
+    """
     first_djumps = set([col for col in data_train.columns if 'DJump' in col]) - set(
         [col for col in data_train.columns if 'DJump_SIG_I_S' in col]) \
                    - set([col for col in data_train.columns if 'DJump_ABS_I_S' in col]) - set(
@@ -94,11 +130,10 @@ def prepare_data_oneliner(data_train, data_test, pp_list):
     x_test = data_test.drop('Sprungtyp', axis=1)
     x_test = x_test.drop(['SprungID'], axis=1)
 
-    #for Djump only
-    """
-    x_train = x_train.drop([col for col in x_train.columns if 'DJump' not in col], axis=1)
-    x_test = x_test.drop([col for col in x_test.columns if 'DJump' not in col], axis=1)
-    """
+    if only_pp is not None:
+        x_train = x_train.drop([col for col in x_train.columns if 'DJump' not in col], axis=1)
+        x_test = x_test.drop([col for col in x_test.columns if 'DJump' not in col], axis=1)
+
 
     num_columns = len(x_train.columns)
 
@@ -114,6 +149,34 @@ def prepare_data_oneliner(data_train, data_test, pp_list):
 
 
 def build_model(jump_data_length, num_columns, num_classes, c, kernel, pool, d, act_func, loss, optim):
+    """
+    Builds a CNN model.
+
+    Parameters
+    ----------
+    jump_data_length : int
+        how many rows for each jump. Return value of prepare_data_CNN
+    num_columns : int
+        how many columns exist. Return value of prepare_data_CNN
+    num_classes : int
+        how many classes exist. Return value of prepare_data_CNN
+    conv : int
+        how many extra convolutional layers to add. 1 is the base
+    kernel : int
+        kernel size of convolutional layers.
+    pool : int
+        pool size of MaxPooling layers.
+    dense : int
+        how many dense layers to add.
+    act_func : str
+        activation function for all layers except the last
+    loss : str
+        loss
+    optim : str
+        optimizer
+
+    :return: model
+    """
     first_input = Input(shape=(jump_data_length, num_columns, 1), name="first_input")
     x = Conv2D(32, kernel_size=(kernel, kernel), padding="same", activation=act_func)(first_input)
     for i in range(c):
@@ -134,6 +197,29 @@ def build_model(jump_data_length, num_columns, num_classes, c, kernel, pool, d, 
 
 def build_model_grid(jump_data_length=20, num_columns=16, num_classes=43, c=1, act_func='tanh',
                      loss='categorical_crossentropy', optim='Nadam'):
+    """
+    Nearly the same as build_model_CNN, just a sequential model. Have to use this for grid search.
+
+    Parameters
+    ----------
+    jump_data_length : int
+        how many rows for each jump. Return value of prepare_data_CNN
+    num_columns : int
+        how many columns exist. Return value of prepare_data_CNN
+    num_classes : int
+        how many classes exist. Return value of prepare_data_CNN
+    c : int
+        how many extra convolutional layers to add. 1 is the base
+    act_func : str
+        activation function for all layers except the last
+    loss : str
+        loss
+    optim : str
+        optimizer
+
+    :return: sequential model
+    """
+
     model = Sequential()
     model.add(Conv2D(32, kernel_size=(3, 3), padding="same", activation=act_func,
                      input_shape=(jump_data_length, num_columns, 1)))
@@ -151,17 +237,48 @@ def build_model_grid(jump_data_length=20, num_columns=16, num_classes=43, c=1, a
     return model
 
 
-def grid_search_build(x_train, x_test, y_train, y_test, model, param_grid, cv=10, scoring_fit='neg_mean_squared_error'):
-    gs = GridSearchCV(estimator=model, param_grid=param_grid, cv=cv, n_jobs=-1, scoring=scoring_fit, verbose=2)
-    fitted_model = gs.fit(x_train, y_train)
-
-    pred = fitted_model.predict(x_test)
-
-    return fitted_model, pred
-
-
 def run_multiple_times(jump_data_length, num_columns, num_classes, runs, conv, kernel, pool, dense, act_func, loss,
                        optim, epochs, x_train, y_train, x_test, y_test):
+    """
+    Builds multiple CNN models and chooses the best one according to accuracy
+
+    Parameters
+    ----------
+    jump_data_length : int
+        how many rows for each jump. Return value of prepare_data_CNN
+    num_columns : int
+        how many columns exist. Return value of prepare_data_CNN
+    num_classes : int
+        how many classes exist. Return value of prepare_data_CNN
+    runs : int
+        how many models to train
+    conv : int
+        how many extra convolutional layers to add. 1 is the base
+    kernel : int
+        kernel size of convolutional layers.
+    pool : int
+        pool size of MaxPooling layers.
+    dense : int
+        how many dense layers to add.
+    act_func : str
+        activation function for all layers except the last
+    loss : str
+        loss
+    optim : str
+        optimizer
+    epochs : int
+        how many epochs to train each model
+    x_train : pandas.Dataframe
+        prepared data
+    y_train : pandas.Dataframe
+        prepared data
+    x_test : pandas.Dataframe
+        prepared data
+    y_test : pandas.Dataframe
+        prepared data
+
+    :return: best model of all runs
+    """
     best_score = 0
     mean_score = 0
 
@@ -198,6 +315,24 @@ def run_multiple_times(jump_data_length, num_columns, num_classes, runs, conv, k
 
 
 def build_model_oneliner(num_columns, num_classes, act_func, loss, optim):
+    """
+    Builds a DFF model.
+
+    Parameters
+    ----------
+    num_columns : int
+        how many columns exist. Return value of prepare_data_DFF
+    num_classes : int
+        how many classes exist. Return value of prepare_data_DFF
+    act_func : str
+        activation function
+    loss : str
+        loss
+    optim : str
+        optimizer
+
+    :return: model
+    """
     first_input = Input(shape=(num_columns,), name="first_input")
     x = Dense(128, activation=act_func)(first_input)
     x = Dense(256, activation=act_func)(x)
@@ -218,6 +353,36 @@ def build_model_oneliner(num_columns, num_classes, act_func, loss, optim):
 
 def run_multiple_times_oneliner(num_columns, num_classes, runs, act_func, loss, optim, epochs, x_train, y_train, x_test,
                                 y_test):
+    """
+    Builds multiple DFF models and chooses the best one according to accuracy
+
+    Parameters
+    ----------
+    num_columns : int
+        how many columns exist. Return value of prepare_data_DFF
+    num_classes : int
+        how many classes exist. Return value of prepare_data_DFF
+    runs : int
+        how many models to train
+    act_func : str
+        activation function for all layers except the last
+    loss : str
+        loss
+    optim : str
+        optimizer
+    epochs : int
+        how many epochs to train each model
+    x_train : pandas.Dataframe
+        prepared data
+    y_train : pandas.Dataframe
+        prepared data
+    x_test : pandas.Dataframe
+        prepared data
+    y_test : pandas.Dataframe
+        prepared data
+
+    :return: best model of all runs
+    """
     best_score = 0
     mean_score = 0
 
@@ -252,6 +417,22 @@ def run_multiple_times_oneliner(num_columns, num_classes, runs, act_func, loss, 
 
 
 def sample_x_test(x_test, y_test, num, cnn=False):
+    """
+    Samples data by retrieving only a certain number of each jump.
+
+    Parameters
+    ----------
+    :param x_test : pandas.Dataframe
+        can be x_test and x_train
+    :param y_test : pandas.Dataframe
+        can be y_test and y_train
+    :param num : int
+        number of each jump to retrieve
+    :param cnn : bool
+        check True for CNN
+
+    :return: sampled data Dataframe
+    """
     if cnn:
         y = y_test.idxmax(axis=1)
         counts = y.value_counts()
@@ -305,6 +486,18 @@ def sample_x_test(x_test, y_test, num, cnn=False):
 
 
 def get_index(jump_list, y_test):
+    """
+    Get the indexes for all jumps in the jump_list
+
+    Parameters
+    ----------
+    jump_list: list
+        list with jump names
+    y_test: pandas.Dataframe
+        y_test
+
+    :return: a list with indexes of all jumps in the jump_list
+    """
     index_list = []
     for jump in jump_list:
         index_list.extend(y_test.where(y_test == jump).dropna().index.tolist())
@@ -312,6 +505,24 @@ def get_index(jump_list, y_test):
 
 
 def jump_core_detection(modeltype, data_train, data_test, pp_list, jump_length=0):
+    """
+    Trains many different models with differently cut data. We cut from back to front, front to back, and from both sides
+
+    Parameters
+    ----------
+    modeltype : str
+        'CNN' or 'DFF'
+    data_train : pandas.Dataframe
+        dataframe read from .csv file
+    data_test : pandas.Dataframe
+        dataframe read from .csv file
+    pp_list : list
+        a list with values from 1 to 4: [1, 2, 3, 4]. Corresponds to the blocks of preprocessed data. 1: first 9 columns, 2, 3, 4: 12 columns each
+    jump_length: int
+        how many datapoints for jump
+    :return: dictionary with scores of all trained models
+    """
+
     if modeltype == 'dff':
         jump_length = int(len(list(data_test.drop([col for col in data_train.columns if 'DJump' in col], axis=1)
                                    .drop(['SprungID', 'Sprungtyp'], axis=1).columns)) \
@@ -416,9 +627,18 @@ def jump_core_detection(modeltype, data_train, data_test, pp_list, jump_length=0
 
 def create_colormap(shap_y_test, shap_values=None):
     """
-    takes values and creates unique colormap, so that each jump, have always the sam color
-    :param shap_values: output from explainer.shap_values(shap_x_test)
-    :param shap_y_test: sampled y_test or single string jump
+    Takes values and creates unique colormap, so that each jump, always has the same color.
+    Function is needed in bar_plots for 'single' and 'summary_color' bar plots
+    -> contains color dict for all jumps, that are used until now, so must be updated if more jumps available.
+    An overview of the colors can be found in cmap.pdf
+
+    Parameters
+    ----------
+    shap_values : list of arrays
+        output from explainer.shap_values(shap_x_test); If shap_values are None, shap_y_test must be a string.
+    shap_y_test : pandas.Dataframe
+        sampled y_test or single string jump
+
     :return: colormap or single color if shap_values=None
     """
     color_dict = {
@@ -480,17 +700,33 @@ def create_colormap(shap_y_test, shap_values=None):
     return cmap
 
 
-def bar_plots(shap_values, shap_x_test, shap_y_test, save_data, bar='summary', size=None, jumps=None, folder=None, name=None, max_display=None):
+def bar_plots(shap_values, shap_x_test, shap_y_test, bar='summary', size=None, jumps=None, folder=None, name=None, max_display=None):
     """
-    :param shap_values:
-    :param shap_x_test:
-    :param shap_y_test:
-    :param bar: different bar plots, can be 'summary', 'single' or 'percentual'
-    :param size: tuple -> for individual plot size
-    :param jumps: for 'single' and 'percentual' you can imput a list with the jump names, for that bar plots should be created
-    :param folder: path, where the plots should be saved, whens its empty, than plots will be shown and not be saved
-    :param name: for saving the plot you can choose an other name
-    :param max_display: int -> for summary plot, if its none, than all features will be display
+    Function used to plot different bar charts. Used for global feature importance, global feature importance per class,
+    feature importance per class and percentual feature importance across the jumps
+
+    Parameters
+    ----------
+
+    shap_values : list of arrays
+        output from explainer.shap_values(shap_x_test)
+    shap_x_test : pandas.Dataframe
+        sampled x data
+    shap_y_test : pandas.Dataframe
+        sampled y data
+    bar : str
+        'summary', 'summary_color', 'single' or 'percentual', default: 'summary'; different bar plots
+    size : tuple (int, int)
+        for individual plot size
+    jumps : list
+        for 'single' and 'percentual' you can input a list with the jump names, for which a bar plot should be created
+    folder : str
+        path, where the plots should be saved, when its empty, plots will be shown and not be saved
+    name : str
+        for saving the plot you can choose an other name
+    max_display : int
+        for 'summary' and 'summary_color' plots, if its none, than all features will be displayed
+
     :return:
     """
     if size is None:
@@ -555,10 +791,10 @@ def bar_plots(shap_values, shap_x_test, shap_y_test, save_data, bar='summary', s
             sum_values = np.sum(values)
             jump_dict[jump] = [(v / sum_values) * 100 for v in values]
 
-
-        #
-        with open(save_data+'percentual_plot' + name + '.txt', 'w') as f:
-            print(jump_dict, file=f)
+        # for saving the data, when plot will be saved
+        if folder is not None:
+            with open(folder+'percentual_plot' + name + '.txt', 'w') as f:
+                print(jump_dict, file=f)
         # creates the plot
         labels = list(jump_dict.keys())
         data = np.array(list(jump_dict.values()))
@@ -650,15 +886,19 @@ def bar_plots(shap_values, shap_x_test, shap_y_test, save_data, bar='summary', s
 
 def main():
     neural_network = 'dff'  # 'dff'  'cnn'
-    run_modus = ''  # 'multi' 'grid' 'core'
+    run_modus = 'load'  # 'multi' 'grid' 'core' or 'load'
     run = 100  # for multi runs or how often random grid search runs
-    data_train = pd.read_csv(
-        "Sprungdaten_processed/without_preprocessed/percentage/20/vector_percentage_mean_std_20_train.csv")
-    data_test = pd.read_csv(
-        "Sprungdaten_processed/without_preprocessed/percentage/20/vector_AJ_percentage_mean_std_20.csv")
+    data = 'without' # or 'without' or 'only'
+    percentage = '20'
+    dataset = 'percentage_mean_std'
     pp_list = [3]
+    saving = False #or False
 
     if neural_network == 'cnn':
+        data_train = pd.read_csv(
+            "Sprungdaten_processed/" + data + "_preprocessed/percentage/" + percentage + "/" + dataset + "_" + percentage +"_train.csv")
+        data_test = pd.read_csv(
+            "Sprungdaten_processed/" + data + "_preprocessed/percentage/" + percentage + "/" + dataset + "_" + percentage +"_test.csv")
         x_train, y_train, x_test, y_test, jump_data_length, num_columns, num_classes = prepare_data(data_train,
                                                                                                     data_test, pp_list)
         if run_modus == 'multi':
@@ -680,7 +920,17 @@ def main():
         if run_modus == 'core':
             jump_core_detection('cnn', data_train, data_test, pp_list, jump_data_length)
 
+        if run_modus == 'load':
+            if data == 'with':
+                model = keras.models.load_model("models/CNN_with_mean_std_20")
+            if data == 'without':
+                model = keras.models.load_model("models/CNN_without_mean_5")
+
     if neural_network == 'dff':
+        data_train = pd.read_csv(
+            "Sprungdaten_processed/" + data + "_preprocessed/percentage/" + percentage + "/vector_" + dataset + "_" + percentage + "_train.csv")
+        data_test = pd.read_csv(
+            "Sprungdaten_processed/" + data + "_preprocessed/percentage/" + percentage + "/vector_" + dataset + "_" + percentage + "_test.csv")
         x_train, y_train, x_test, y_test, num_columns, num_classes = prepare_data_oneliner(data_train, data_test,
                                                                                            pp_list)
         if run_modus == 'multi':
@@ -700,12 +950,20 @@ def main():
             print(grid_result.best_params_)
         if run_modus == 'core':
             jump_core_detection('dff', data_train, data_test, pp_list)
+        if run_modus == 'load':
+            if data == 'with':
+                model = keras.models.load_model("models/DFF_with_mean_std_25")
+            if data == 'without':
+                model = keras.models.load_model("models/DFF_without_mean_std_20")
 
-    # model.save("models/DFF_only_pp_")
-    model = keras.models.load_model("models/DFF_without_mean_std_20")
+    # for saving model
+    if saving:
+        keras.models.save_model(model, "models/" + neural_network + "_" + data + "_" + dataset + "_" + percentage)
+
     # model.summary()
-    # model.evaluate(x_test, y_test, verbose=1)
+
     shap.initjs()
+
     # colormap
     cmap = ['#393b79', '#5254a3', '#6b6ecf', '#9c9ede', '#637939', '#8ca252', '#b5cf6b', '#cedb9c', '#8c6d31',
             '#bd9e39', '#e7ba52',
@@ -726,113 +984,105 @@ def main():
     cmap_cm_AJ = ['#ffffff', '#048166']
     cmap_cm_AJ = ListedColormap(cmap_cm_AJ)
 
-    # ListedColormap(process_cmap('winter'))
-
-    #"""
+    if neural_network == 'dff':
     # DFF
+        if run_modus == 'load':
+            with open('plots/DFF/' + data + '_preprocessed/shap_data.pkl', 'rb') as f:
+                shap_values, shap_x_train, shap_y_train, shap_x_test, shap_y_test = pickle.load(f)
+        else:
+            shap_x_test, shap_y_test = sample_x_test(x_test, y_test, 3)
+            shap_x_train, shap_y_train = sample_x_test(x_train, y_train, 6)
+            # background = shap.sample(shap_x_train, 400, random_state=1)
+            explainer = shap.KernelExplainer(model, shap_x_train)
+            shap_values = explainer.shap_values(shap_x_test)
 
-    shap_x_test, shap_y_test = sample_x_test(x_test, y_test, 3)
-    shap_x_train, shap_y_train = sample_x_test(x_train, y_train, 6)
-    # background = shap.sample(shap_x_train, 400, random_state=1)
-    explainer = shap.KernelExplainer(model, shap_x_train)
-    shap_values = explainer.shap_values(shap_x_test)
+        bar_cm = create_colormap(shap_y_test, shap_values)
 
-    bar_cm = create_colormap(shap_y_test, shap_values)
+        if saving:
 
-    with open('plots/DFF/without_preprocessed/AJ/' + 'shap_data_AJ.pkl', 'wb') as f:  # Python 3: open(..., 'wb')
-        pickle.dump([shap_values, shap_x_train, shap_y_train, shap_x_test, shap_y_test], f)
+            with open('plots/DFF/' + data + '_preprocessed/' + 'shap_data_' + dataset + '.pkl', 'wb') as f:  # Python 3: open(..., 'wb')
+                pickle.dump([shap_values, shap_x_train, shap_y_train, shap_x_test, shap_y_test], f)
 
-    #"""
-    #with open('plots/DFF/with_preprocessed/only_preprocessed/shap_data.pkl', 'rb') as f:
-        #shap_values, shap_x_test, shap_y_test, shap_x_train, shap_y_train = pickle.load(f)
-    """
+        # Beeswarm plots
+        saltoA = np.where(shap_y_test.unique() == 'Salto A')[0][0]
+        shap.summary_plot(shap_values[saltoA], shap_x_test, plot_size=(25, 15), title='Salto A')
+        saltoB = np.where(shap_y_test.unique() == 'Salto B')[0][0]
+        shap.summary_plot(shap_values[saltoB], shap_x_test, plot_size=(25, 15), title='Salto B')
+        saltoC = np.where(shap_y_test.unique() == 'Salto C')[0][0]
+        shap.summary_plot(shap_values[saltoC], shap_x_test, plot_size=(25, 15), title='Salto C')
 
+        # percentage plots
+        bar_plots(shap_values, shap_x_test, shap_y_test, bar='percentual')
 
-    """
-    """
-    
-    shap.summary_plot(shap_values, shap_x_test, plot_type='bar', plot_size=(25, 20), color=bar_cm, class_names=shap_y_test.unique(), max_display=20)
-    shap.summary_plot(shap_values, shap_x_test, plot_type='bar', plot_size=(25, 20), color=ListedColormap('#616161'), class_names=shap_y_test.unique(), max_display=len(shap_x_test.columns))
-    bar_plots(shap_values, shap_x_test, shap_y_test)
-    """
-    """
-    saltoA = np.where(shap_y_test.unique() == 'Salto A')[0][0]
-    shap.summary_plot(shap_values[saltoA], shap_x_test, plot_size=(25, 15), title='Salto A')
+        bar_plots(shap_values, shap_x_test, shap_y_test, bar='percentual',
+                  jumps=['Salto A', 'Salto B', 'Salto C', 'Salto rw A', 'Salto rw B', 'Salto rw C', 'Schraubensalto',
+                         'Schraubensalto A', 'Schraubensalto C', 'Doppelsalto B', 'Doppelsalto C'], name='Saltos')
 
-    saltoB = np.where(shap_y_test.unique() == 'Salto B')[0][0]
-    shap.summary_plot(shap_values[saltoB], shap_x_test, plot_size=(25, 15), title='Salto B')
-    saltoC = np.where(shap_y_test.unique() == 'Salto C')[0][0]
-    shap.summary_plot(shap_values[saltoC], shap_x_test, plot_size=(25, 15), title='Salto C')
-    """
-    """
+    if neural_network == 'cnn':
 
-    # creating vor each jump a bar chart
-    for jump in shap_y_test.unique():
-        color_string = create_colormap(jump)
-        shap.summary_plot(shap_values[np.where(shap_y_test.unique() == jump)[0][0]].__abs__(), shap_x_test, plot_type='bar', color=color_string, plot_size=(20,20), show=False)
-        plt.show()
-        # plt.savefig('plots/DFF/with_preprocessed/jump_analysis/' + jump.replace('/', '-') + '.png')
-        plt.clf()
-    """
-    #"""
-    bar_plots(shap_values, shap_x_test, shap_y_test, bar='percentual', save_data='plots/DFF/without_preprocessed/AJ/')
+        shap_x_test, shap_y_test = sample_x_test(x_test, y_test, 3, cnn=True)
+        shap_x_train, shap_y_train = sample_x_test(x_train, y_train, 6, cnn=True)
 
-    bar_plots(shap_values, shap_x_test, shap_y_test, bar='percentual', jumps=['Salto A', 'Salto B', 'Salto C', 'Salto rw A', 'Salto rw B', 'Salto rw C', 'Schraubensalto', 'Schraubensalto A', 'Schraubensalto C',  'Doppelsalto B', 'Doppelsalto C'], name='Saltos', save_data='plots/DFF/without_preprocessed/AJ/')
-    # bar_plots(shap_values, shap_x_test, shap_y_test)
-    #"""
+        parts = {1: ['1 3/4 Salto vw B', '1 3/4 Salto vw C', '1/2 ein 1/2 aus C', '3/4 Salto rw A', '3/4 Salto vw A',
+                     'Baby- Fliffis C'],
+                 2: ['Barani A', 'Barani B', 'Barani C', 'Cody C', 'Rudi'],
+                 3: ['Bauchsprung', 'Bücksprung', 'Grätschwinkel', 'Hocksprung', 'Von Bauch in Stand', 'Strecksprung'],
+                 4: ['Fliffis B', 'Fliffis C', 'Fliffis aus B', 'Fliffis aus C', 'Fliffis- Rudi B', 'Fliffis- Rudi C'],
+                 5: ['Halb ein Triffis C', 'Triffis B', 'Triffis C'],
+                 6: ['Salto A', 'Salto B', 'Salto C', 'Salto rw A', 'Salto rw B', 'Salto rw C'],
+                 7: ['Schraubensalto', 'Schraubensalto A', 'Schraubensalto C', 'Doppelsalto B', 'Doppelsalto C'],
+                 8: ['Voll- ein 1 3/4 Salto vw C', 'Voll- ein- Rudi- aus B', 'Voll- ein- halb- aus B',
+                     'Voll- ein- voll- aus A', 'Voll- ein- voll- aus B', 'Voll- ein- voll- aus C']}
 
-    # CNN
-    """
-    shap_x_test, shap_y_test = sample_x_test(x_test, y_test, 3, cnn=True)
-    shap_x_train, shap_y_train = sample_x_test(x_train, y_train, 6, cnn=True)
+        for j in [1, 2, 3, 4, 5, 6, 7, 8]:
+            index_list = get_index(parts[j], shap_y_test)
+            to_explain = shap_x_test[index_list]
+            explainer = shap.DeepExplainer(model, shap_x_train)
+            shap_values, indexes = explainer.shap_values(to_explain, ranked_outputs=4, check_additivity=False)
+            d = dict(enumerate(np.array(y_test.columns).flatten(), 0))
+            index_names = np.vectorize(lambda i: d[i])(indexes)
 
-    parts = {1: ['1 3/4 Salto vw B', '1 3/4 Salto vw C', '1/2 ein 1/2 aus C', '3/4 Salto rw A', '3/4 Salto vw A', 'Baby- Fliffis C'],
-             2: ['Barani A', 'Barani B', 'Barani C', 'Cody C', 'Rudi'],
-             3: ['Bauchsprung', 'Bücksprung', 'Grätschwinkel', 'Hocksprung', 'Von Bauch in Stand', 'Strecksprung'],
-             4: ['Fliffis B', 'Fliffis C', 'Fliffis aus B', 'Fliffis aus C', 'Fliffis- Rudi B', 'Fliffis- Rudi C'],
-             5: ['Halb ein Triffis C', 'Triffis B', 'Triffis C'],
-             6: ['Salto A', 'Salto B', 'Salto C', 'Salto rw A', 'Salto rw B', 'Salto rw C'],
-             7: ['Schraubensalto', 'Schraubensalto A', 'Schraubensalto C',  'Doppelsalto B', 'Doppelsalto C'],
-             8: ['Voll- ein 1 3/4 Salto vw C', 'Voll- ein- Rudi- aus B', 'Voll- ein- halb- aus B', 'Voll- ein- voll- aus A', 'Voll- ein- voll- aus B', 'Voll- ein- voll- aus C']}
+            with open('plots/CNN/without_preprocessed/shap_data' + str(j) + '.pkl', 'wb') as f:
+                pickle.dump([shap_values, to_explain, index_names], f)
 
-    for j in [1, 2, 3, 4, 5, 6, 7, 8]:
-        index_list = get_index(parts[j], shap_y_test)
-        to_explain = shap_x_test[index_list]
-        explainer = shap.DeepExplainer(model, shap_x_train)
-        shap_values, indexes = explainer.shap_values(to_explain, ranked_outputs=4, check_additivity=False)
-        d = dict(enumerate(np.array(y_test.columns).flatten(), 0))
-        index_names = np.vectorize(lambda i: d[i])(indexes)
+            shap.image_plot(shap_values, to_explain, index_names, show=False)
+            # plt.savefig('plots/CNN/with_preprocessed/CNN_with_mean_std_20_part' + str(j) + '.png')
+        """
+        # Shap for specific Class
+        i = y_test.index[y_test['Salto C'] == 1]
+        pd.DataFrame(model.predict(x_test[i]), columns=y_test.columns).idxmax(axis=1)
+        background = x_train[np.random.choice(x_train.shape[0], 100, replace=False)]
+        e = shap.DeepExplainer(model, background)
+        shap_values = e.shap_values(x_test[i])
+        shap.image_plot(shap_values, -x_test[i])  # , labels=list(y_test.columns))
+        """
 
-        with open('plots/CNN/without_preprocessed/shap_data' + str(j) + '.pkl', 'wb') as f:
-            pickle.dump([shap_values, to_explain, index_names], f)
-
-        shap.image_plot(shap_values, to_explain, index_names, show=False)
-        #plt.savefig('plots/CNN/with_preprocessed/CNN_with_mean_std_20_part' + str(j) + '.png')
-    """
-    """
-    # Shap for specific Class
-    i = y_test.index[y_test['Salto C'] == 1]
-    pd.DataFrame(model.predict(x_test[i]), columns=y_test.columns).idxmax(axis=1)
-    background = x_train[np.random.choice(x_train.shape[0], 100, replace=False)]
-    e = shap.DeepExplainer(model, background)
-    shap_values = e.shap_values(x_test[i])
-    shap.image_plot(shap_values, -x_test[i])  # , labels=list(y_test.columns))
-    """
-
-    #"""
     # Confusion matrix to find mistakes in classification
-    cm = sklearn.metrics.confusion_matrix(y_test.idxmax(axis=1), pd.DataFrame(model.predict(x_test), columns=y_test.columns).idxmax(axis=1))
-    # save data:
-    pd.DataFrame(cm, columns=y_test.columns, index=y_test.columns).to_csv('plots/DFF/without_preprocessed/AJ/confusion_matrix_AJ.csv')
+    cm = sklearn.metrics.confusion_matrix(y_test.idxmax(axis=1),
+                                          pd.DataFrame(model.predict(x_test), columns=y_test.columns).idxmax(
+                                              axis=1))
+    if saving:
+        # save data:
+        if neural_network == 'dff':
+            pd.DataFrame(cm, columns=y_test.columns, index=y_test.columns).to_csv(
+                'plots/DFF/' + data + '_preprocessed/confusion_matrix_' + dataset + '.csv')
+        if neural_network == 'cnn':
+            pd.DataFrame(cm, columns=y_test.columns, index=y_test.columns).to_csv(
+                'plots/CNN/' + data + '_preprocessed/confusion_matrix_' + dataset + '.csv')
 
     disp = sklearn.metrics.ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=y_test.columns)
     disp.plot(cmap=cmap_cm)
     disp.figure_.set_figwidth(35)
     disp.figure_.set_figheight(25)
     disp.figure_.autofmt_xdate()
-    plt.show()
-    #plt.savefig('CNN_confusion_matrix_flag.png')
-    #"""
+    if saving:
+        if neural_network == 'dff':
+            plt.savefig('plots/DFF/DFF_confusion_matrix_' + dataset + '.png')
+        if neural_network == 'cnn':
+            plt.savefig('plots/CNN/CNN_confusion_matrix_' + dataset + '.png')
+
+    else:
+        plt.show()
 
     return
 
