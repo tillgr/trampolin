@@ -15,6 +15,7 @@ from neural_networks import bar_plots
 from sklearn.metrics import confusion_matrix
 from matplotlib import pyplot as plt
 
+
 def prepare_data(data_train, data_test, pp_list):
     first_djumps = set([col for col in data_train.columns if 'DJump' in col]) - set(
         [col for col in data_train.columns if 'DJump_SIG_I_S' in col]) \
@@ -52,6 +53,7 @@ def prepare_data(data_train, data_test, pp_list):
     y_test = data_test['Sprungtyp']
 
     return X_train, y_train, X_test, y_test
+
 
 def random_search_all_parameters(data_train, data_test, pp_list):
     X_train, y_train, X_test, y_test = prepare_data(data_train, data_test, pp_list)
@@ -109,7 +111,7 @@ def sample_x_test(x_test, y_test, num):
         subframe = df[df['Sprungtyp'] == jump]
         x = x.append(subframe.sample(counts[jump], random_state=1), ignore_index=True)
 
-    x = x.sample(frac=1)        # shuffle
+    x = x.sample(frac=1)  # shuffle
     y = x['Sprungtyp']
     y = y.reset_index(drop=True)
     x = x.drop(['Sprungtyp'], axis=1)
@@ -135,6 +137,7 @@ def gbc_classifier(X_train, y_train, X_test, y_test, estimators, depth):
     print(f"Accuracy f1 score: {str(mean_f.round(4))}")
 
     return clf, y_pred
+
 
 def shap_plots(data_train, data_test, pp_list, estimators, depth, aj=None):
     X_train, y_train, X_test, y_test = prepare_data(data_train, data_test, pp_list)
@@ -183,7 +186,7 @@ def shap_plots(data_train, data_test, pp_list, estimators, depth, aj=None):
     shap_x_test, shap_y_test = sample_x_test(X_test, y_test, 3)
     shap_x_train, shap_y_train = sample_x_test(X_train, y_train, 6)
 
-    explainer = shap.KernelExplainer(clf.predict_proba, shap.kmeans(shap_x_train, 3))
+    explainer = shap.KernelExplainer(clf.decision_function, shap_x_train)
     shap_values = explainer.shap_values(shap_x_test)
 
     with open('../plots/GBC/with_preprocessed/' + 'shap_data.pkl', 'wb') as f:  # TODO
@@ -207,6 +210,7 @@ def shap_plots(data_train, data_test, pp_list, estimators, depth, aj=None):
     shap.summary_plot(shap_values[saltoB], shap_x_test, plot_size=(30, 12), title='Salto B')
     saltoC = np.where(shap_y_test.unique() == 'Salto C')[0][0]
     shap.summary_plot(shap_values[saltoC], shap_x_test, plot_size=(30, 12), title='Salto C')
+
 
 def jump_core_detection(data_train, data_test, pp_list, jump_length=0):
     scores = {}
