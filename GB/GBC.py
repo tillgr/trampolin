@@ -144,6 +144,7 @@ def shap_plots(data_train, data_test, pp_list, estimators, depth, aj=None):
     clf, y_pred = gbc_classifier(X_train, y_train, X_test, y_test, estimators, depth)
 
     # confusion matrix
+    """
     if aj is None:
         cmap_cm = process_cmap('summer')
         cmap_cm.insert(0, '#ffffff')
@@ -182,6 +183,7 @@ def shap_plots(data_train, data_test, pp_list, estimators, depth, aj=None):
         plt.tight_layout()
         plt.savefig('../plots/GBC/only_preprocessed/GBC_only_25_ConfusionMatrix_AJ')  # TODO
         plt.show()
+    """
 
     shap_x_test, shap_y_test = sample_x_test(X_test, y_test, 3)
     shap_x_train, shap_y_train = sample_x_test(X_train, y_train, 6)
@@ -189,19 +191,20 @@ def shap_plots(data_train, data_test, pp_list, estimators, depth, aj=None):
     explainer = shap.KernelExplainer(clf.decision_function, shap_x_train)
     shap_values = explainer.shap_values(shap_x_test)
 
-    with open('../plots/GBC/only_preprocessed/' + 'shap_data.pkl', 'wb') as f:  # TODO
+    with open('../plots/GBC/with_preprocessed/' + 'shap_data.pkl', 'wb') as f:  # TODO
         pickle.dump([shap_values, shap_x_train, shap_y_train, shap_x_test, shap_y_test], f)
 
-    bar_plots(shap_values, shap_x_test, shap_y_test, save_data='../plots/GBC/only_preprocessed/',  # TODO
+    """
+    bar_plots(shap_values, shap_x_test, shap_y_test, folder='../plots/GBC/only_preprocessed/',  # TODO
               bar='percentual', size=(50, 30))
 
-    bar_plots(shap_values, shap_x_test, shap_y_test, save_data='../plots/GBC/only_preprocessed/',  # TODO
+    bar_plots(shap_values, shap_x_test, shap_y_test, folder='../plots/GBC/only_preprocessed/',  # TODO
               bar='percentual', size=(50, 30),
               jumps=['Salto A', 'Salto B', 'Salto C', 'Salto rw A', 'Salto rw B', 'Salto rw C', 'Schraubensalto',
                      'Schraubensalto A', 'Schraubensalto C', 'Doppelsalto B', 'Doppelsalto C'],
               name='Saltos')
 
-    bar_plots(shap_values, shap_x_test, shap_y_test, save_data='../plots/GBC/only_preprocessed/',  # TODO
+    bar_plots(shap_values, shap_x_test, shap_y_test, folder='../plots/GBC/only_preprocessed/',  # TODO
               name='only_preprocessed', size=(30, 45))
 
     saltoA = np.where(shap_y_test.unique() == 'Salto A')[0][0]
@@ -210,6 +213,7 @@ def shap_plots(data_train, data_test, pp_list, estimators, depth, aj=None):
     shap.summary_plot(shap_values[saltoB], shap_x_test, plot_size=(30, 12), title='Salto B')
     saltoC = np.where(shap_y_test.unique() == 'Salto C')[0][0]
     shap.summary_plot(shap_values[saltoC], shap_x_test, plot_size=(30, 12), title='Salto C')
+    """
 
 
 def jump_core_detection(data_train, data_test, pp_list, jump_length=0):
@@ -289,7 +293,7 @@ if __name__ == '__main__':
     test_data = pd.read_csv('../Sprungdaten_processed/with_preprocessed/percentage/25/vector_percentage_25_test.csv')
     #test_data = pd.read_csv('../Sprungdaten_processed/with_preprocessed/percentage/25/vector_AJ_percentage_25.csv')
 
-    shap_plots(train_data, test_data, [1, 2, 3, 4, "only"], 200, 7)
+    shap_plots(train_data, test_data, [1, 2, 3, 4], 200, 7)
 
     # params gb
     # if dataType == 'with':
