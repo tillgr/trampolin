@@ -13,7 +13,7 @@ def train_CNN_standard(preprocessed='with_preprocessed'):
     elif preprocessed == 'with_preprocessed':
         data_train = pd.read_csv('Sprungdaten_processed/' + preprocessed + '/percentage/20/percentage_mean_std_20_train.csv')
         data_test = pd.read_csv('Sprungdaten_processed/' + preprocessed + '/percentage/20/percentage_mean_std_20_test.csv')
-        params = [10, 3, 3, 2, 2, 'tanh', 'categorical_crossentropy', 'Nadam', 40]
+        params = [10, 3, 3, 2, 2, 'tanh', 'kl_divergence', 'Nadam', 40]
 
     else:
         raise AttributeError('preprocessed not correctly defined!')
