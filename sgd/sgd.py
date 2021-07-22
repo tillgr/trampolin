@@ -57,29 +57,29 @@ def prepare_data(data_train, data_test, pp_list):
     x_test = x_test.drop(['SprungID'], axis=1)
 
     if 1 in pp_list and 2 in pp_list and 3 in pp_list and 4 in pp_list and "only" in pp_list:
-        data_train = data_train.drop([col for col in data_train.columns if 'DJump' not in col], axis=1)
-        data_test = data_test.drop([col for col in data_test.columns if 'DJump' not in col], axis=1)
+        x_train = x_train.drop([col for col in x_train.columns if 'DJump' not in col], axis=1)
+        x_test = x_test.drop([col for col in x_test.columns if 'DJump' not in col], axis=1)
 
     y_train = data_train['Sprungtyp']
     y_test = data_test['Sprungtyp']
 
-    print(x_train)
     return x_train, y_train, x_test, y_test
 
 
-def all_parameters_classifier(data_train, data_test, pp_list, accuracy):
+def all_parameters_classifier(data_train, data_test, pp_list, accuracy=0):
     """
 
     Classifier with all possible parameters and with accuracy
 
     Parameters
     ----------
-    data_train: pandas.Dataframe
-        train data set
-    data_test: pandas.Dataframe
-        test data set
-    pp_list: list
-        list of DJumps, that should be included in train and test data sets
+    data_train : pandas.Dataframe
+        dataframe read from .csv file
+    data_test : pandas.Dataframe
+        dataframe read from .csv file
+    pp_list : list
+        a list with values from 1 to 4: [1, 2, 3, 4]. Corresponds to the blocks of preprocessed data. 1: first 9 columns,
+        2, 3, 4: 12 columns each
     accuracy: float
         accuracy for the Classifier
 
@@ -106,7 +106,7 @@ def all_parameters_classifier(data_train, data_test, pp_list, accuracy):
                     print(f"Accuracy f1 score: {str(mean_f.round(4))}")
 
 
-def all_datasets_with_all_parameters_classifier(pp_list, accuracy):
+def all_datasets_with_all_parameters_classifier(pp_list, accuracy=0):
     """
 
     Classifier with all possible parameters and all data sets
@@ -131,6 +131,14 @@ def all_datasets_with_all_parameters_classifier(pp_list, accuracy):
                 i) + "/vector_percentage_" + calc_type + str(i) + "_test.csv")
 
             all_parameters_classifier(data_train, data_test, pp_list, accuracy)
+
+    for type in ['averaged_data/averaged', 'avg_std_data/avg_std', 'std_data/std']:
+        print(f"> Type: {type}")
+        data_train = pd.read_csv("../Sprungdaten_processed/with_preprocessed/" + str(
+            type) + "_data_train.csv")
+        data_test = pd.read_csv("../Sprungdaten_processed/with_preprocessed/" + str(
+            type) + "_data_test.csv")
+        all_parameters_classifier(data_train, data_test, pp_list, accuracy)
 
 
 def get_best_data_set_with_preprocessed():
@@ -182,18 +190,20 @@ def get_targets(data):
 
 def sample_x_test(x_test, y_test, num):
     """
-        Samples data by retrieving only a certain number of each jump.
 
-        Parameters
-        ----------
-        :param x_test : pandas.Dataframe
-            can be x_test and x_train
-        :param y_test : pandas.Dataframe
-            can be y_test and y_train
-        :param num : int
-            number of each jump to retrieve
+    Samples data by retrieving only a certain number of each jump.
 
-        :return: sampled data Dataframe
+    Parameters
+    ----------
+    :param x_test : pandas.Dataframe
+        can be x_test and x_train
+    :param y_test : pandas.Dataframe
+        can be y_test and y_train
+    :param num : int
+        number of each jump to retrieve
+
+    :return: sampled data Dataframe
+
     """
     df = x_test.copy()
     df['Sprungtyp'] = y_test
@@ -215,22 +225,32 @@ def sample_x_test(x_test, y_test, num):
     return x, y
 
 
-def sgd_classifier(X_train, y_train, X_test, y_test, loss: str, penalty: str, max_iter: int):
+def sgd_classifier(X_train, y_train, X_test, y_test, loss, penalty, max_iter):
     """
+    SGD Classifier with specific parameters
 
     Parameters
     ----------
-    X_train
-    y_train
-    X_test
-    y_test
-    loss
-    penalty
-    max_iter
+    X_train: pandas.Dataframe
+        features of the train data set,
+    y_train: pandas.Dataframe
+        targets of the train data set,
+    X_test: pandas.Dataframe
+        features of the test data set,
+    y_test: pandas.Dataframe
+        targets of the test data set
+    loss: str
+        classifier parameter
+    penalty: str
+        classifier parameter
+    max_iter: int
+        classifier parameter
 
-    :return:
+    :return: clf - sgd Classifier
+             y_pred - predicted class labels for the provided data
 
     """
+
     clf = SGDClassifier(loss=loss, penalty=penalty, alpha=0.0001,
                         l1_ratio=0.15, fit_intercept=True, max_iter=max_iter,
                         tol=0.001, shuffle=True, verbose=0, epsilon=0.1,
@@ -250,15 +270,36 @@ def sgd_classifier(X_train, y_train, X_test, y_test, loss: str, penalty: str, ma
 def shap_plots(data_train, data_test, pp_list, loss, penalty, max_iter, aj=None):
     """
 
+    creates plots:
+        1. Confusion Matrix
+        2. Percentual Plot
+        3. Percentual Saltos Plot
+        4. Summary Plot
+        5. Salto A,B,C
+
+    creates data files:
+        1. Confusion Matrix (csv)
+        2. Percentual Plot (txt)
+        3. Saltos Plot (txt)
+        4. Common Shap Data (pkl)
+
     Parameters
     ----------
-    data_train
-    data_test
-    pp_list
-    loss
-    penalty
-    max_iter
-    aj
+    data_train : pandas.Dataframe
+        dataframe read from .csv file
+    data_test : pandas.Dataframe
+        dataframe read from .csv file
+    pp_list : list
+        a list with values from 1 to 4: [1, 2, 3, 4]. Corresponds to the blocks of preprocessed data. 1: first 9 columns,
+        2, 3, 4: 12 columns each
+    loss: str
+        classifier parameter
+    penalty: str
+        classifier parameter
+    max_iter: int
+        classifier parameter
+    aj: str
+        Set for AJ-Data, changes appearance of the confusion matrix
 
     :return:
 
@@ -273,7 +314,6 @@ def shap_plots(data_train, data_test, pp_list, loss, penalty, max_iter, aj=None)
         cmap_cm = ListedColormap(cmap_cm)
 
         cm = confusion_matrix(y_test, y_pred, labels=clf.classes_)
-        print(y_test)
         pd.DataFrame(cm, columns=y_test.unique(), index=y_test.unique()).to_csv(
             '../plots/SGD/without_preprocessed/confusion_matrix.csv')
         disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=clf.classes_)
@@ -314,16 +354,16 @@ def shap_plots(data_train, data_test, pp_list, loss, penalty, max_iter, aj=None)
     with open('../plots/SGD/without_preprocessed/' + 'shap_data.pkl', 'wb') as f:
         pickle.dump([shap_values, shap_x_train, shap_y_train, shap_x_test, shap_y_test], f)
 
-    bar_plots(shap_values, shap_x_test, shap_y_test, save_data='../plots/SGD/without_preprocessed/',
+    bar_plots(shap_values, shap_x_test, shap_y_test, folder='../plots/SGD/without_preprocessed/',
               bar='percentual', size=(50, 30))
 
-    bar_plots(shap_values, shap_x_test, shap_y_test, save_data='../plots/SGD/without_preprocessed/',
+    bar_plots(shap_values, shap_x_test, shap_y_test, folder='../plots/SGD/without_preprocessed/',
               bar='percentual', size=(50, 30),
               jumps=['Salto A', 'Salto B', 'Salto C', 'Salto rw A', 'Salto rw B', 'Salto rw C', 'Schraubensalto',
                      'Schraubensalto A', 'Schraubensalto C', 'Doppelsalto B', 'Doppelsalto C'],
               name='Saltos')
 
-    bar_plots(shap_values, shap_x_test, shap_y_test, save_data='../plots/SGD/with_preprocessed/',
+    bar_plots(shap_values, shap_x_test, shap_y_test, folder='../plots/SGD/with_preprocessed/',
               size=(30, 45), name='summary_without_preprocessed')
 
     saltoA = np.where(shap_y_test.unique() == 'Salto A')[0][0]
@@ -334,7 +374,7 @@ def shap_plots(data_train, data_test, pp_list, loss, penalty, max_iter, aj=None)
     shap.summary_plot(shap_values[saltoC], shap_x_test, plot_size=(30, 12), title='Salto C')
 
 
-def jump_core_detection(data_train, data_test, pp_list, jump_length=0):
+def jump_core_detection(data_train, data_test, pp_list):
     """
         Trains many different models with differently cut data. We cut from back to front, front to back, and from both sides
 
@@ -347,11 +387,18 @@ def jump_core_detection(data_train, data_test, pp_list, jump_length=0):
             dataframe read from .csv file
         pp_list : list
             a list with values from 1 to 4: [1, 2, 3, 4]. Corresponds to the blocks of preprocessed data. 1: first 9 columns, 2, 3, 4: 12 columns each
-        jump_length : int
 
 
         :return: dictionary with scores of all trained models
         """
+    jump_length = int(len(list(data_test.drop([col for col in data_train.columns if 'DJump' in col], axis=1)
+                               .drop(['SprungID', 'Sprungtyp'], axis=1).columns))
+                      / len(
+        [c for c in list(data_test.drop([col for col in data_train.columns if 'DJump' in col], axis=1)
+                         .drop(['SprungID', 'Sprungtyp'], axis=1).columns) if c.startswith('0_')]))
+
+    print(jump_length)
+
     scores = {}
     percentage = int(100 / jump_length)
     full_list = [l for l in range(0, 100, percentage)]
@@ -430,10 +477,11 @@ def jump_core_detection(data_train, data_test, pp_list, jump_length=0):
 
 if __name__ == '__main__':
     train_data = pd.read_csv(
-        '../Sprungdaten_processed/without_preprocessed/percentage/10/vector_percentage_mean_std_10_train.csv')
+        '../Sprungdaten_processed/with_preprocessed/percentage/10/vector_percentage_mean_std_10_train.csv')
     test_data = pd.read_csv(
-        '../Sprungdaten_processed/without_preprocessed/percentage/10/vector_percentage_mean_std_10_test.csv')
-    # jump_core_detection(train_data, test_data, [1, 2, 3, 4], 10)
+        '../Sprungdaten_processed/with_preprocessed/percentage/10/vector_percentage_mean_std_10_test.csv')
+    #all_datasets_with_all_parameters_classifier([1, 2, 3, 4])
+    #jump_core_detection(train_data, test_data, [1, 2, 3, 4])
     '''clf = SGDClassifier(loss='log', penalty='l1', alpha=0.0001,
                             l1_ratio=0.15, fit_intercept=True, max_iter=10000,
                             tol=0.001, shuffle=True, verbose=0, epsilon=0.1,
@@ -447,5 +495,5 @@ if __name__ == '__main__':
             mean_prec, mean_rec, mean_f, mean_youden = metrics(y_test, y_pred)
             print(f"Accuracy youden score: {str(mean_youden.round(4))}")
             print(f"Accuracy f1 score: {str(mean_f.round(4))}")'''
-    shap_plots(train_data, test_data, [1, 2, 3, 4], 'perceptron', 'l1', 10000)
-    #prepare_data(train_data, test_data, [1, 2, 3, 4, "only"])
+    #shap_plots(train_data, test_data, [1, 2, 3, 4], 'perceptron', 'l1', 10000)
+    prepare_data(train_data, test_data, [1, 2, 3, 4, "only"])
