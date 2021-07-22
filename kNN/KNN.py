@@ -36,7 +36,7 @@ def prepare_data(data_train, data_test, pp_list):
                  y_train: - targets of the train data set,
                  X_test: - features of the test data set,
                  y_test: - targets of the test data set
-        """
+    """
 
     first_djumps = set([col for col in data_train.columns if 'DJump' in col]) - set(
         [col for col in data_train.columns if 'DJump_SIG_I_S' in col]) \
@@ -62,8 +62,8 @@ def prepare_data(data_train, data_test, pp_list):
 
     # for only preprocessed
     if 1 in pp_list and 2 in pp_list and 3 in pp_list and 4 in pp_list and "only" in pp_list:
-        data_train = data_train.drop([col for col in data_train.columns if 'DJump' not in col], axis=1)
-        data_test = data_test.drop([col for col in data_test.columns if 'DJump' not in col], axis=1)
+        X_train = X_train.drop([col for col in X_train.columns if 'DJump' not in col], axis=1)
+        X_test = X_test.drop([col for col in X_test.columns if 'DJump' not in col], axis=1)
 
     y_train = data_train['Sprungtyp']
     y_test = data_test['Sprungtyp']
@@ -74,7 +74,7 @@ def prepare_data(data_train, data_test, pp_list):
 def test_all_parameters(data_train, data_test, pp_list, accuracy):
     """
 
-        Classifier with all possible parameters and with accuracy
+        Test Classifier with all possible parameters, filter by accuracy
 
         Parameters
         ----------
@@ -89,7 +89,7 @@ def test_all_parameters(data_train, data_test, pp_list, accuracy):
 
         :return:
 
-        """
+    """
     X_train, y_train, X_test, y_test = prepare_data(data_train, data_test, pp_list)
     for weights in ['uniform', 'distance']:
         for dist_metrics in ['manhattan', 'chebyshev', 'minkowski']:
@@ -118,18 +118,19 @@ def test_all_parameters(data_train, data_test, pp_list, accuracy):
 def test_all_datasets_with_all_parameters(pp_list, accuracy):
     """
 
-        Classifier with all possible parameters and all data sets
+    Classifier with all possible parameters and all data sets
 
-        Parameters
-        ----------
-        pp_list: list
-            list of DJumps, that should be included in train and test data sets
-        accuracy: float
-            accuracy for the Classifier
+    Parameters
+    ----------
+    pp_list: list
+        list of DJumps, that should be included in train and test data sets
+    accuracy: float
+        accuracy for the Classifier
 
-        :return:
+    :return:
 
-        """
+    """
+
     for i in [1, 2, 5, 10, 20, 25]:
         for calc_type in ['', 'mean_', 'mean_std_']:
             print(f"Folder: {i}")
@@ -143,7 +144,13 @@ def test_all_datasets_with_all_parameters(pp_list, accuracy):
 
 
 def get_best_data_set_with_preprocessed():
+    """
+        train and test data sets with best accuracy and without preprocessed data
 
+        :return: train_data - train data set without preprocessed data and best accuracy
+                 test_data - test data set without preprocessed data and best accuracy
+
+    """
     train_data = pd.read_csv(
         '../Sprungdaten_processed/with_preprocessed/percentage/10/vector_percentage_mean_10_train.csv')
     test_data = pd.read_csv(
@@ -160,7 +167,7 @@ def get_best_data_set_without_preprocessed():
         :return: train_data - train data set without preprocessed data and best accuracy
                  test_data - test data set without preprocessed data and best accuracy
 
-        """
+    """
     train_data = pd.read_csv(
         '../Sprungdaten_processed/without_preprocessed/percentage/20/vector_percentage_mean_std_20_train.csv')
     test_data = pd.read_csv(
@@ -182,7 +189,8 @@ def sample_x_test(x_test, y_test, num):
                 number of each jump to retrieve
 
             :return: sampled data Dataframe
-        """
+    """
+
     df = x_test.copy()
     df['Sprungtyp'] = y_test
     counts = df['Sprungtyp'].value_counts()
@@ -203,7 +211,35 @@ def sample_x_test(x_test, y_test, num):
     return x, y
 
 
-def knn_classifier(X_train, y_train, X_test, y_test, n_neighbors, weights: str, dist_metric: str):
+def knn_classifier(X_train, y_train, X_test, y_test, n_neighbors, weights, dist_metric):
+    """
+    1. Creates classifier
+    2. Fits classifier from the training data
+    3. Predicts class labels
+
+    Parameters
+    ----------
+    X_train: pandas.Dataframe
+        features of the train data set
+    y_train: pandas.Dataframe
+        targets of the train data set
+    X_test: pandas.Dataframe
+        features of the test data set
+    y_test: pandas.Dataframe
+        targets of the test data set
+
+    n_neighbors: integer
+        Number of neighbors to use for the classifier (default = 5)
+    weights: string
+        weight function used in prediction ("uniform", "distance")
+    dist_metric: string
+        he distance metric to use for the tree (default = "minkowski",
+        other: "euclidean", "manhattan", "chebyshev", "wminkowski", "seuclidean", "mahalanobis")
+
+    :return:    clf - classifier object
+                y_pred - prediction of class labels by the classifier
+
+    """
     clf = neighbors.KNeighborsClassifier(n_neighbors=n_neighbors, weights=weights, metric=dist_metric, p=5)
 
     # Train the model using the training sets
@@ -221,7 +257,46 @@ def knn_classifier(X_train, y_train, X_test, y_test, n_neighbors, weights: str, 
     return clf, y_pred
 
 
-def shap_plots(data_train, data_test, pp_list, n_neighbors, weights: str, dist_metric: str, aj=None):
+def shap_plots(data_train, data_test, pp_list, n_neighbors, weights, dist_metric, aj=None):
+    """
+
+    creates plots:
+        1. Confusion Matrix
+        2. Percentual Plot
+        3. Saltos Plot
+        4. Summary Plot
+        5. Salto A,B,C
+
+    creates data files:
+        1. Confusion Matrix (csv)
+        2. Percentual Plot (txt)
+        3. Saltos Plot (txt)
+        4. Commom Shap Data (pkl)
+
+    Parameters
+    ----------
+    data_train: pandas.Dataframe
+        train data set
+    data_test: pandas.Dataframe
+        test data set
+    pp_list: list
+        list of DJumps, that should be included in train and test data sets
+
+    n_neighbors: integer
+        Number of neighbors to use for the classifier (default = 5)
+    weights: string
+        Weight function used in prediction ("uniform", "distance")
+    dist_metric: string
+        The distance metric to use for the tree (default = "minkowski",
+        other: "euclidean", "manhattan", "chebyshev", "wminkowski", "seuclidean", "mahalanobis")
+
+    aj: string
+        Set for AJ-Data, changes appearance of the confusion matrix
+
+    :return:
+
+    """
+
     X_train, y_train, X_test, y_test = prepare_data(data_train, data_test, pp_list)
     clf, y_pred = knn_classifier(X_train, y_train, X_test, y_test, n_neighbors, weights, dist_metric)
 
@@ -274,16 +349,16 @@ def shap_plots(data_train, data_test, pp_list, n_neighbors, weights: str, dist_m
     with open('../plots/KNN/with_preprocessed/' + 'shap_data.pkl', 'wb') as f:  # TODO
         pickle.dump([shap_values, shap_x_train, shap_y_train, shap_x_test, shap_y_test], f)
 
-    bar_plots(shap_values, shap_x_test, shap_y_test, save_data='../plots/KNN/with_preprocessed/',  # TODO
+    bar_plots(shap_values, shap_x_test, shap_y_test, folder='../plots/KNN/with_preprocessed/',  # TODO
               bar='percentual', size=(50, 30))
 
-    bar_plots(shap_values, shap_x_test, shap_y_test, save_data='../plots/KNN/with_preprocessed/',  # TODO
+    bar_plots(shap_values, shap_x_test, shap_y_test, folder='../plots/KNN/with_preprocessed/',  # TODO
               bar='percentual', size=(50, 30),
               jumps=['Salto A', 'Salto B', 'Salto C', 'Salto rw A', 'Salto rw B', 'Salto rw C', 'Schraubensalto',
                      'Schraubensalto A', 'Schraubensalto C', 'Doppelsalto B', 'Doppelsalto C'],
               name='Saltos')
 
-    bar_plots(shap_values, shap_x_test, shap_y_test, save_data='../plots/KNN/with_preprocessed/',  # TODO
+    bar_plots(shap_values, shap_x_test, shap_y_test, folder='../plots/KNN/with_preprocessed/',  # TODO
               name='with_preprocessed', size=(30, 45))
 
     saltoA = np.where(shap_y_test.unique() == 'Salto A')[0][0]
@@ -295,6 +370,24 @@ def shap_plots(data_train, data_test, pp_list, n_neighbors, weights: str, dist_m
 
 
 def jump_core_detection(data_train, data_test, pp_list, jump_length=0):
+    """
+
+    creates plots with ranking for different core sizes
+
+    Parameters
+    ----------
+    data_train: pandas.Dataframe
+        train data set
+    data_test: pandas.Dataframe
+        test data set
+    pp_list: list
+        list of DJumps, that should be included in train and test data sets
+    jump_length: integer
+        100/<percentage> = jump_length (e.g. 100%/25% = 4)
+
+    :return:
+
+    """
     scores = {}
     percentage = int(100 / jump_length)
     full_list = [l for l in range(0, 100, percentage)]
