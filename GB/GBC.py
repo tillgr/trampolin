@@ -53,21 +53,16 @@ def prepare_data(data_train, data_test, pp_list):
     if 4 not in pp_list:
         data_train = data_train.drop([col for col in data_train.columns if 'DJump_I_ABS_S' in col], axis=1)
         data_test = data_test.drop([col for col in data_test.columns if 'DJump_I_ABS_S' in col], axis=1)
-    # for only preprocessed
-    if 1 in pp_list and 2 in pp_list and 3 in pp_list and 4 in pp_list and "only" in pp_list:
-        no_djumps_data_train = data_train.drop([col for col in data_train.columns if 'DJump' in col], axis=1)
-        no_djumps_data_train = no_djumps_data_train.drop('Sprungtyp', axis=1)
-        no_djumps_data_train = no_djumps_data_train.drop(['SprungID'], axis=1)
-        data_train = data_train.drop(no_djumps_data_train, axis=1)
-        no_djumps_data_test = data_test.drop([col for col in data_test.columns if 'DJump' in col], axis=1)
-        no_djumps_data_test = no_djumps_data_test.drop('Sprungtyp', axis=1)
-        no_djumps_data_test = no_djumps_data_test.drop(['SprungID'], axis=1)
-        data_test = data_test.drop(no_djumps_data_test, axis=1)
 
     X_train = data_train.drop('Sprungtyp', axis=1)
     X_train = X_train.drop(['SprungID'], axis=1)
     X_test = data_test.drop('Sprungtyp', axis=1)
     X_test = X_test.drop(['SprungID'], axis=1)
+
+    # for only preprocessed
+    if 1 in pp_list and 2 in pp_list and 3 in pp_list and 4 in pp_list and "only" in pp_list:
+        X_train = X_train.drop([col for col in X_train.columns if 'DJump' not in col], axis=1)
+        X_test = X_test.drop([col for col in X_test.columns if 'DJump' not in col], axis=1)
 
     y_train = data_train['Sprungtyp']
     y_test = data_test['Sprungtyp']
